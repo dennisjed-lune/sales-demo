@@ -93,15 +93,14 @@
           { name: 'Costco', total: 420.40, count: 3 }, { name: "Trader Joe's", total: 150.10, count: 3 } ],
     10: [ { name: 'Starbucks', total: 392.00, count: 14 }, { name: 'Uber Eats', total: 742.30, count: 12 },
           { name: 'Deliveroo', total: 388.20, count: 7 }, { name: 'Costa Coffee', total: 190.50, count: 6 },
-          { name: 'Shake Shack', total: 246.50, count: 4 }, { name: 'Five Guys', total: 164.00, count: 3 },
-          { name: 'McDonald\'s', total: 120.20, count: 4 }, { name: 'KFC', total: 132.00, count: 3 },
-          { name: 'Domino\'s', total: 88.30, count: 3 }, { name: 'Subway', total: 140.60, count: 3 },
-          { name: 'Burger King', total: 96.40, count: 2 } ],
+          { name: 'Five Guys', total: 164.00, count: 3 }, { name: 'McDonald\'s', total: 120.20, count: 4 },
+          { name: 'Domino\'s', total: 88.30, count: 3 }, { name: 'Subway', total: 140.60, count: 3 } ],
     11: [ { name: 'Amazon', total: 984.20, count: 6 }, { name: 'Apple', total: 749.00, count: 1 },
-          { name: 'IKEA', total: 388.00, count: 2 }, { name: 'Zara', total: 224.90, count: 3 },
-          { name: 'H&M', total: 156.30, count: 3 }, { name: 'Nike', total: 318.40, count: 2 },
-          { name: 'Adidas', total: 201.30, count: 3 }, { name: 'Sephora', total: 246.90, count: 2 },
-          { name: 'Uniqlo', total: 174.50, count: 2 }, { name: 'Best Buy', total: 142.00, count: 1 } ],
+          { name: 'Louis Vuitton', total: 620.00, count: 1 }, { name: 'IKEA', total: 388.00, count: 2 },
+          { name: 'Zara', total: 224.90, count: 3 }, { name: 'H&M', total: 156.30, count: 3 },
+          { name: 'Nike', total: 318.40, count: 2 }, { name: 'Adidas', total: 201.30, count: 3 },
+          { name: 'Sephora', total: 246.90, count: 2 }, { name: 'Uniqlo', total: 174.50, count: 2 },
+          { name: 'Best Buy', total: 142.00, count: 1 } ],
     14: [ { name: 'Uber', total: 486.90, count: 20 }, { name: 'Shell', total: 420.00, count: 6 },
           { name: 'Lyft', total: 186.50, count: 10 }, { name: 'Mercedes-Benz', total: 320.00, count: 2 },
           { name: 'BP', total: 152.30, count: 3 }, { name: 'Bolt', total: 142.60, count: 7 },
@@ -109,7 +108,7 @@
     9:  [ { name: 'Vodafone', total: 525.00, count: 1 }, { name: 'AT&T', total: 389.00, count: 1 },
           { name: 'Verizon', total: 240.00, count: 1 }, { name: 'T-Mobile', total: 180.00, count: 1 },
           { name: 'Xfinity', total: 200.00, count: 1 } ],
-    15: [ { name: 'British Airways', total: 2480.00, count: 1 }, { name: 'Marriott', total: 1280.00, count: 1 },
+    15: [ { name: 'Emirates', total: 1980.00, count: 1 }, { name: 'British Airways', total: 2480.00, count: 1 }, { name: 'Marriott', total: 1280.00, count: 1 },
           { name: 'Hilton', total: 980.00, count: 1 }, { name: 'Booking.com', total: 864.50, count: 1 },
           { name: 'Airbnb', total: 720.00, count: 1 }, { name: 'Expedia', total: 642.00, count: 1 },
           { name: 'Agoda', total: 512.30, count: 1 }, { name: 'Lufthansa', total: 430.00, count: 1 },
@@ -121,8 +120,9 @@
     4:  [ { name: 'PlayStation', total: 229.00, count: 2 }, { name: 'Xbox', total: 132.00, count: 2 },
           { name: 'AMC Theatres', total: 184.00, count: 3 }, { name: 'Steam', total: 88.00, count: 2 },
           { name: 'Disney+', total: 99.00, count: 1 }, { name: 'HBO Max', total: 96.00, count: 1 },
-          { name: 'Netflix', total: 56.99, count: 1 }, { name: 'Prime Video', total: 24.00, count: 1 },
-          { name: 'YouTube Premium', total: 21.00, count: 1 }, { name: 'Spotify', total: 19.99, count: 1 } ],
+          { name: 'Google Play Store', total: 64.00, count: 3 }, { name: 'Netflix', total: 56.99, count: 1 },
+          { name: 'Prime Video', total: 24.00, count: 1 }, { name: 'YouTube Premium', total: 21.00, count: 1 },
+          { name: 'Spotify', total: 19.99, count: 1 } ],
     1:  [ { name: 'PayPal', total: 312.40, count: 3 }, { name: 'Klarna', total: 188.00, count: 2 },
           { name: 'Wise', total: 200.00, count: 1 }, { name: 'Revolut', total: 140.00, count: 1 },
           { name: 'Afterpay', total: 96.00, count: 2 } ],
@@ -1274,10 +1274,10 @@ const MERCHANT_DOMAIN = {
   'Waitrose': 'waitrose.com', 'Costco': 'costco.com', "Trader Joe's": 'traderjoes.com',
   // Dining
   'Starbucks': 'starbucks.com', 'Uber Eats': 'ubereats.com', 'Deliveroo': 'deliveroo.com', 'Costa Coffee': 'costacoffee.com',
-  'Shake Shack': 'shakeshack.com', 'Five Guys': 'fiveguys.com', "McDonald's": 'mcdonalds.com',
-  'KFC': 'kfc.com', "Domino's": 'dominos.com', 'Subway': 'subway.com', 'Burger King': 'bk.com',
+  'Five Guys': 'fiveguys.com', "McDonald's": 'mcdonalds.com',
+  "Domino's": 'dominos.com', 'Subway': 'subway.com',
   // Shopping
-  'Amazon': 'amazon.com', 'Apple': 'apple.com', 'IKEA': 'ikea.com', 'Zara': 'zara.com', 'H&M': 'hm.com',
+  'Amazon': 'amazon.com', 'Apple': 'apple.com', 'Louis Vuitton': 'louisvuitton.com', 'IKEA': 'ikea.com', 'Zara': 'zara.com', 'H&M': 'hm.com',
   'Nike': 'nike.com', 'Adidas': 'adidas.com', 'Sephora': 'sephora.com', 'Uniqlo': 'uniqlo.com', 'Best Buy': 'bestbuy.com',
   // Transportation
   'Uber': 'uber.com', 'Shell': 'shell.com', 'Lyft': 'lyft.com', 'Mercedes-Benz': 'mercedes-benz.com',
@@ -1285,7 +1285,7 @@ const MERCHANT_DOMAIN = {
   // Household — telecom / utilities
   'Vodafone': 'vodafone.com', 'AT&T': 'att.com', 'Verizon': 'verizon.com', 'T-Mobile': 't-mobile.com', 'Xfinity': 'xfinity.com',
   // Travel
-  'British Airways': 'britishairways.com', 'Marriott': 'marriott.com', 'Hilton': 'hilton.com', 'Booking.com': 'booking.com',
+  'Emirates': 'emirates.com', 'British Airways': 'britishairways.com', 'Marriott': 'marriott.com', 'Hilton': 'hilton.com', 'Booking.com': 'booking.com',
   'Airbnb': 'airbnb.com', 'Expedia': 'expedia.com', 'Agoda': 'agoda.com', 'Lufthansa': 'lufthansa.com', 'Delta': 'delta.com', 'Trip.com': 'trip.com',
   // Wellness
   'Fitness First': 'fitnessfirst.com', 'CVS Pharmacy': 'cvs.com', 'Boots': 'boots.com', "Gold's Gym": 'goldsgym.com',
@@ -1293,7 +1293,7 @@ const MERCHANT_DOMAIN = {
   // Entertainment
   'PlayStation': 'playstation.com', 'Xbox': 'xbox.com', 'AMC Theatres': 'amctheatres.com', 'Prime Video': 'primevideo.com',
   'Steam': 'steampowered.com', 'Disney+': 'disneyplus.com', 'HBO Max': 'max.com', 'Netflix': 'netflix.com',
-  'YouTube Premium': 'youtube.com', 'Spotify': 'spotify.com',
+  'Google Play Store': 'play.google.com', 'YouTube Premium': 'youtube.com', 'Spotify': 'spotify.com',
   // Financial services
   'PayPal': 'paypal.com', 'Klarna': 'klarna.com', 'Wise': 'wise.com', 'Revolut': 'revolut.com', 'Afterpay': 'afterpay.com',
   // Loans
@@ -2479,13 +2479,12 @@ function LuneToggle({ T, enriched, onChange }) {
 // (fast food + coffee → apparel → e-commerce/tech → subscriptions → transport →
 // travel → wellness → financial), groceries last.
 const ENRICH_ORDER = [
-  "McDonald's", 'Starbucks', 'Burger King', 'KFC', 'Subway', 'Shake Shack',
-  'Nike', 'Adidas', 'Zara', 'H&M',
-  'Amazon', 'Apple', 'IKEA',
-  'Netflix', 'Spotify', 'Disney+', 'Prime Video', 'PlayStation',
-  'Uber', 'Mercedes-Benz',
-  'British Airways', 'Airbnb',
-  'Carrefour', 'Whole Foods Market',
+  "McDonald's", 'Starbucks', 'Nike', 'Zara', 'Amazon', 'IKEA',
+  'Netflix', 'Disney+', 'Prime Video', 'PlayStation',
+  'Subway', 'Uber', 'Emirates', 'Airbnb', 'Whole Foods Market', 'Spotify', 'H&M',
+  'Louis Vuitton', 'Google Play Store',
+  // remaining curated globals to round out the feed
+  'Apple', 'Adidas', 'Mercedes-Benz', 'British Airways', 'Carrefour',
 ];
 
 // Small 4-point sparkle to hint "tap to enrich".
@@ -2543,7 +2542,10 @@ function RawTransactions({ T, period, enriched, onToggle }) {
         }}><LuneMark size={15} disc="#fff" crescent={T.accent} />Open in app →</button>
       </div>
       <div style={{ fontSize: 25, fontWeight: 700, letterSpacing: '-0.025em', color: T.ink }}>Your transactions</div>
-      <div style={{ fontSize: 13, color: T.muted, marginTop: 5, lineHeight: 1.5 }}>The raw feed from your core — cryptic descriptors, no merchant, logo or category. Tap any row to enrich it live.</div>
+      <div style={{ fontSize: 13, color: T.muted, marginTop: 6, lineHeight: 1.55 }}>Below is the raw feed of transactions the bank receives — cryptic descriptions, no clear merchant name, logo or category.</div>
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, marginTop: 11, padding: '8px 13px', borderRadius: 10, background: hexA(T.accent, T.dark ? 0.16 : 0.10), color: T.ink, fontSize: 14, fontWeight: 720, letterSpacing: '-0.01em' }}>
+        <Sparkle size={14} color={T.accent} />Tap any row to enrich
+      </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 16 }}>
         <div style={{ fontSize: 12.5, color: T.muted, fontWeight: 560, fontVariantNumeric: 'tabular-nums' }}>{nDone} of {txns.length} enriched</div>
