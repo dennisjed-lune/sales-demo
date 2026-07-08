@@ -47,7 +47,7 @@
 <!-- Brand logos: paste a free logo.dev publishable token below (get one at
      https://logo.dev) for crisp real logos on every brand. Leave blank to use
      Google favicons (good for global brands, weaker for some regional ones). -->
-<script>window.LOGODEV_TOKEN = "";</script>
+<script>window.LOGODEV_TOKEN = "pk_PCfI5A2ISc2tZmQNIql7Ww";</script>
 
 <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
@@ -84,7 +84,8 @@
   // active card user's month (they scale up across 3/6/12-month windows).
   const BRANDS = {
     6:  [ { name: 'Carrefour', total: 1284.40, count: 9 }, { name: 'Spinneys', total: 962.10, count: 6 },
-          { name: 'Waitrose', total: 340.20, count: 4 }, { name: 'Union Coop', total: 420.40, count: 5 },
+          { name: 'Lulu Hypermarket', total: 548.75, count: 5 }, { name: 'Waitrose', total: 340.20, count: 4 },
+          { name: 'Union Coop', total: 420.40, count: 5 }, { name: 'Choithrams', total: 142.60, count: 3 },
           { name: 'Grandiose', total: 180.00, count: 3 }, { name: 'Al Maya', total: 150.10, count: 3 } ],
     10: [ { name: 'Starbucks', total: 392.00, count: 14 }, { name: 'Talabat', total: 742.30, count: 12 },
           { name: 'Deliveroo', total: 388.20, count: 7 }, { name: 'Costa Coffee', total: 190.50, count: 6 },
@@ -102,20 +103,22 @@
           { name: 'Jumbo Electronics', total: 142.00, count: 1 }, { name: 'Virgin Megastore', total: 98.40, count: 2 } ],
     14: [ { name: 'Careem', total: 486.90, count: 20 }, { name: 'Salik', total: 240.00, count: 22 },
           { name: 'RTA Nol', total: 186.50, count: 10 }, { name: 'ADNOC', total: 420.00, count: 6 },
-          { name: 'Dubai Taxi', total: 142.60, count: 7 }, { name: 'Uber', total: 132.30, count: 5 },
+          { name: 'ENOC', total: 152.30, count: 3 }, { name: 'Dubai Taxi', total: 142.60, count: 7 }, { name: 'Uber', total: 132.30, count: 5 },
           { name: 'Emarat', total: 150.00, count: 4 }, { name: 'Yango', total: 88.20, count: 5 },
           { name: 'Parkin', total: 64.00, count: 10 } ],
-    9:  [ { name: 'Etisalat', total: 525.00, count: 1 }, { name: 'du', total: 389.00, count: 1 },
-          { name: 'Emaar Community', total: 240.00, count: 1 }, { name: 'Tadweer', total: 95.00, count: 1 },
+    9:  [ { name: 'DEWA', total: 742.85, count: 1 }, { name: 'Etisalat', total: 525.00, count: 1 },
+          { name: 'du', total: 389.00, count: 1 }, { name: 'Emaar Community', total: 240.00, count: 1 },
+          { name: 'SEWA', total: 180.00, count: 1 }, { name: 'Tadweer', total: 95.00, count: 1 },
           { name: 'Virgin Mobile', total: 60.00, count: 1 } ],
     15: [ { name: 'Emirates', total: 2480.00, count: 1 }, { name: 'Etihad', total: 1280.00, count: 1 },
           { name: 'Jumeirah', total: 980.00, count: 1 }, { name: 'Booking.com', total: 864.50, count: 1 },
           { name: 'Rotana Hotels', total: 720.00, count: 1 }, { name: 'flydubai', total: 642.00, count: 1 },
-          { name: 'Agoda', total: 512.30, count: 1 }, { name: 'Air Arabia', total: 388.00, count: 1 },
-          { name: 'Wego', total: 156.00, count: 1 } ],
-    7:  [ { name: 'Warehouse Gym', total: 220.00, count: 2 }, { name: 'Life Pharmacy', total: 142.30, count: 3 },
-          { name: 'Boots', total: 120.00, count: 2 }, { name: 'Dr. Sulaiman Al Habib', total: 320.00, count: 1 },
-          { name: 'GNC', total: 90.00, count: 1 } ],
+          { name: 'Agoda', total: 512.30, count: 1 }, { name: 'Almosafer', total: 430.00, count: 1 },
+          { name: 'Air Arabia', total: 388.00, count: 1 }, { name: 'Wego', total: 156.00, count: 1 } ],
+    7:  [ { name: 'Fitness First', total: 350.00, count: 2 }, { name: 'Mediclinic', total: 410.00, count: 1 },
+          { name: 'Aster Pharmacy', total: 214.60, count: 4 }, { name: 'Warehouse Gym', total: 220.00, count: 2 },
+          { name: 'Life Pharmacy', total: 142.30, count: 3 }, { name: 'Boots', total: 120.00, count: 2 },
+          { name: 'Dr. Sulaiman Al Habib', total: 320.00, count: 1 }, { name: 'GNC', total: 90.00, count: 1 } ],
     4:  [ { name: 'PlayStation', total: 229.00, count: 2 }, { name: 'VOX Cinemas', total: 184.00, count: 3 },
           { name: 'Reel Cinemas', total: 132.00, count: 2 }, { name: 'IMG Worlds', total: 240.00, count: 1 },
           { name: 'Roxy Cinemas', total: 96.00, count: 1 }, { name: 'Steam', total: 88.00, count: 2 },
