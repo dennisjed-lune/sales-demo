@@ -2489,7 +2489,16 @@ function Sparkle({ size = 12, color = 'currentColor' }) {
 // the cryptic descriptor into a clean merchant, logo and category in real time.
 function RawTransactions({ T, period, enriched, onToggle }) {
   const scoped = D().forPeriod(period);
-  const txns = scoped.TRANSACTIONS.slice(0, 22);
+  // One transaction per brand — no duplicate merchants on the enrich feed.
+  const txns = React.useMemo(() => {
+    const seen = new Set(); const out = [];
+    for (const t of scoped.TRANSACTIONS) {
+      if (seen.has(t.merchant)) continue;
+      seen.add(t.merchant); out.push(t);
+      if (out.length >= 24) break;
+    }
+    return out;
+  }, [period]);
   const mono = "'SF Mono', ui-monospace, 'Roboto Mono', Menlo, monospace";
   const [done, setDone] = React.useState({});
   const [delays, setDelays] = React.useState({});
