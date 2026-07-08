@@ -88,62 +88,55 @@
   // Curated to brands with clean, recognisable logos; counts reflect a normal
   // active card user's month (they scale up across 3/6/12-month windows).
   const BRANDS = {
-    6:  [ { name: 'Carrefour', total: 1284.40, count: 9 }, { name: 'Spinneys', total: 962.10, count: 6 },
-          { name: 'Lulu Hypermarket', total: 548.75, count: 5 }, { name: 'Waitrose', total: 340.20, count: 4 },
-          { name: 'Union Coop', total: 420.40, count: 5 }, { name: 'Choithrams', total: 142.60, count: 3 },
-          { name: 'Grandiose', total: 180.00, count: 3 }, { name: 'Al Maya', total: 150.10, count: 3 } ],
-    10: [ { name: 'Starbucks', total: 392.00, count: 14 }, { name: 'Talabat', total: 742.30, count: 12 },
+    6:  [ { name: 'Carrefour', total: 1284.40, count: 9 }, { name: 'Tesco', total: 640.10, count: 6 },
+          { name: 'Whole Foods Market', total: 548.75, count: 5 }, { name: 'Waitrose', total: 340.20, count: 4 },
+          { name: 'Costco', total: 420.40, count: 3 }, { name: 'Aldi', total: 142.60, count: 3 },
+          { name: 'Lidl', total: 180.00, count: 3 }, { name: "Trader Joe's", total: 150.10, count: 3 } ],
+    10: [ { name: 'Starbucks', total: 392.00, count: 14 }, { name: 'Uber Eats', total: 742.30, count: 12 },
           { name: 'Deliveroo', total: 388.20, count: 7 }, { name: 'Costa Coffee', total: 190.50, count: 6 },
-          { name: 'Shake Shack', total: 246.50, count: 4 },
-          { name: 'Five Guys', total: 164.00, count: 3 }, { name: 'Pret A Manger', total: 180.75, count: 5 },
-          { name: 'McDonald\'s', total: 120.20, count: 4 }, { name: 'KFC', total: 132.00, count: 3 },
-          { name: 'Operation Falafel', total: 88.30, count: 3 }, { name: 'Al Beiruti', total: 240.60, count: 3 },
-          { name: 'Zomato', total: 96.40, count: 2 } ],
-    11: [ { name: 'Noon', total: 984.20, count: 6 }, { name: 'Amazon.ae', total: 712.55, count: 6 },
-          { name: 'Namshi', total: 201.30, count: 3 }, { name: 'Sharaf DG', total: 318.40, count: 2 },
-          { name: 'Apple Store', total: 749.00, count: 1 }, { name: 'IKEA', total: 388.00, count: 2 },
-          { name: 'Zara', total: 224.90, count: 3 }, { name: 'H&M', total: 156.30, count: 3 },
-          { name: 'Centrepoint', total: 174.50, count: 2 }, { name: 'Faces', total: 246.90, count: 2 },
-          { name: 'Max Fashion', total: 132.00, count: 2 }, { name: 'Ounass', total: 312.00, count: 2 },
-          { name: 'Jumbo Electronics', total: 142.00, count: 1 }, { name: 'Virgin Megastore', total: 98.40, count: 2 } ],
-    14: [ { name: 'Careem', total: 486.90, count: 20 }, { name: 'Salik', total: 240.00, count: 22 },
-          { name: 'RTA Nol', total: 186.50, count: 10 }, { name: 'ADNOC', total: 420.00, count: 6 },
-          { name: 'ENOC', total: 152.30, count: 3 }, { name: 'Dubai Taxi', total: 142.60, count: 7 }, { name: 'Uber', total: 132.30, count: 5 },
-          { name: 'Emarat', total: 150.00, count: 4 }, { name: 'Yango', total: 88.20, count: 5 },
-          { name: 'Parkin', total: 64.00, count: 10 } ],
-    9:  [ { name: 'DEWA', total: 742.85, count: 1 }, { name: 'Etisalat', total: 525.00, count: 1 },
-          { name: 'du', total: 389.00, count: 1 }, { name: 'Emaar Community', total: 240.00, count: 1 },
-          { name: 'SEWA', total: 180.00, count: 1 }, { name: 'Tadweer', total: 95.00, count: 1 },
-          { name: 'Virgin Mobile', total: 60.00, count: 1 } ],
-    15: [ { name: 'Emirates', total: 2480.00, count: 1 }, { name: 'Etihad', total: 1280.00, count: 1 },
-          { name: 'Jumeirah', total: 980.00, count: 1 }, { name: 'Booking.com', total: 864.50, count: 1 },
-          { name: 'Rotana Hotels', total: 720.00, count: 1 }, { name: 'flydubai', total: 642.00, count: 1 },
-          { name: 'Agoda', total: 512.30, count: 1 }, { name: 'Almosafer', total: 430.00, count: 1 },
-          { name: 'Air Arabia', total: 388.00, count: 1 }, { name: 'Wego', total: 156.00, count: 1 } ],
-    7:  [ { name: 'Fitness First', total: 350.00, count: 2 }, { name: 'Mediclinic', total: 410.00, count: 1 },
-          { name: 'Aster Pharmacy', total: 214.60, count: 4 }, { name: 'Warehouse Gym', total: 220.00, count: 2 },
-          { name: 'Life Pharmacy', total: 142.30, count: 3 }, { name: 'Boots', total: 120.00, count: 2 },
-          { name: 'Dr. Sulaiman Al Habib', total: 320.00, count: 1 }, { name: 'GNC', total: 90.00, count: 1 } ],
-    4:  [ { name: 'PlayStation', total: 229.00, count: 2 }, { name: 'VOX Cinemas', total: 184.00, count: 3 },
-          { name: 'Reel Cinemas', total: 132.00, count: 2 }, { name: 'IMG Worlds', total: 240.00, count: 1 },
-          { name: 'Roxy Cinemas', total: 96.00, count: 1 }, { name: 'Steam', total: 88.00, count: 2 },
-          { name: 'OSN+', total: 99.00, count: 1 }, { name: 'Netflix', total: 56.99, count: 1 },
-          { name: 'Anghami', total: 21.00, count: 1 }, { name: 'Spotify', total: 19.99, count: 1 } ],
-    1:  [ { name: 'Tabby', total: 312.40, count: 3 }, { name: 'Tamara', total: 188.00, count: 2 },
-          { name: 'Al Ansari Exchange', total: 200.00, count: 1 }, { name: 'Beehive', total: 140.00, count: 1 } ],
-    16: [ { name: 'Emirates NBD Loan', total: 1200.00, count: 1 }, { name: 'ADCB Personal Loan', total: 880.00, count: 1 },
-          { name: 'DIB Finance', total: 640.00, count: 1 } ],
-    17: [ { name: 'Daman Health', total: 480.00, count: 1 }, { name: 'AXA', total: 320.00, count: 1 },
-          { name: 'Sukoon', total: 198.00, count: 1 } ],
-    5:  [ { name: 'RTA Fines', total: 200.00, count: 1 }, { name: 'DubaiNow', total: 150.00, count: 2 } ],
+          { name: 'Shake Shack', total: 246.50, count: 4 }, { name: 'Five Guys', total: 164.00, count: 3 },
+          { name: 'Pret A Manger', total: 180.75, count: 5 }, { name: 'McDonald\'s', total: 120.20, count: 4 },
+          { name: 'KFC', total: 132.00, count: 3 }, { name: 'Domino\'s', total: 88.30, count: 3 },
+          { name: 'Subway', total: 140.60, count: 3 }, { name: 'Burger King', total: 96.40, count: 2 } ],
+    11: [ { name: 'Amazon', total: 984.20, count: 6 }, { name: 'Apple', total: 749.00, count: 1 },
+          { name: 'IKEA', total: 388.00, count: 2 }, { name: 'Zara', total: 224.90, count: 3 },
+          { name: 'H&M', total: 156.30, count: 3 }, { name: 'Nike', total: 318.40, count: 2 },
+          { name: 'Adidas', total: 201.30, count: 3 }, { name: 'Sephora', total: 246.90, count: 2 },
+          { name: 'Uniqlo', total: 174.50, count: 2 }, { name: 'Best Buy', total: 142.00, count: 1 } ],
+    14: [ { name: 'Uber', total: 486.90, count: 20 }, { name: 'Shell', total: 420.00, count: 6 },
+          { name: 'Lyft', total: 186.50, count: 10 }, { name: 'BP', total: 152.30, count: 3 },
+          { name: 'Bolt', total: 142.60, count: 7 }, { name: 'Chevron', total: 150.00, count: 4 },
+          { name: 'ExxonMobil', total: 88.20, count: 5 } ],
+    9:  [ { name: 'Vodafone', total: 525.00, count: 1 }, { name: 'AT&T', total: 389.00, count: 1 },
+          { name: 'Verizon', total: 240.00, count: 1 }, { name: 'T-Mobile', total: 180.00, count: 1 },
+          { name: 'Xfinity', total: 200.00, count: 1 } ],
+    15: [ { name: 'British Airways', total: 2480.00, count: 1 }, { name: 'Marriott', total: 1280.00, count: 1 },
+          { name: 'Hilton', total: 980.00, count: 1 }, { name: 'Booking.com', total: 864.50, count: 1 },
+          { name: 'Airbnb', total: 720.00, count: 1 }, { name: 'Expedia', total: 642.00, count: 1 },
+          { name: 'Agoda', total: 512.30, count: 1 }, { name: 'Lufthansa', total: 430.00, count: 1 },
+          { name: 'Delta', total: 388.00, count: 1 }, { name: 'Trip.com', total: 156.00, count: 1 } ],
+    7:  [ { name: 'Fitness First', total: 350.00, count: 2 }, { name: 'CVS Pharmacy', total: 410.00, count: 1 },
+          { name: 'Boots', total: 214.60, count: 4 }, { name: "Gold's Gym", total: 220.00, count: 2 },
+          { name: 'Walgreens', total: 142.30, count: 3 }, { name: 'Holland & Barrett', total: 120.00, count: 2 },
+          { name: 'GNC', total: 90.00, count: 1 } ],
+    4:  [ { name: 'PlayStation', total: 229.00, count: 2 }, { name: 'Xbox', total: 132.00, count: 2 },
+          { name: 'AMC Theatres', total: 184.00, count: 3 }, { name: 'Steam', total: 88.00, count: 2 },
+          { name: 'Disney+', total: 99.00, count: 1 }, { name: 'HBO Max', total: 96.00, count: 1 },
+          { name: 'Netflix', total: 56.99, count: 1 }, { name: 'Prime Video', total: 24.00, count: 1 },
+          { name: 'YouTube Premium', total: 21.00, count: 1 }, { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'PayPal', total: 312.40, count: 3 }, { name: 'Klarna', total: 188.00, count: 2 },
+          { name: 'Wise', total: 200.00, count: 1 }, { name: 'Revolut', total: 140.00, count: 1 },
+          { name: 'Afterpay', total: 96.00, count: 2 } ],
+    16: [ { name: 'SoFi', total: 1200.00, count: 1 }, { name: 'American Express', total: 880.00, count: 1 },
+          { name: 'HSBC', total: 640.00, count: 1 } ],
+    17: [ { name: 'AXA', total: 480.00, count: 1 }, { name: 'Allianz', total: 320.00, count: 1 },
+          { name: 'MetLife', total: 198.00, count: 1 } ],
     3:  [ { name: 'Udacity', total: 210.00, count: 1 }, { name: 'Coursera', total: 156.00, count: 1 },
           { name: 'Udemy', total: 89.00, count: 1 }, { name: 'Skillshare', total: 72.00, count: 1 } ],
     18: [ { name: 'Adobe', total: 74.99, count: 1 }, { name: 'ChatGPT', total: 73.40, count: 1 },
           { name: 'Microsoft 365', total: 47.00, count: 1 }, { name: 'Canva', total: 45.00, count: 1 },
           { name: 'Notion', total: 40.00, count: 1 }, { name: 'Dropbox', total: 39.99, count: 1 },
           { name: 'Google One', total: 31.99, count: 1 }, { name: 'iCloud+', total: 11.99, count: 1 } ],
-    19: [ { name: 'ATM Withdrawal', total: 600.00, count: 3 }, { name: 'Misc POS', total: 142.00, count: 4 },
-          { name: 'Unclassified', total: 90.00, count: 2 } ],
   };
 
   const MERCHANT_CAT = {};
@@ -1278,46 +1271,36 @@ function initials(name) {
 // Anything missing falls back to the brand monogram automatically.
 const MERCHANT_DOMAIN = {
   // Groceries
-  'Carrefour': 'carrefour.com', 'Spinneys': 'spinneys.com', 'Lulu Hypermarket': 'luluhypermarket.com',
-  'Waitrose': 'waitrose.com', 'Organic Foods': 'organicfoodsandcafe.com', 'Choithrams': 'choithrams.com',
-  'Union Coop': 'unioncoop.ae', 'Géant': 'geant.ae', 'West Zone': 'westzonegroup.com', 'Al Maya': 'almaya.ae', 'Grandiose': 'grandiose.ae',
+  'Carrefour': 'carrefour.com', 'Tesco': 'tesco.com', 'Whole Foods Market': 'wholefoodsmarket.com',
+  'Waitrose': 'waitrose.com', 'Costco': 'costco.com', 'Aldi': 'aldi.us', 'Lidl': 'lidl.com', "Trader Joe's": 'traderjoes.com',
   // Dining
-  'Talabat': 'talabat.com', 'Al Beiruti': 'albeiruti.ae', 'Starbucks': 'starbucks.com', 'Deliveroo': 'deliveroo.com',
-  'Shake Shack': 'shakeshack.com', "PF Chang's": 'pfchangs.com', 'Pret A Manger': 'pret.com', 'Zomato': 'zomato.com',
-  'Five Guys': 'fiveguys.com', 'Costa Coffee': 'costacoffee.com', 'Tim Hortons': 'timhortons.com',
-  'Operation Falafel': 'operationfalafel.com', "McDonald's": 'mcdonalds.com', 'KFC': 'kfc.com',
+  'Starbucks': 'starbucks.com', 'Uber Eats': 'ubereats.com', 'Deliveroo': 'deliveroo.com', 'Costa Coffee': 'costacoffee.com',
+  'Shake Shack': 'shakeshack.com', 'Five Guys': 'fiveguys.com', 'Pret A Manger': 'pret.com', "McDonald's": 'mcdonalds.com',
+  'KFC': 'kfc.com', "Domino's": 'dominos.com', 'Subway': 'subway.com', 'Burger King': 'bk.com',
   // Shopping
-  'Noon': 'noon.com', 'Amazon.ae': 'amazon.com', 'Apple Store': 'apple.com', 'IKEA': 'ikea.com',
-  'Sharaf DG': 'sharafdg.com', 'Ounass': 'ounass.ae', 'Faces': 'faces.com', 'Zara': 'zara.com',
-  'Namshi': 'namshi.com', 'Centrepoint': 'centrepointstores.com', 'H&M': 'hm.com', 'Jumbo Electronics': 'jumbo.ae',
-  'Max Fashion': 'maxfashion.com', 'Virgin Megastore': 'virginmegastore.ae',
+  'Amazon': 'amazon.com', 'Apple': 'apple.com', 'IKEA': 'ikea.com', 'Zara': 'zara.com', 'H&M': 'hm.com',
+  'Nike': 'nike.com', 'Adidas': 'adidas.com', 'Sephora': 'sephora.com', 'Uniqlo': 'uniqlo.com', 'Best Buy': 'bestbuy.com',
   // Transportation
-  'Careem': 'careem.com', 'ADNOC': 'adnoc.ae', 'Salik': 'salik.ae', 'RTA Nol': 'rta.ae', 'ENOC': 'enoc.com',
-  'Dubai Taxi': 'dubaitaxi.ae', 'Uber': 'uber.com', 'Emarat': 'emarat.ae', 'EPPCO': 'enoc.com', 'Yango': 'yango.com', 'Parkin': 'parkin.ae',
-  // Household / utilities
-  'DEWA': 'dewa.gov.ae', 'Etisalat': 'etisalat.ae', 'du': 'du.ae', 'Emaar Community': 'emaar.com',
-  'SEWA': 'sewa.gov.ae', 'Tadweer': 'tadweer.ae', 'Virgin Mobile': 'virginmobile.ae',
+  'Uber': 'uber.com', 'Shell': 'shell.com', 'Lyft': 'lyft.com', 'BP': 'bp.com', 'Bolt': 'bolt.eu',
+  'Chevron': 'chevron.com', 'ExxonMobil': 'exxonmobil.com',
+  // Household — telecom / utilities
+  'Vodafone': 'vodafone.com', 'AT&T': 'att.com', 'Verizon': 'verizon.com', 'T-Mobile': 't-mobile.com', 'Xfinity': 'xfinity.com',
   // Travel
-  'Emirates': 'emirates.com', 'Etihad': 'etihad.com', 'Jumeirah': 'jumeirah.com', 'Booking.com': 'booking.com',
-  'Rotana Hotels': 'rotana.com', 'flydubai': 'flydubai.com', 'Agoda': 'agoda.com', 'Almosafer': 'almosafer.com',
-  'Air Arabia': 'airarabia.com', 'Wego': 'wego.com',
+  'British Airways': 'britishairways.com', 'Marriott': 'marriott.com', 'Hilton': 'hilton.com', 'Booking.com': 'booking.com',
+  'Airbnb': 'airbnb.com', 'Expedia': 'expedia.com', 'Agoda': 'agoda.com', 'Lufthansa': 'lufthansa.com', 'Delta': 'delta.com', 'Trip.com': 'trip.com',
   // Wellness
-  'Mediclinic': 'mediclinic.ae', 'Fitness First': 'fitnessfirst.ae', 'Dr. Sulaiman Al Habib': 'hmg.com',
-  'Warehouse Gym': 'thewarehousegym.com', 'Aster Pharmacy': 'asterpharmacy.com', 'The Grooming Co.': 'thegroomingco.com',
-  'GMC Clinics': 'gmclinics.com', 'Life Pharmacy': 'lifepharmacy.com', 'BinSina Pharmacy': 'binsina.ae',
-  'Boots': 'boots.com', 'GNC': 'gnc.com',
+  'Fitness First': 'fitnessfirst.com', 'CVS Pharmacy': 'cvs.com', 'Boots': 'boots.com', "Gold's Gym": 'goldsgym.com',
+  'Walgreens': 'walgreens.com', 'Holland & Barrett': 'hollandandbarrett.com', 'GNC': 'gnc.com',
   // Entertainment
-  'Yas Waterworld': 'yaswaterworld.com', 'IMG Worlds': 'imgworlds.com', 'PlayStation': 'playstation.com',
-  'VOX Cinemas': 'voxcinemas.com', 'Reel Cinemas': 'reelcinemas.ae', 'OSN+': 'osnplus.com', 'Roxy Cinemas': 'theroxycinemas.com',
-  'Steam': 'steampowered.com', 'Netflix': 'netflix.com', 'Anghami': 'anghami.com', 'Spotify': 'spotify.com',
+  'PlayStation': 'playstation.com', 'Xbox': 'xbox.com', 'AMC Theatres': 'amctheatres.com', 'Prime Video': 'primevideo.com',
+  'Steam': 'steampowered.com', 'Disney+': 'disneyplus.com', 'HBO Max': 'max.com', 'Netflix': 'netflix.com',
+  'YouTube Premium': 'youtube.com', 'Spotify': 'spotify.com',
   // Financial services
-  'Tabby': 'tabby.ai', 'Al Ansari Exchange': 'alansariexchange.com', 'Tamara': 'tamara.co', 'Beehive': 'beehive.ae', 'PostPay': 'postpay.io',
+  'PayPal': 'paypal.com', 'Klarna': 'klarna.com', 'Wise': 'wise.com', 'Revolut': 'revolut.com', 'Afterpay': 'afterpay.com',
   // Loans
-  'Emirates NBD Loan': 'emiratesnbd.com', 'ADCB Personal Loan': 'adcb.com', 'DIB Finance': 'dib.ae',
+  'SoFi': 'sofi.com', 'American Express': 'americanexpress.com', 'HSBC': 'hsbc.com',
   // Insurance
-  'Daman Health': 'damanhealth.ae', 'AXA': 'axa.com', 'Orient Insurance': 'orientinsurance.ae', 'Sukoon': 'sukoon.com', 'Salama': 'salama.ae',
-  // Government
-  'RTA Fines': 'rta.ae', 'DubaiNow': 'dubai.ae', 'GDRFA': 'gdrfad.gov.ae', 'MOI Fines': 'moi.gov.ae', 'Dubai Police': 'dubaipolice.gov.ae',
+  'AXA': 'axa.com', 'Allianz': 'allianz.com', 'MetLife': 'metlife.com',
   // Student / Services (SaaS)
   'Udacity': 'udacity.com', 'Coursera': 'coursera.org', 'Udemy': 'udemy.com', 'Skillshare': 'skillshare.com',
   'Adobe': 'adobe.com', 'ChatGPT': 'openai.com', 'Microsoft 365': 'microsoft.com', 'Canva': 'canva.com',
@@ -2389,26 +2372,8 @@ function SpendRing({ data, total, prevTotal, dark, ink, muted, surface, onSlice 
         </div>
       </div>
 
-      {/* on-ring NAME + % labels — quadrant-anchored, width-clamped, single tap opens */}
-      {segs.map((s) => {
-        const [bx, by] = polar(R, s.mid);
-        const a = (s.mid - 90) * Math.PI / 180;
-        const c = Math.cos(a), si = Math.sin(a);
-        const dim = hover != null && hover !== s.id;
-        const gap = stroke / 2 + 8;
-        let style, mw, justify;
-        if (c > 0.34) { mw = clamp(W - (bx + gap) - 2, 52, 112); style = { left: bx + gap, top: by, transform: 'translateY(-50%)' }; justify = 'flex-start'; }
-        else if (c < -0.34) { mw = clamp((bx - gap) - 2, 52, 112); style = { right: W - (bx - gap), top: by, transform: 'translateY(-50%)' }; justify = 'flex-end'; }
-        else { mw = 108; justify = 'center'; const [lx, ly] = polar(R + gap, s.mid); style = { left: lx, top: ly, transform: `translateX(-50%) ${si < 0 ? 'translateY(-100%)' : ''}` }; }
-        return (
-          <div key={'l' + s.id} className="pressable" onClick={() => open(s)}
-            onMouseEnter={() => setHover(s.id)} onMouseLeave={() => setHover(null)}
-            style={{ position: 'absolute', ...style, width: mw, display: 'flex', alignItems: 'baseline', gap: 4, justifyContent: justify, cursor: 'pointer', opacity: dim ? 0.4 : 1, transition: 'opacity .2s' }}>
-            <span style={{ fontSize: 10.5, fontWeight: 640, color: ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{s.name}</span>
-            <span style={{ fontSize: 10, fontWeight: 600, color: muted, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{s.pct}%</span>
-          </div>
-        );
-      })}
+      {/* Names + % live in the ranked list directly below — the ring stays clean
+          (on-ring labels can't fit a phone-width ring without colliding). */}
     </div>
     {delta != null && (
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: -6 }}>
@@ -2505,7 +2470,7 @@ function LuneToggle({ T, enriched, onChange }) {
   };
   return (
     <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 14, background: T.dark ? 'rgba(255,255,255,0.06)' : 'rgba(7,3,18,0.05)' }}>
-      {seg(false, 'Raw transactions')}
+      {seg(false, 'Enrich transactions')}
       {seg(true, <React.Fragment><LuneMark size={16} disc={T.dark ? '#FFFFFF' : '#002E2A'} crescent={T.accent} />In your app</React.Fragment>)}
     </div>
   );
