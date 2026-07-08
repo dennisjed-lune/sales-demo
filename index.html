@@ -90,22 +90,21 @@
   const BRANDS = {
     6:  [ { name: 'Carrefour', total: 1284.40, count: 9 }, { name: 'Tesco', total: 640.10, count: 6 },
           { name: 'Whole Foods Market', total: 548.75, count: 5 }, { name: 'Waitrose', total: 340.20, count: 4 },
-          { name: 'Costco', total: 420.40, count: 3 }, { name: 'Aldi', total: 142.60, count: 3 },
-          { name: 'Lidl', total: 180.00, count: 3 }, { name: "Trader Joe's", total: 150.10, count: 3 } ],
+          { name: 'Costco', total: 420.40, count: 3 }, { name: "Trader Joe's", total: 150.10, count: 3 } ],
     10: [ { name: 'Starbucks', total: 392.00, count: 14 }, { name: 'Uber Eats', total: 742.30, count: 12 },
           { name: 'Deliveroo', total: 388.20, count: 7 }, { name: 'Costa Coffee', total: 190.50, count: 6 },
           { name: 'Shake Shack', total: 246.50, count: 4 }, { name: 'Five Guys', total: 164.00, count: 3 },
-          { name: 'Pret A Manger', total: 180.75, count: 5 }, { name: 'McDonald\'s', total: 120.20, count: 4 },
-          { name: 'KFC', total: 132.00, count: 3 }, { name: 'Domino\'s', total: 88.30, count: 3 },
-          { name: 'Subway', total: 140.60, count: 3 }, { name: 'Burger King', total: 96.40, count: 2 } ],
+          { name: 'McDonald\'s', total: 120.20, count: 4 }, { name: 'KFC', total: 132.00, count: 3 },
+          { name: 'Domino\'s', total: 88.30, count: 3 }, { name: 'Subway', total: 140.60, count: 3 },
+          { name: 'Burger King', total: 96.40, count: 2 } ],
     11: [ { name: 'Amazon', total: 984.20, count: 6 }, { name: 'Apple', total: 749.00, count: 1 },
           { name: 'IKEA', total: 388.00, count: 2 }, { name: 'Zara', total: 224.90, count: 3 },
           { name: 'H&M', total: 156.30, count: 3 }, { name: 'Nike', total: 318.40, count: 2 },
           { name: 'Adidas', total: 201.30, count: 3 }, { name: 'Sephora', total: 246.90, count: 2 },
           { name: 'Uniqlo', total: 174.50, count: 2 }, { name: 'Best Buy', total: 142.00, count: 1 } ],
     14: [ { name: 'Uber', total: 486.90, count: 20 }, { name: 'Shell', total: 420.00, count: 6 },
-          { name: 'Lyft', total: 186.50, count: 10 }, { name: 'BP', total: 152.30, count: 3 },
-          { name: 'Bolt', total: 142.60, count: 7 }, { name: 'Chevron', total: 150.00, count: 4 },
+          { name: 'Lyft', total: 186.50, count: 10 }, { name: 'Mercedes-Benz', total: 320.00, count: 2 },
+          { name: 'BP', total: 152.30, count: 3 }, { name: 'Bolt', total: 142.60, count: 7 },
           { name: 'ExxonMobil', total: 88.20, count: 5 } ],
     9:  [ { name: 'Vodafone', total: 525.00, count: 1 }, { name: 'AT&T', total: 389.00, count: 1 },
           { name: 'Verizon', total: 240.00, count: 1 }, { name: 'T-Mobile', total: 180.00, count: 1 },
@@ -1272,17 +1271,17 @@ function initials(name) {
 const MERCHANT_DOMAIN = {
   // Groceries
   'Carrefour': 'carrefour.com', 'Tesco': 'tesco.com', 'Whole Foods Market': 'wholefoodsmarket.com',
-  'Waitrose': 'waitrose.com', 'Costco': 'costco.com', 'Aldi': 'aldi.us', 'Lidl': 'lidl.com', "Trader Joe's": 'traderjoes.com',
+  'Waitrose': 'waitrose.com', 'Costco': 'costco.com', "Trader Joe's": 'traderjoes.com',
   // Dining
   'Starbucks': 'starbucks.com', 'Uber Eats': 'ubereats.com', 'Deliveroo': 'deliveroo.com', 'Costa Coffee': 'costacoffee.com',
-  'Shake Shack': 'shakeshack.com', 'Five Guys': 'fiveguys.com', 'Pret A Manger': 'pret.com', "McDonald's": 'mcdonalds.com',
+  'Shake Shack': 'shakeshack.com', 'Five Guys': 'fiveguys.com', "McDonald's": 'mcdonalds.com',
   'KFC': 'kfc.com', "Domino's": 'dominos.com', 'Subway': 'subway.com', 'Burger King': 'bk.com',
   // Shopping
   'Amazon': 'amazon.com', 'Apple': 'apple.com', 'IKEA': 'ikea.com', 'Zara': 'zara.com', 'H&M': 'hm.com',
   'Nike': 'nike.com', 'Adidas': 'adidas.com', 'Sephora': 'sephora.com', 'Uniqlo': 'uniqlo.com', 'Best Buy': 'bestbuy.com',
   // Transportation
-  'Uber': 'uber.com', 'Shell': 'shell.com', 'Lyft': 'lyft.com', 'BP': 'bp.com', 'Bolt': 'bolt.eu',
-  'Chevron': 'chevron.com', 'ExxonMobil': 'exxonmobil.com',
+  'Uber': 'uber.com', 'Shell': 'shell.com', 'Lyft': 'lyft.com', 'Mercedes-Benz': 'mercedes-benz.com',
+  'BP': 'bp.com', 'Bolt': 'bolt.eu', 'ExxonMobil': 'exxonmobil.com',
   // Household — telecom / utilities
   'Vodafone': 'vodafone.com', 'AT&T': 'att.com', 'Verizon': 'verizon.com', 'T-Mobile': 't-mobile.com', 'Xfinity': 'xfinity.com',
   // Travel
@@ -2476,6 +2475,19 @@ function LuneToggle({ T, enriched, onChange }) {
   );
 }
 
+// Curated order for the enrich feed — globally-recognised brands first
+// (fast food + coffee → apparel → e-commerce/tech → subscriptions → transport →
+// travel → wellness → financial), groceries last.
+const ENRICH_ORDER = [
+  "McDonald's", 'Starbucks', 'Burger King', 'KFC', 'Subway', 'Shake Shack',
+  'Nike', 'Adidas', 'Zara', 'H&M',
+  'Amazon', 'Apple', 'IKEA',
+  'Netflix', 'Spotify', 'Disney+', 'Prime Video', 'PlayStation',
+  'Uber', 'Mercedes-Benz',
+  'British Airways', 'Airbnb',
+  'Carrefour', 'Whole Foods Market',
+];
+
 // Small 4-point sparkle to hint "tap to enrich".
 function Sparkle({ size = 12, color = 'currentColor' }) {
   return (
@@ -2489,15 +2501,15 @@ function Sparkle({ size = 12, color = 'currentColor' }) {
 // the cryptic descriptor into a clean merchant, logo and category in real time.
 function RawTransactions({ T, period, enriched, onToggle }) {
   const scoped = D().forPeriod(period);
-  // One transaction per brand — no duplicate merchants on the enrich feed.
+  // One transaction per brand, ordered to lead with the most globally-recognised
+  // brands (fast food + coffee, apparel, e-commerce, subscriptions), with
+  // groceries lower down (they brand differently across borders).
   const txns = React.useMemo(() => {
-    const seen = new Set(); const out = [];
-    for (const t of scoped.TRANSACTIONS) {
-      if (seen.has(t.merchant)) continue;
-      seen.add(t.merchant); out.push(t);
-      if (out.length >= 24) break;
-    }
-    return out;
+    // Use the uncapped current-month feed so every curated brand is present
+    // (forPeriod caps at 120 + day-sorts, which drops low-frequency brands).
+    const byMerchant = new Map();
+    for (const t of D().TRANSACTIONS) { if (!byMerchant.has(t.merchant)) byMerchant.set(t.merchant, t); }
+    return ENRICH_ORDER.map((n) => byMerchant.get(n)).filter(Boolean).slice(0, 24);
   }, [period]);
   const mono = "'SF Mono', ui-monospace, 'Roboto Mono', Menlo, monospace";
   const [done, setDone] = React.useState({});
@@ -2518,6 +2530,10 @@ function RawTransactions({ T, period, enriched, onToggle }) {
 
   return (
     <Screen T={T}>
+      {/* Warm the browser cache on mount so every logo reveals instantly on enrich */}
+      <div aria-hidden style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
+        {txns.map((t) => { const s = logoSources(t.merchant)[0]; return s ? <img key={t.merchant} src={s} alt="" width="2" height="2" /> : null; })}
+      </div>
       <div style={{ marginBottom: 18 }}><LuneToggle T={T} enriched={enriched} onChange={onToggle} /></div>
       <div style={{ fontSize: 25, fontWeight: 700, letterSpacing: '-0.025em', color: T.ink }}>Your transactions</div>
       <div style={{ fontSize: 13, color: T.muted, marginTop: 5, lineHeight: 1.5 }}>The raw feed from your core — cryptic descriptors, no merchant, logo or category. Tap any row to enrich it live.</div>
