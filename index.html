@@ -33,6 +33,11 @@
   @keyframes pageIn { from { transform: translateX(100%) } to { transform: translateX(0) } }
   .page-in { animation: pageIn .34s cubic-bezier(.32,.72,0,1) both; }
   @keyframes ringDraw { from { stroke-dashoffset: 220 } to { stroke-dashoffset: 0 } }
+  @keyframes enrichContent { from { opacity: 0; filter: blur(5px); transform: translateY(4px) } to { opacity: 1; filter: blur(0); transform: translateY(0) } }
+  .enrich-content { animation: enrichContent .42s cubic-bezier(.32,.72,0,1) both; }
+  @keyframes enrichFlash { 0% { background: var(--enrich-flash) } 100% { background: transparent } }
+  .enrich-flash { animation: enrichFlash 1.1s ease-out both; }
+  @keyframes rawFade { from { opacity: 1 } to { opacity: 0 } }
   @media (prefers-reduced-motion: reduce) {
     /* Keep opacity/color fades that aid comprehension; drop movement + scale. */
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .1s !important; }
@@ -211,21 +216,22 @@
     return { labels: MONTH_LABELS, vals: vals.map((v) => Math.round(v)) };
   }
 
-  let tid = 1000;
-  function mk(merchant, amount, day, mLabel, mYear) {
+  function mk(merchant, amount, day, mLabel, mYear, id) {
     const cid = MERCHANT_CAT[merchant] || 19;
     const cat = CATEGORIES.find((c) => c.id === cid);
-    return { id: ++tid, merchant, categoryId: cid, category: cat.name, categoryColor: cat.color, glyph: cat.glyph, amount, date: `${day} ${mLabel} ${mYear}`, day, month: mLabel };
+    return { id, merchant, categoryId: cid, category: cat.name, categoryColor: cat.color, glyph: cat.glyph, amount, date: `${day} ${mLabel} ${mYear}`, day, month: mLabel };
   }
   // Explode one (brand, month) bucket into individual transactions summing to `amount`.
   function bucketTxns(name, cid, m, amount, count) {
     const n = Math.min(Math.max(count, 1), 4);
     const r = rng(cid * 911 + m * 37 + name.length * 7 + 5);
     const out = []; let remaining = amount;
+    const nameHash = name.split('').reduce((a, ch) => ((a * 31) + ch.charCodeAt(0)) >>> 0, 7) % 100000;
     for (let i = 0; i < n; i++) {
       const amt = i === n - 1 ? Math.max(2, r2(remaining)) : Math.max(3, r2((amount / n) * (0.6 + r() * 0.8)));
       remaining = r2(remaining - amt);
-      out.push(mk(name, amt, String(Math.floor(r() * 27) + 1).padStart(2, '0'), MONTH_LABELS[m], MONTH_YEAR[m]));
+      const id = (((cid * 100 + m) * 100000) + nameHash) * 10 + i; // deterministic & stable across renders
+      out.push(mk(name, amt, String(Math.floor(r() * 27) + 1).padStart(2, '0'), MONTH_LABELS[m], MONTH_YEAR[m], id));
     }
     return out;
   }
@@ -2499,42 +2505,135 @@ function LuneToggle({ T, enriched, onChange }) {
   };
   return (
     <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 14, background: T.dark ? 'rgba(255,255,255,0.06)' : 'rgba(7,3,18,0.05)' }}>
-      {seg(false, 'Without Lune')}
-      {seg(true, <React.Fragment><LuneMark size={16} disc={T.dark ? '#FFFFFF' : '#002E2A'} crescent={T.accent} />With Lune</React.Fragment>)}
+      {seg(false, 'Raw transactions')}
+      {seg(true, <React.Fragment><LuneMark size={16} disc={T.dark ? '#FFFFFF' : '#002E2A'} crescent={T.accent} />In your app</React.Fragment>)}
     </div>
   );
 }
 
-// "Without Lune" — the raw, unenriched transaction feed. Deliberately flat.
+// Small 4-point sparkle to hint "tap to enrich".
+function Sparkle({ size = 12, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ display: 'block' }}>
+      <path d="M12 2c.5 4.6 2.4 6.5 7 7-4.6.5-6.5 2.4-7 7-.5-4.6-2.4-6.5-7-7 4.6-.5 6.5-2.4 7-7Z" fill={color} />
+    </svg>
+  );
+}
+
+// The raw bank feed — enriched live. Tap a row (or "Enrich all") and Lune turns
+// the cryptic descriptor into a clean merchant, logo and category in real time.
 function RawTransactions({ T, period, enriched, onToggle }) {
-  const { TRANSACTIONS } = D().forPeriod(period);
+  const scoped = D().forPeriod(period);
+  const txns = scoped.TRANSACTIONS.slice(0, 22);
   const mono = "'SF Mono', ui-monospace, 'Roboto Mono', Menlo, monospace";
+  const [done, setDone] = React.useState({});
+  const [delays, setDelays] = React.useState({});
+  const nDone = txns.filter(t => done[t.id]).length;
+  const allDone = nDone === txns.length;
+
+  const enrichOne = (t) => {
+    if (done[t.id]) return;
+    setDone(d => ({ ...d, [t.id]: true }));
+    setDelays(x => ({ ...x, [t.id]: 0 }));
+  };
+  const enrichAll = () => {
+    const nd = { ...done }, nx = { ...delays }; let k = 0;
+    txns.forEach(t => { if (!nd[t.id]) { nd[t.id] = true; nx[t.id] = k * 55; k++; } });
+    setDone(nd); setDelays(nx);
+  };
+
   return (
     <Screen T={T}>
       <div style={{ marginBottom: 18 }}><LuneToggle T={T} enriched={enriched} onChange={onToggle} /></div>
-      <div style={{ fontSize: 25, fontWeight: 700, letterSpacing: '-0.025em', color: T.ink }}>Transactions</div>
-      <div style={{ fontSize: 13, color: T.muted, marginTop: 5, lineHeight: 1.5 }}>The raw bank feed — cryptic descriptors, no merchant names, logos or categories.</div>
-      <div style={{ marginTop: 16 }}>
+      <div style={{ fontSize: 25, fontWeight: 700, letterSpacing: '-0.025em', color: T.ink }}>Your transactions</div>
+      <div style={{ fontSize: 13, color: T.muted, marginTop: 5, lineHeight: 1.5 }}>The raw feed from your core — cryptic descriptors, no merchant, logo or category. Tap any row to enrich it live.</div>
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 16 }}>
+        <div style={{ fontSize: 12.5, color: T.muted, fontWeight: 560, fontVariantNumeric: 'tabular-nums' }}>{nDone} of {txns.length} enriched</div>
+        <button className="pressable" onClick={enrichAll} disabled={allDone} style={{
+          display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 15px', borderRadius: 11, border: 'none',
+          fontFamily: 'inherit', fontSize: 13.5, fontWeight: 680, cursor: allDone ? 'default' : 'pointer',
+          color: allDone ? T.muted : '#fff', background: allDone ? (T.dark ? 'rgba(255,255,255,0.08)' : 'rgba(7,3,18,0.05)') : T.accent,
+          boxShadow: allDone ? 'none' : `0 6px 16px ${hexA(T.accent, 0.34)}`, transition: 'all .18s',
+        }}>
+          {allDone
+            ? <React.Fragment>✓ All enriched</React.Fragment>
+            : <React.Fragment><LuneMark size={15} disc="#fff" crescent={T.accent} />Enrich all</React.Fragment>}
+        </button>
+      </div>
+
+      <div style={{ marginTop: 12 }}>
         <Card T={T} pad="2px 16px">
-          {TRANSACTIONS.map((t, i, a) => (
-            <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0', position: 'relative' }}>
-              <span style={{ width: 34, height: 34, borderRadius: 8, background: T.dark ? 'rgba(255,255,255,0.06)' : 'rgba(7,3,18,0.05)', flexShrink: 0 }} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: mono, fontSize: 12.5, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{rawDescriptor(t)}</div>
-                <div style={{ fontFamily: mono, fontSize: 11, color: T.muted, marginTop: 3 }}>{t.date}</div>
+          {txns.map((t, i, a) => {
+            const isDone = !!done[t.id];
+            const cat = D().CATEGORIES[t.categoryId];
+            const delay = (delays[t.id] || 0) + 'ms';
+            return (
+              <div key={t.id}
+                className={(isDone ? 'enrich-flash ' : 'pressable-row ')}
+                onClick={isDone ? undefined : () => enrichOne(t)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', position: 'relative',
+                  cursor: isDone ? 'default' : 'pointer', borderRadius: 10,
+                  animationDelay: delay, '--enrich-flash': hexA(T.accent, T.dark ? 0.22 : 0.13),
+                }}>
+                {isDone ? (
+                  <React.Fragment>
+                    <span className="enrich-content" style={{ animationDelay: delay, flexShrink: 0, display: 'inline-flex' }}>
+                      <MerchantMark name={t.merchant} glyph={t.glyph} catColor={t.categoryColor} showLogos={true} dark={T.dark} size={40} radius={12} />
+                    </span>
+                    <div className="enrich-content" style={{ animationDelay: delay, flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 15, fontWeight: 560, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.merchant}</div>
+                      <div style={{ marginTop: 4 }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '2px 8px', borderRadius: 20, background: hexA(t.categoryColor, T.dark ? 0.20 : 0.12), color: t.categoryColor, fontSize: 11, fontWeight: 640 }}>
+                          <CatGlyph glyph={t.glyph} size={11} color={t.categoryColor} />{t.category}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="enrich-content" style={{ animationDelay: delay, textAlign: 'right', flexShrink: 0 }}>
+                      <div style={{ fontSize: 15, fontWeight: 600, color: T.ink, fontVariantNumeric: 'tabular-nums' }}>
+                        <span style={{ display: 'inline-flex', color: T.muted, marginRight: 3 }}><Dirham size={11} color="currentColor" /></span>{fmtAED(t.amount, true)}
+                      </div>
+                      <div style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}>{t.day + ' ' + (t.month || 'May')}</div>
+                    </div>
+                  </React.Fragment>
+                ) : (
+                  <React.Fragment>
+                    <span style={{ width: 40, height: 40, borderRadius: 12, flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: T.dark ? 'rgba(255,255,255,0.05)' : 'rgba(7,3,18,0.035)', border: `1px dashed ${hexA(T.accent, 0.5)}`, color: hexA(T.accent, 0.85) }}>
+                      <Sparkle size={13} color="currentColor" />
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: mono, fontSize: 12.5, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{rawDescriptor(t)}</div>
+                      <div style={{ fontFamily: mono, fontSize: 11, color: T.muted, marginTop: 3 }}>{t.date}</div>
+                    </div>
+                    <div style={{ fontFamily: mono, fontSize: 13.5, fontWeight: 600, color: T.ink, fontVariantNumeric: 'tabular-nums', flexShrink: 0, display: 'inline-flex', alignItems: 'baseline', gap: 3 }}><Dirham size={11} color="currentColor" />{fmtAED(t.amount, true)}</div>
+                  </React.Fragment>
+                )}
+                {i < a.length - 1 && <div style={{ position: 'absolute', left: 52, right: 0, bottom: 0, height: 1, background: T.faint }} />}
               </div>
-              <div style={{ fontFamily: mono, fontSize: 13.5, fontWeight: 600, color: T.ink, fontVariantNumeric: 'tabular-nums', flexShrink: 0, display: 'inline-flex', alignItems: 'baseline', gap: 3 }}><Dirham size={11} color="currentColor" />{fmtAED(t.amount, true)}</div>
-              {i < a.length - 1 && <div style={{ position: 'absolute', left: 46, right: 0, bottom: 0, height: 1, background: T.faint }} />}
-            </div>
-          ))}
+            );
+          })}
         </Card>
       </div>
-      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginTop: 16, padding: '13px 15px', borderRadius: 14, background: hexA(T.accent, T.dark ? 0.14 : 0.08), border: `1px solid ${hexA(T.accent, 0.28)}` }}>
-        <span style={{ marginTop: 1, flexShrink: 0 }}><LuneMark size={18} disc={T.dark ? '#FFFFFF' : '#002E2A'} crescent={T.accent} /></span>
-        <div style={{ fontSize: 12.5, color: T.ink, lineHeight: 1.5 }}>
-          <b>This is your data before Lune.</b> Switch to <b>With Lune</b> to see the same transactions enriched into merchants, logos, categories and insights.
+
+      {allDone ? (
+        <div style={{ marginTop: 16, padding: '15px 16px', borderRadius: 16, background: hexA(T.accent, T.dark ? 0.14 : 0.08), border: `1px solid ${hexA(T.accent, 0.28)}` }}>
+          <div style={{ fontSize: 13.5, fontWeight: 680, color: T.ink }}>Every transaction, enriched.</div>
+          <div style={{ fontSize: 12.5, color: T.muted, lineHeight: 1.5, marginTop: 4 }}>Clean merchants, logos and categories — from the same raw feed. Now see how it powers the experience inside your app.</div>
+          <button className="pressable" onClick={() => onToggle(true)} style={{
+            marginTop: 12, width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            padding: '12px 16px', borderRadius: 12, border: 'none', fontFamily: 'inherit', fontSize: 14, fontWeight: 680,
+            color: '#fff', background: T.accent, boxShadow: `0 8px 20px ${hexA(T.accent, 0.34)}`, cursor: 'pointer',
+          }}><LuneMark size={16} disc="#fff" crescent={T.accent} />See it in your app →</button>
         </div>
-      </div>
+      ) : (
+        <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginTop: 16, padding: '13px 15px', borderRadius: 14, background: T.dark ? 'rgba(255,255,255,0.04)' : 'rgba(7,3,18,0.03)', border: `1px solid ${T.line}` }}>
+          <span style={{ marginTop: 1, flexShrink: 0, color: T.accent }}><Sparkle size={16} color="currentColor" /></span>
+          <div style={{ fontSize: 12.5, color: T.muted, lineHeight: 1.5 }}>
+            This is your data <b style={{ color: T.ink }}>before Lune</b>. Tap a transaction to enrich it — or <b style={{ color: T.ink }}>Enrich all</b> — then open <b style={{ color: T.ink }}>In your app</b>.
+          </div>
+        </div>
+      )}
     </Screen>
   );
 }
@@ -2905,7 +3004,7 @@ function ExpensesApp() {
   const [period, setPeriod] = React.useState(window.EXP_DATA.CURRENT_PERIOD);
   const [periodOpen, setPeriodOpen] = React.useState(false);
 
-  const [enriched, setEnriched] = React.useState(true); // With Lune (true) vs raw feed
+  const [enriched, setEnriched] = React.useState(false); // start on the raw feed, enrich, then "In your app"
   const [breakdownOpen, setBreakdownOpen] = React.useState(false);
   const [trends, setTrends] = React.useState(null); // null | { mode, catId }
   const [allTxnsOpen, setAllTxnsOpen] = React.useState(false);
@@ -3017,7 +3116,7 @@ function ExpensesApp() {
                 The same transactions.<br /><span style={{ color: A }}>Transformed.</span>
               </h1>
               <p style={{ fontSize: 17, lineHeight: 1.55, color: MUT, margin: '18px 0 0', maxWidth: 440 }}>
-                Lune enriches raw bank data into clean merchants, logos, categories and insights. Flip the switch on the phone and watch the same feed come alive.
+                Lune turns your raw transaction feed into clean merchants, logos, categories and insights. Enrich the feed on the phone, then see how it powers your app.
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 30 }}>
                 {btn('Book a demo', 'mailto:salman@lunedata.io?subject=Lune%20demo%20request', true)}
@@ -3052,13 +3151,13 @@ function ExpensesApp() {
             The same transactions.<br /><span style={{ color: A }}>Transformed.</span>
           </h1>
           <p style={{ fontSize: 16, lineHeight: 1.55, color: MUT, margin: '16px auto 0', maxWidth: 420 }}>
-            Lune enriches raw bank data into clean merchants, logos, categories and insights. Flip the switch below and watch the same feed come alive.
+            Lune turns your raw transaction feed into clean merchants, logos, categories and insights. Enrich the feed below, then see how it powers your app.
           </p>
         </header>
 
         <div style={{ marginTop: 30 }}>{phoneStage(mScale)}</div>
         <p style={{ textAlign: 'center', fontSize: 13.5, color: MUT, margin: '18px auto 0', maxWidth: 340 }}>
-          Live demo — tap <b style={{ color: INK }}>Without Lune</b> / <b style={{ color: INK }}>With Lune</b>, then explore.
+          Live demo — enrich the raw feed, then open <b style={{ color: INK }}>In your app</b>.
         </p>
 
         <section style={{ margin: '44px 0 0', padding: '32px 26px', borderRadius: 24, background: '#0B241F', color: '#fff', textAlign: 'center', boxShadow: '0 18px 50px rgba(11,36,31,0.22)' }}>
