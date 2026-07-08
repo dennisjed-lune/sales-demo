@@ -2534,7 +2534,14 @@ function RawTransactions({ T, period, enriched, onToggle }) {
       <div aria-hidden style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
         {txns.map((t) => { const s = logoSources(t.merchant)[0]; return s ? <img key={t.merchant} src={s} alt="" width="2" height="2" /> : null; })}
       </div>
-      <div style={{ marginBottom: 18 }}><LuneToggle T={T} enriched={enriched} onChange={onToggle} /></div>
+      {/* top nav — jump to the in-app PFM view */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+        <button className="pressable" onClick={() => onToggle(true)} style={{
+          display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 15px', borderRadius: 999, border: 'none',
+          fontFamily: 'inherit', fontSize: 13, fontWeight: 680, color: '#fff', background: T.accent,
+          boxShadow: `0 6px 16px ${hexA(T.accent, 0.30)}`, cursor: 'pointer',
+        }}><LuneMark size={15} disc="#fff" crescent={T.accent} />Open in app →</button>
+      </div>
       <div style={{ fontSize: 25, fontWeight: 700, letterSpacing: '-0.025em', color: T.ink }}>Your transactions</div>
       <div style={{ fontSize: 13, color: T.muted, marginTop: 5, lineHeight: 1.5 }}>The raw feed from your core — cryptic descriptors, no merchant, logo or category. Tap any row to enrich it live.</div>
 
@@ -2620,7 +2627,7 @@ function RawTransactions({ T, period, enriched, onToggle }) {
         <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginTop: 16, padding: '13px 15px', borderRadius: 14, background: T.dark ? 'rgba(255,255,255,0.04)' : 'rgba(7,3,18,0.03)', border: `1px solid ${T.line}` }}>
           <span style={{ marginTop: 1, flexShrink: 0, color: T.accent }}><Sparkle size={16} color="currentColor" /></span>
           <div style={{ fontSize: 12.5, color: T.muted, lineHeight: 1.5 }}>
-            This is your data <b style={{ color: T.ink }}>before Lune</b>. Tap a transaction to enrich it — or <b style={{ color: T.ink }}>Enrich all</b> — then open <b style={{ color: T.ink }}>In your app</b>.
+            This is your data <b style={{ color: T.ink }}>before Lune</b>. Tap a transaction to enrich it — or <b style={{ color: T.ink }}>Enrich all</b> — then tap <b style={{ color: T.ink }}>Open in app</b>.
           </div>
         </div>
       )}
@@ -2635,7 +2642,13 @@ function Spends({ T, showLogos, period, actions, enriched, onToggle }) {
   const topCats = [...CATEGORY_SPEND].sort((a, b) => b.total - a.total).slice(0, 5);
   return (
     <Screen T={T}>
-      <div style={{ marginBottom: 4 }}><LuneToggle T={T} enriched={enriched} onChange={onToggle} /></div>
+      {/* top nav — back to the raw transactions feed */}
+      <div style={{ marginBottom: 14 }}>
+        <button className="pressable" onClick={() => onToggle(false)} style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px 8px 11px', borderRadius: 999, cursor: 'pointer',
+          border: `1px solid ${T.line}`, background: T.surface, fontFamily: 'inherit', fontSize: 13, fontWeight: 620, color: T.ink,
+        }}><UIIcon name="chevL" size={15} stroke="currentColor" />Transactions</button>
+      </div>
       <AppHeader T={T} title="Spends" period={period} onPeriod={actions.openPeriod} />
 
       {/* Hero: the clean ring + the ranked category list, one focal block. */}
@@ -3053,9 +3066,11 @@ function ExpensesApp() {
     <IOSDevice dark={T.dark} width={390} height={844}>
         <div style={{ position: 'relative', height: '100%', overflow: 'hidden', background: T.bg }}>
           <div className="exp-screens" style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', paddingTop: 56 }}>
-            {enriched
-              ? <Spends T={T} showLogos={t.showLogos} period={period} actions={actions} enriched={enriched} onToggle={setEnriched} />
-              : <RawTransactions T={T} period={period} enriched={enriched} onToggle={setEnriched} />}
+            <div key={enriched ? 'app' : 'txns'} style={{ animation: `${enriched ? 'slideFwd' : 'slideBack'} .34s cubic-bezier(.32,.72,0,1) both` }}>
+              {enriched
+                ? <Spends T={T} showLogos={t.showLogos} period={period} actions={actions} enriched={enriched} onToggle={setEnriched} />
+                : <RawTransactions T={T} period={period} enriched={enriched} onToggle={setEnriched} />}
+            </div>
           </div>
 
           {/* Sheet stack — z-order matches how they open on top of one another. Only in the enriched flow. */}
@@ -3147,7 +3162,7 @@ function ExpensesApp() {
 
         <div style={{ marginTop: 30 }}>{phoneStage(mScale)}</div>
         <p style={{ textAlign: 'center', fontSize: 13.5, color: MUT, margin: '18px auto 0', maxWidth: 340 }}>
-          Live demo — enrich the raw feed, then open <b style={{ color: INK }}>In your app</b>.
+          Live demo — enrich the raw feed, then tap <b style={{ color: INK }}>Open in app</b>.
         </p>
 
         <section style={{ margin: '44px 0 0', padding: '32px 26px', borderRadius: 24, background: '#0B241F', color: '#fff', textAlign: 'center', boxShadow: '0 18px 50px rgba(11,36,31,0.22)' }}>
