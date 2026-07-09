@@ -2371,8 +2371,42 @@ function SpendRing({ data, total, prevTotal, dark, ink, muted, surface, onSlice 
         </div>
       </div>
 
-      {/* Names + % live in the ranked list directly below — the ring stays clean
-          (on-ring labels can't fit a phone-width ring without colliding). */}
+      {/* Category name + % callouts — anchored to left/right columns beside the
+          ring, then de-collided vertically per side so labels can NEVER overlap
+          (the old quadrant labels collided at the bottom of the ring). */}
+      {(() => {
+        const gap = stroke / 2 + 9;
+        const colW = cx - R - gap - 10;
+        const pts = segs.map((s) => {
+          const [, ly] = polar(R + gap, s.mid);
+          const right = Math.cos((s.mid - 90) * Math.PI / 180) >= 0;
+          return { s, right, y: ly };
+        });
+        [true, false].forEach((side) => {
+          const col = pts.filter((p) => p.right === side).sort((a, b) => a.y - b.y);
+          for (let i = 1; i < col.length; i++) if (col[i].y - col[i - 1].y < 17) col[i].y = col[i - 1].y + 17;
+          for (let i = col.length - 1; i >= 0; i--) {
+            if (col[i].y > H - 9) col[i].y = H - 9;
+            if (i < col.length - 1 && col[i + 1].y - col[i].y < 17) col[i].y = col[i + 1].y - 17;
+          }
+        });
+        return pts.map(({ s, right, y }) => {
+          const dim = hover != null && hover !== s.id;
+          return (
+            <div key={'l' + s.id} className="pressable" onClick={() => open(s)}
+              onMouseEnter={() => setHover(s.id)} onMouseLeave={() => setHover(null)}
+              style={{
+                position: 'absolute', top: y, transform: 'translateY(-50%)', width: colW,
+                left: right ? cx + R + gap + 5 : cx - R - gap - 5 - colW,
+                display: 'flex', alignItems: 'baseline', gap: 4, justifyContent: right ? 'flex-start' : 'flex-end',
+                cursor: 'pointer', opacity: dim ? 0.4 : 1, transition: 'opacity .2s',
+              }}>
+              <span style={{ fontSize: 10.5, fontWeight: 640, color: ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{s.name}</span>
+              <span style={{ fontSize: 10, fontWeight: 600, color: muted, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{s.pct}%</span>
+            </div>
+          );
+        });
+      })()}
     </div>
     {delta != null && (
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: -6 }}>
@@ -2498,7 +2532,7 @@ function Sparkle({ size = 12, color = 'currentColor' }) {
 
 // The raw bank feed — enriched live. Tap a row (or "Enrich all") and Lune turns
 // the cryptic descriptor into a clean merchant, logo and category in real time.
-function RawTransactions({ T, period, enriched, onToggle }) {
+function RawTransactions({ T, period, enriched, onToggle, ctaLabel = 'Open in app', standalone = false }) {
   const scoped = D().forPeriod(period);
   // One transaction per brand, ordered to lead with the most globally-recognised
   // brands (fast food + coffee, apparel, e-commerce, subscriptions), with
@@ -2533,13 +2567,15 @@ function RawTransactions({ T, period, enriched, onToggle }) {
       <div aria-hidden style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
         {txns.map((t) => { const s = logoSources(t.merchant)[0]; return s ? <img key={t.merchant} src={s} alt="" width="2" height="2" /> : null; })}
       </div>
-      {/* top nav — jump to the in-app PFM view */}
+      {/* top nav — enter the in-app PFM portal */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
         <button className="pressable" onClick={() => onToggle(true)} style={{
-          display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 15px', borderRadius: 999, border: 'none',
-          fontFamily: 'inherit', fontSize: 13, fontWeight: 680, color: '#fff', background: T.accent,
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+          padding: standalone ? '13px 18px' : '9px 15px', borderRadius: standalone ? 14 : 999, border: 'none',
+          width: standalone ? '100%' : 'auto',
+          fontFamily: 'inherit', fontSize: standalone ? 14.5 : 13, fontWeight: 680, color: '#fff', background: T.accent,
           boxShadow: `0 6px 16px ${hexA(T.accent, 0.30)}`, cursor: 'pointer',
-        }}><LuneMark size={15} disc="#fff" crescent={T.accent} />Open in app →</button>
+        }}><LuneMark size={15} disc="#fff" crescent={T.accent} />{ctaLabel} →</button>
       </div>
       <div style={{ fontSize: 25, fontWeight: 700, letterSpacing: '-0.025em', color: T.ink }}>Your transactions</div>
       <div style={{ fontSize: 13, color: T.muted, marginTop: 6, lineHeight: 1.55 }}>Below is the raw feed of transactions the bank receives — cryptic descriptions, no clear merchant name, logo or category.</div>
@@ -2682,10 +2718,10 @@ function Spends({ T, showLogos, period, actions, enriched, onToggle }) {
         </Card>
       </div>
 
-      {/* listView() — recent transactions */}
-      <SectionTitle T={T} action="View all" onAction={actions.openAllTxns}>Recent</SectionTitle>
+      {/* listView() — recent transactions; longer periods surface more rows */}
+      <SectionTitle T={T} action={`View all (${scoped.TXN_COUNT})`} onAction={actions.openAllTxns}>Recent</SectionTitle>
       <Card T={T} pad="2px 18px">
-        {TRANSACTIONS.slice(0, 6).map((t, i, a) => (
+        {TRANSACTIONS.slice(0, scoped.months === 1 ? 6 : scoped.months === 3 ? 12 : 16).map((t, i, a) => (
           <TxnRow key={t.id} T={T} txn={t} showLogos={showLogos} onClick={() => actions.openTxn(t)} divider={i < a.length - 1} />
         ))}
       </Card>
@@ -3058,11 +3094,33 @@ function ExpensesApp() {
   const [vh, setVh] = React.useState(typeof window !== 'undefined' ? window.innerHeight : 900);
   React.useEffect(() => { const on = () => { setVw(window.innerWidth); setVh(window.innerHeight); }; window.addEventListener('resize', on); return () => window.removeEventListener('resize', on); }, []);
   const desktop = vw >= 900;
+  // Mobile PFM portal is a fixed full-screen page — freeze the landing behind it.
+  React.useEffect(() => {
+    if (!desktop && enriched) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [desktop, enriched]);
   const mScale = Math.min(1, (Math.min(vw, 520) - 32) / 390);
   const dScale = Math.min(0.9, Math.max(0.6, (vh - 96) / 844));
   const scale = desktop ? dScale : mScale;
   const A = '#10A37F', INK = '#0B241F', MUT = '#5E6E68', LINE = '#DCE6E2';
   const BG = 'linear-gradient(180deg,#EAF3EF 0%,#F5F8F7 34%,#F5F8F7 100%)';
+
+  // Sheet stack — z-order matches how they open on top of one another.
+  // Rendered inside the desktop phone AND inside the mobile PFM portal.
+  const sheets = (
+    <React.Fragment>
+      <BreakdownSheet T={T} open={breakdownOpen} onClose={() => setBreakdownOpen(false)} showLogos={t.showLogos} period={period} actions={actions} z={210} />
+      <AllTxnsSheet T={T} open={allTxnsOpen} onClose={() => setAllTxnsOpen(false)} showLogos={t.showLogos} period={period} onTxn={(tx) => actions.openTxn(tx)} z={230} />
+      {trends && <TrendsPage key={trends.mode + '-' + trends.catId} T={T} showLogos={t.showLogos} period={period} actions={actions} mode={trends.mode} initialCatId={trends.catId} onClose={() => setTrends(null)} />}
+      <TxnListSheet T={T} open={listOpen} onClose={() => setListOpen(false)} title={list.title} subtitle={list.subtitle} txns={list.txns} total={list.total} showLogos={t.showLogos} onTxn={(tx) => actions.openTxn(tx)} z={300} />
+      <TxnDetailSheet T={T} txn={txn} open={txnOpen} onClose={() => setTxnOpen(false)} showLogos={t.showLogos} onImprove={(tx) => { setTxnOpen(false); actions.openFeedback(tx); }} />
+      <FeedbackSheet T={T} txn={fbTxn} open={fbOpen} onClose={() => setFbOpen(false)} showLogos={t.showLogos} />
+      <PeriodSheet T={T} open={periodOpen} onClose={() => setPeriodOpen(false)} period={period} onPick={setPeriod} />
+    </React.Fragment>
+  );
 
   const phone = (
     <IOSDevice dark={T.dark} width={390} height={844}>
@@ -3074,17 +3132,7 @@ function ExpensesApp() {
                 : <RawTransactions T={T} period={period} enriched={enriched} onToggle={setEnriched} />}
             </div>
           </div>
-
-          {/* Sheet stack — z-order matches how they open on top of one another. Only in the enriched flow. */}
-          {enriched && <React.Fragment>
-          <BreakdownSheet T={T} open={breakdownOpen} onClose={() => setBreakdownOpen(false)} showLogos={t.showLogos} period={period} actions={actions} z={210} />
-          <AllTxnsSheet T={T} open={allTxnsOpen} onClose={() => setAllTxnsOpen(false)} showLogos={t.showLogos} period={period} onTxn={(tx) => actions.openTxn(tx)} z={230} />
-          {trends && <TrendsPage key={trends.mode + '-' + trends.catId} T={T} showLogos={t.showLogos} period={period} actions={actions} mode={trends.mode} initialCatId={trends.catId} onClose={() => setTrends(null)} />}
-          <TxnListSheet T={T} open={listOpen} onClose={() => setListOpen(false)} title={list.title} subtitle={list.subtitle} txns={list.txns} total={list.total} showLogos={t.showLogos} onTxn={(tx) => actions.openTxn(tx)} z={300} />
-          <TxnDetailSheet T={T} txn={txn} open={txnOpen} onClose={() => setTxnOpen(false)} showLogos={t.showLogos} onImprove={(tx) => { setTxnOpen(false); actions.openFeedback(tx); }} />
-          <FeedbackSheet T={T} txn={fbTxn} open={fbOpen} onClose={() => setFbOpen(false)} showLogos={t.showLogos} />
-          <PeriodSheet T={T} open={periodOpen} onClose={() => setPeriodOpen(false)} period={period} onPick={setPeriod} />
-          </React.Fragment>}
+          {enriched && sheets}
         </div>
       </IOSDevice>
   );
@@ -3162,10 +3210,12 @@ function ExpensesApp() {
           </p>
         </header>
 
-        <div style={{ marginTop: 30 }}>{phoneStage(mScale)}</div>
-        <p style={{ textAlign: 'center', fontSize: 13.5, color: MUT, margin: '18px auto 0', maxWidth: 340 }}>
-          Live demo — enrich the raw feed, then tap <b style={{ color: INK }}>Open in app</b>.
-        </p>
+        {/* The enrich list lives directly on the page — no phone-in-phone. */}
+        <div style={{ marginTop: 28, borderRadius: 24, border: `1px solid ${LINE}`, background: T.bg, overflow: 'hidden', boxShadow: '0 14px 40px rgba(11,36,31,0.10)' }}>
+          <div style={{ paddingTop: 20 }}>
+            <RawTransactions T={T} period={period} enriched={enriched} onToggle={setEnriched} ctaLabel="How it looks in your app" standalone />
+          </div>
+        </div>
 
         <section style={{ margin: '44px 0 0', padding: '32px 26px', borderRadius: 24, background: '#0B241F', color: '#fff', textAlign: 'center', boxShadow: '0 18px 50px rgba(11,36,31,0.22)' }}>
           <h2 style={{ fontSize: 25, fontWeight: 720, letterSpacing: '-0.025em', margin: 0, textWrap: 'balance' }}>Bring this to your customers</h2>
@@ -3185,6 +3235,19 @@ function ExpensesApp() {
           <a href="https://lunedata.io" target="_blank" rel="noopener noreferrer" style={{ color: MUT, textDecoration: 'none', fontWeight: 560 }}>lunedata.io ↗</a>
         </footer>
       </div>
+
+      {/* PFM portal — a whole new full-screen page you enter and exit,
+          not a container inside the landing. */}
+      {enriched && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 500, background: T.bg, animation: 'slideFwd .34s cubic-bezier(.32,.72,0,1) both' }}>
+          <div className="exp-screens" style={{ position: 'absolute', inset: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <div style={{ maxWidth: 560, margin: '0 auto', paddingTop: 18 }}>
+              <Spends T={T} showLogos={t.showLogos} period={period} actions={actions} enriched={enriched} onToggle={setEnriched} />
+            </div>
+          </div>
+          {sheets}
+        </div>
+      )}
     </div>
   );
 }
