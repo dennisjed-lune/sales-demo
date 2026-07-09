@@ -2699,7 +2699,7 @@ function WalletIcon({ size = 18, stroke, sw = 1.8 }) {
 //    single tap opens that category — no reveal-then-open double tap.
 function SpendRing({ data, total, prevTotal, dark, ink, muted, surface, onSlice }) {
   const [hover, setHover] = React.useState(null);
-  const W = 180, H = 180, cx = 90, cy = 90, R = 70, stroke = 19, gapDeg = 4;
+  const W = 164, H = 164, cx = 82, cy = 82, R = 63, stroke = 17, gapDeg = 4;
 
   const sorted = [...data].sort((a, b) => b.total - a.total);
   const topN = sorted.slice(0, 5);
@@ -2720,59 +2720,60 @@ function SpendRing({ data, total, prevTotal, dark, ink, muted, surface, onSlice 
 
   return (
     <div>
-    <div style={{ position: 'relative', width: W, height: H, margin: '0 auto' }}>
-      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
+    {/* Ring + legend side by side: legend rows sit NEXT TO the donut, one per
+        category, color-dot-keyed. Ring is sized so the legend always fits the
+        remaining width; long names ellipsize rather than wrap or collide. */}
+    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div style={{ position: 'relative', width: W, height: H, flexShrink: 0 }}>
+        <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
+          {segs.map((s) => {
+            const dim = hover != null && hover !== s.id;
+            return (
+              <path key={s.id} d={arc(R, s.start + gapDeg / 2, s.end - gapDeg / 2)} fill="none"
+                stroke={s.color} strokeWidth={hover === s.id ? stroke + 3 : stroke} strokeLinecap="round"
+                opacity={dim ? 0.4 : 1} onClick={() => open(s)}
+                onMouseEnter={() => setHover(s.id)} onMouseLeave={() => setHover(null)}
+                style={{ transition: 'opacity .2s var(--ease-out), stroke-width .18s var(--ease-out)', cursor: 'pointer' }} />
+            );
+          })}
+        </svg>
+
+        {/* centre: just the total — two calm lines, no crowding */}
+        <div style={{ position: 'absolute', left: 0, right: 0, top: cy, transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', pointerEvents: 'none' }}>
+          <div style={{ fontSize: 9.5, fontWeight: 680, letterSpacing: '0.08em', textTransform: 'uppercase', color: muted }}>Total spent</div>
+          {(() => {
+            const disp = total * ((window.CURRENT_REGION || {}).rate || 1);
+            const fs = disp >= 10000000 ? 15 : disp >= 1000000 ? 18 : disp >= 100000 ? 21 : 24;
+            return (
+              <div style={{ fontSize: fs, fontWeight: 730, color: ink, marginTop: 4, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                <span style={{ display: 'inline-flex', color: muted, marginRight: 3 }}><Dirham size={fs * 0.58} color="currentColor" /></span>{fmtAED(total)}
+              </div>
+            );
+          })()}
+        </div>
+      </div>
+
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
         {segs.map((s) => {
           const dim = hover != null && hover !== s.id;
           return (
-            <path key={s.id} d={arc(R, s.start + gapDeg / 2, s.end - gapDeg / 2)} fill="none"
-              stroke={s.color} strokeWidth={hover === s.id ? stroke + 4 : stroke} strokeLinecap="round"
-              opacity={dim ? 0.4 : 1} onClick={() => open(s)}
+            <button key={'lg' + s.id} className="pressable-row" onClick={() => open(s)}
               onMouseEnter={() => setHover(s.id)} onMouseLeave={() => setHover(null)}
-              style={{ transition: 'opacity .2s var(--ease-out), stroke-width .18s var(--ease-out)', cursor: 'pointer' }} />
+              style={{
+                display: 'flex', alignItems: 'center', gap: 7, minWidth: 0, padding: '4px 0',
+                border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+                opacity: dim ? 0.4 : 1, transition: 'opacity .2s',
+              }}>
+              <span style={{ width: 9, height: 9, borderRadius: 3, background: s.color, flexShrink: 0 }} />
+              <span style={{ fontSize: 12, fontWeight: 600, color: ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{s.name}</span>
+              <span style={{ fontSize: 11.5, fontWeight: 600, color: muted, fontVariantNumeric: 'tabular-nums', marginLeft: 'auto', flexShrink: 0 }}>{s.pct}%</span>
+            </button>
           );
         })}
-      </svg>
-
-      {/* centre: just the total — two calm lines, no crowding */}
-      <div style={{ position: 'absolute', left: 0, right: 0, top: cy, transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', pointerEvents: 'none' }}>
-        <div style={{ fontSize: 10.5, fontWeight: 680, letterSpacing: '0.09em', textTransform: 'uppercase', color: muted }}>Total spent</div>
-        {(() => {
-          const disp = total * ((window.CURRENT_REGION || {}).rate || 1);
-          const fs = disp >= 1000000 ? 20 : disp >= 100000 ? 24 : 29;
-          return (
-            <div style={{ fontSize: fs, fontWeight: 730, color: ink, marginTop: 5, letterSpacing: '-0.035em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-              <span style={{ display: 'inline-flex', color: muted, marginRight: 4 }}><Dirham size={fs * 0.58} color="currentColor" /></span>{fmtAED(total)}
-            </div>
-          );
-        })()}
       </div>
-
-    </div>
-
-    {/* Color-keyed legend — the dot ties each heading to its slice, so the
-        headings can never mis-point the way de-collided callouts did when
-        several small slices clustered on one side of the ring. */}
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '4px 20px', margin: '16px 4px 0' }}>
-      {segs.map((s) => {
-        const dim = hover != null && hover !== s.id;
-        return (
-          <button key={'lg' + s.id} className="pressable-row" onClick={() => open(s)}
-            onMouseEnter={() => setHover(s.id)} onMouseLeave={() => setHover(null)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, padding: '4px 0',
-              border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
-              opacity: dim ? 0.4 : 1, transition: 'opacity .2s',
-            }}>
-            <span style={{ width: 10, height: 10, borderRadius: 3.5, background: s.color, flexShrink: 0 }} />
-            <span style={{ fontSize: 12.5, fontWeight: 600, color: ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{s.name}</span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: muted, fontVariantNumeric: 'tabular-nums', marginLeft: 'auto', flexShrink: 0 }}>{s.pct}%</span>
-          </button>
-        );
-      })}
     </div>
     {delta != null && (
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 14 }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 11px', borderRadius: 999, fontSize: 12, fontWeight: 640, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums', color: up ? T_POS_INK(dark) : T_NEG_INK(dark), background: up ? T_POS_BG(dark) : T_NEG_BG(dark) }}>
           <UIIcon name={up ? 'arrowUp' : 'arrowDn'} size={12} stroke="currentColor" />{Math.abs(delta)}% vs last period
         </span>
@@ -3617,7 +3618,7 @@ function ExpensesApp() {
             <LuneMark size={26} disc="#0B241F" crescent={A} />
             <span style={{ fontSize: 20, fontWeight: 720, letterSpacing: '-0.02em' }}>Lune</span>
           </div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, margin: '22px auto 0', padding: '6px 13px', borderRadius: 999, background: hexA(A, 0.1), color: '#0A634D', fontSize: 12.5, fontWeight: 600 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, margin: '18px auto 0', padding: '6px 13px', borderRadius: 999, background: hexA(A, 0.1), color: '#0A634D', fontSize: 12.5, fontWeight: 600, width: 'fit-content' }}>
             <span style={{ width: 6, height: 6, borderRadius: 999, background: A }} />Transaction intelligence, live
           </div>
           <h1 style={{ fontSize: 'clamp(30px,8vw,42px)', fontWeight: 760, letterSpacing: '-0.035em', lineHeight: 1.05, margin: '16px 0 0', textWrap: 'balance' }}>
