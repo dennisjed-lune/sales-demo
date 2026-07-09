@@ -84,10 +84,10 @@
     { id: 19, name: 'Miscellaneous',      color: '#7E8E89', glyph: 'miscellaneous'       },
   ];
 
-  // ── Brands per category: monthly spend (AED) + typical monthly txn count.
-  // Curated to brands with clean, recognisable logos; counts reflect a normal
-  // active card user's month (they scale up across 3/6/12-month windows).
-  const BRANDS = {
+  // ── Brands per category: monthly spend (base units) + typical monthly txn
+  // count. One catalog per region — same category taxonomy, local brands.
+  // Every domain is pre-verified against logo.dev (real logo, not a monogram).
+  const CATALOG_ME = {
     6:  [ { name: 'Carrefour', total: 1284.40, count: 9 }, { name: 'Tesco', total: 640.10, count: 6 },
           { name: 'Whole Foods Market', total: 548.75, count: 5 }, { name: 'Waitrose', total: 340.20, count: 4 },
           { name: 'Costco', total: 420.40, count: 3 }, { name: "Trader Joe's", total: 150.10, count: 3 } ],
@@ -138,8 +138,212 @@
           { name: 'Google One', total: 31.99, count: 1 }, { name: 'iCloud+', total: 11.99, count: 1 } ],
   };
 
+  // SaaS subscriptions are global — shared by every regional catalog.
+  const SAAS = [ { name: 'Adobe', total: 74.99, count: 1 }, { name: 'ChatGPT', total: 73.40, count: 1 },
+    { name: 'Microsoft 365', total: 47.00, count: 1 }, { name: 'Canva', total: 45.00, count: 1 },
+    { name: 'Notion', total: 40.00, count: 1 }, { name: 'Dropbox', total: 39.99, count: 1 },
+    { name: 'Google One', total: 31.99, count: 1 }, { name: 'iCloud+', total: 11.99, count: 1 } ];
+
+  const CATALOG_EU = {
+    6:  [ { name: 'Carrefour', total: 1180.40, count: 8 }, { name: 'Tesco', total: 720.10, count: 6 },
+          { name: 'Lidl', total: 460.30, count: 5 }, { name: 'Aldi', total: 310.00, count: 4 },
+          { name: "Sainsbury's", total: 280.20, count: 3 }, { name: 'Waitrose', total: 240.00, count: 2 } ],
+    10: [ { name: 'Deliveroo', total: 520.30, count: 9 }, { name: 'Starbucks', total: 380.00, count: 13 },
+          { name: 'Just Eat', total: 310.00, count: 6 }, { name: "McDonald's", total: 210.20, count: 6 },
+          { name: 'Pret A Manger', total: 180.75, count: 5 }, { name: "Nando's", total: 150.00, count: 3 },
+          { name: 'Costa Coffee', total: 140.50, count: 5 }, { name: 'Greggs', total: 66.40, count: 4 } ],
+    11: [ { name: 'Amazon', total: 920.20, count: 6 }, { name: 'IKEA', total: 420.00, count: 2 },
+          { name: 'Zalando', total: 340.00, count: 2 }, { name: 'Nike', total: 280.40, count: 2 },
+          { name: 'Zara', total: 264.90, count: 3 }, { name: 'Decathlon', total: 210.00, count: 2 },
+          { name: 'H&M', total: 176.30, count: 3 }, { name: 'Primark', total: 150.00, count: 2 } ],
+    14: [ { name: 'Uber', total: 420.90, count: 16 }, { name: 'Shell', total: 380.00, count: 5 },
+          { name: 'Deutsche Bahn', total: 260.50, count: 5 }, { name: 'Bolt', total: 180.60, count: 8 },
+          { name: 'BP', total: 160.30, count: 3 }, { name: 'TotalEnergies', total: 140.00, count: 3 } ],
+    9:  [ { name: 'Vodafone', total: 480.00, count: 1 }, { name: 'E.ON', total: 420.00, count: 1 },
+          { name: 'Orange', total: 350.00, count: 1 }, { name: 'O2', total: 240.00, count: 1 } ],
+    15: [ { name: 'Lufthansa', total: 2180.00, count: 1 }, { name: 'British Airways', total: 1480.00, count: 1 },
+          { name: 'Airbnb', total: 820.00, count: 1 }, { name: 'Booking.com', total: 764.50, count: 1 },
+          { name: 'Ryanair', total: 420.00, count: 1 }, { name: 'easyJet', total: 380.00, count: 1 },
+          { name: 'Eurostar', total: 340.00, count: 1 } ],
+    7:  [ { name: 'Boots', total: 244.60, count: 4 }, { name: 'PureGym', total: 220.00, count: 1 },
+          { name: 'dm', total: 160.30, count: 3 }, { name: 'Basic-Fit', total: 130.00, count: 1 },
+          { name: 'Holland & Barrett', total: 110.00, count: 2 } ],
+    4:  [ { name: 'PlayStation', total: 229.00, count: 2 }, { name: 'Sky', total: 180.00, count: 1 },
+          { name: 'Disney+', total: 99.00, count: 1 }, { name: 'Steam', total: 88.00, count: 2 },
+          { name: 'Netflix', total: 56.99, count: 1 }, { name: 'Prime Video', total: 24.00, count: 1 },
+          { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'PayPal', total: 312.40, count: 3 }, { name: 'Revolut', total: 200.00, count: 1 },
+          { name: 'Klarna', total: 188.00, count: 2 }, { name: 'N26', total: 120.00, count: 1 },
+          { name: 'Wise', total: 96.00, count: 1 } ],
+    16: [ { name: 'Santander', total: 1150.00, count: 1 }, { name: 'ING', total: 840.00, count: 1 },
+          { name: 'HSBC', total: 620.00, count: 1 } ],
+    17: [ { name: 'Allianz', total: 460.00, count: 1 }, { name: 'AXA', total: 330.00, count: 1 },
+          { name: 'Zurich', total: 210.00, count: 1 } ],
+    18: SAAS,
+  };
+
+  // Japanese brands carry their native name plus a Latin transliteration.
+  const CATALOG_JP = {
+    6:  [ { name: 'セブン-イレブン 7-Eleven', total: 980.40, count: 14 }, { name: 'イオン AEON', total: 760.00, count: 5 },
+          { name: 'ローソン Lawson', total: 620.10, count: 10 }, { name: 'ファミリーマート FamilyMart', total: 540.30, count: 9 } ],
+    10: [ { name: 'Uber Eats', total: 420.30, count: 7 }, { name: 'スターバックス Starbucks', total: 360.00, count: 12 },
+          { name: 'くら寿司 Kura Sushi', total: 220.50, count: 4 }, { name: "マクドナルド McDonald's", total: 190.20, count: 6 },
+          { name: '吉野家 Yoshinoya', total: 180.20, count: 6 }, { name: 'サイゼリヤ Saizeriya', total: 160.00, count: 4 },
+          { name: 'すき家 Sukiya', total: 140.00, count: 5 } ],
+    11: [ { name: 'Amazon', total: 880.20, count: 6 }, { name: '楽天市場 Rakuten', total: 640.00, count: 4 },
+          { name: 'ヨドバシカメラ Yodobashi', total: 320.40, count: 1 }, { name: 'ユニクロ Uniqlo', total: 280.50, count: 2 },
+          { name: '無印良品 MUJI', total: 220.00, count: 2 }, { name: 'ニトリ Nitori', total: 190.00, count: 1 },
+          { name: 'ドン・キホーテ Don Quijote', total: 180.00, count: 3 } ],
+    14: [ { name: 'JR東日本 JR East', total: 420.90, count: 18 }, { name: 'ENEOS', total: 320.00, count: 4 },
+          { name: '東京メトロ Tokyo Metro', total: 180.60, count: 14 }, { name: 'Uber', total: 140.30, count: 4 } ],
+    9:  [ { name: '東京電力 TEPCO', total: 480.00, count: 1 }, { name: 'NTTドコモ docomo', total: 420.00, count: 1 },
+          { name: 'ソフトバンク SoftBank', total: 360.00, count: 1 }, { name: 'au', total: 300.00, count: 1 },
+          { name: '東京ガス Tokyo Gas', total: 260.00, count: 1 } ],
+    15: [ { name: 'ANA 全日空', total: 1980.00, count: 1 }, { name: 'JAL 日本航空', total: 1680.00, count: 1 },
+          { name: 'Booking.com', total: 664.50, count: 1 }, { name: 'アパホテル APA Hotel', total: 420.00, count: 1 },
+          { name: 'Agoda', total: 412.30, count: 1 } ],
+    7:  [ { name: 'マツモトキヨシ Matsumoto Kiyoshi', total: 240.60, count: 4 }, { name: 'Anytime Fitness', total: 220.00, count: 1 } ],
+    4:  [ { name: '任天堂 Nintendo', total: 240.00, count: 2 }, { name: 'PlayStation', total: 229.00, count: 2 },
+          { name: 'TOHOシネマズ TOHO Cinemas', total: 180.00, count: 2 }, { name: 'U-NEXT', total: 80.00, count: 1 },
+          { name: 'Netflix', total: 56.99, count: 1 }, { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'PayPay', total: 380.40, count: 8 }, { name: 'LINE Pay', total: 180.00, count: 4 },
+          { name: 'Wise', total: 96.00, count: 1 } ],
+    16: [ { name: '三菱UFJ銀行 MUFG', total: 1150.00, count: 1 }, { name: 'みずほ銀行 Mizuho', total: 840.00, count: 1 },
+          { name: '三井住友銀行 SMBC', total: 620.00, count: 1 } ],
+    17: [ { name: '東京海上日動 Tokio Marine', total: 420.00, count: 1 }, { name: '日本生命 Nissay', total: 330.00, count: 1 } ],
+    18: SAAS,
+  };
+
+  const CATALOG_MY = {
+    6:  [ { name: 'Jaya Grocer', total: 880.40, count: 7 }, { name: 'Village Grocer', total: 560.10, count: 5 },
+          { name: "Lotus's", total: 460.30, count: 4 }, { name: 'AEON', total: 320.00, count: 3 },
+          { name: '99 Speedmart', total: 240.00, count: 6 } ],
+    10: [ { name: 'GrabFood', total: 620.30, count: 12 }, { name: 'Starbucks', total: 280.00, count: 8 },
+          { name: "McDonald's", total: 190.20, count: 6 }, { name: 'OldTown White Coffee', total: 180.20, count: 5 },
+          { name: 'Secret Recipe', total: 160.50, count: 3 }, { name: 'ZUS Coffee', total: 140.00, count: 7 },
+          { name: 'Tealive', total: 120.00, count: 6 } ],
+    11: [ { name: 'Shopee', total: 780.20, count: 8 }, { name: 'Lazada', total: 540.00, count: 5 },
+          { name: 'Uniqlo', total: 240.40, count: 2 }, { name: 'Zalora', total: 220.00, count: 2 },
+          { name: 'Mr DIY', total: 180.50, count: 3 }, { name: 'Padini', total: 160.00, count: 2 } ],
+    14: [ { name: 'Grab', total: 420.90, count: 16 }, { name: 'Petronas', total: 380.00, count: 5 },
+          { name: 'Shell', total: 260.00, count: 4 }, { name: "Touch 'n Go", total: 180.60, count: 12 },
+          { name: 'Rapid KL', total: 90.30, count: 10 } ],
+    9:  [ { name: 'Tenaga Nasional', total: 380.00, count: 1 }, { name: 'Maxis', total: 320.00, count: 1 },
+          { name: 'CelcomDigi', total: 260.00, count: 1 }, { name: 'Astro', total: 240.00, count: 1 },
+          { name: 'Unifi', total: 220.00, count: 1 } ],
+    15: [ { name: 'Malaysia Airlines', total: 1480.00, count: 1 }, { name: 'AirAsia', total: 980.00, count: 1 },
+          { name: 'Agoda', total: 512.30, count: 1 }, { name: 'Booking.com', total: 464.50, count: 1 } ],
+    7:  [ { name: 'Watsons', total: 220.30, count: 3 }, { name: 'Guardian', total: 190.60, count: 3 },
+          { name: 'Fitness First', total: 350.00, count: 1 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'GSC Cinemas', total: 120.00, count: 2 },
+          { name: 'Disney+', total: 99.00, count: 1 }, { name: 'TGV Cinemas', total: 90.00, count: 1 },
+          { name: 'Netflix', total: 56.99, count: 1 }, { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'Boost', total: 240.40, count: 6 }, { name: 'PayPal', total: 212.40, count: 2 },
+          { name: 'BigPay', total: 160.00, count: 3 }, { name: 'Wise', total: 96.00, count: 1 } ],
+    16: [ { name: 'Maybank', total: 1150.00, count: 1 }, { name: 'CIMB', total: 840.00, count: 1 },
+          { name: 'RHB Bank', total: 620.00, count: 1 } ],
+    17: [ { name: 'AIA', total: 420.00, count: 1 }, { name: 'Prudential', total: 330.00, count: 1 },
+          { name: 'Etiqa', total: 280.00, count: 1 } ],
+    18: SAAS,
+  };
+
+  const CATALOG_SG = {
+    6:  [ { name: 'FairPrice', total: 880.40, count: 7 }, { name: 'Cold Storage', total: 460.10, count: 4 },
+          { name: 'Sheng Siong', total: 360.30, count: 4 } ],
+    10: [ { name: 'GrabFood', total: 520.30, count: 10 }, { name: 'foodpanda', total: 340.00, count: 7 },
+          { name: 'Starbucks', total: 280.00, count: 8 }, { name: "McDonald's", total: 190.20, count: 6 },
+          { name: 'Ya Kun Kaya Toast', total: 90.20, count: 5 }, { name: 'Toast Box', total: 80.00, count: 4 } ],
+    11: [ { name: 'Shopee', total: 680.20, count: 7 }, { name: 'Lazada', total: 440.00, count: 4 },
+          { name: 'IKEA', total: 380.00, count: 1 }, { name: 'Charles & Keith', total: 260.00, count: 1 },
+          { name: 'Uniqlo', total: 240.40, count: 2 }, { name: 'Courts', total: 220.00, count: 1 } ],
+    14: [ { name: 'Grab', total: 420.90, count: 15 }, { name: 'Shell', total: 220.00, count: 3 },
+          { name: 'Gojek', total: 180.60, count: 7 }, { name: 'ComfortDelGro', total: 160.00, count: 6 },
+          { name: 'EZ-Link', total: 120.30, count: 16 }, { name: 'SMRT', total: 90.00, count: 9 } ],
+    9:  [ { name: 'SP Group', total: 380.00, count: 1 }, { name: 'Singtel', total: 320.00, count: 1 },
+          { name: 'StarHub', total: 240.00, count: 1 }, { name: 'M1', total: 180.00, count: 1 } ],
+    15: [ { name: 'Singapore Airlines', total: 2280.00, count: 1 }, { name: 'Marina Bay Sands', total: 880.00, count: 1 },
+          { name: 'Agoda', total: 512.30, count: 1 }, { name: 'Scoot', total: 480.00, count: 1 },
+          { name: 'Booking.com', total: 464.50, count: 1 }, { name: 'Jetstar', total: 320.00, count: 1 } ],
+    7:  [ { name: 'Watsons', total: 200.30, count: 3 }, { name: 'Guardian', total: 190.60, count: 3 },
+          { name: 'Fitness First', total: 350.00, count: 1 }, { name: 'Virgin Active', total: 280.00, count: 1 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'Golden Village', total: 120.00, count: 2 },
+          { name: 'Disney+', total: 99.00, count: 1 }, { name: 'Netflix', total: 56.99, count: 1 },
+          { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'YouTrip', total: 240.40, count: 3 }, { name: 'PayPal', total: 212.40, count: 2 },
+          { name: 'Wise', total: 96.00, count: 1 } ],
+    16: [ { name: 'DBS', total: 1150.00, count: 1 }, { name: 'OCBC', total: 840.00, count: 1 },
+          { name: 'UOB', total: 620.00, count: 1 } ],
+    17: [ { name: 'AIA', total: 420.00, count: 1 }, { name: 'Great Eastern', total: 330.00, count: 1 },
+          { name: 'Prudential', total: 280.00, count: 1 } ],
+    18: SAAS,
+  };
+
+  const CATALOG_ZA = {
+    6:  [ { name: 'Checkers', total: 780.40, count: 6 }, { name: 'Pick n Pay', total: 560.10, count: 5 },
+          { name: 'Woolworths', total: 480.30, count: 4 }, { name: 'SPAR', total: 260.00, count: 3 },
+          { name: 'Shoprite', total: 240.00, count: 3 } ],
+    10: [ { name: 'Uber Eats', total: 320.30, count: 6 }, { name: "Nando's", total: 220.30, count: 4 },
+          { name: "McDonald's", total: 150.20, count: 5 }, { name: 'Mugg & Bean', total: 140.00, count: 3 },
+          { name: 'Steers', total: 120.20, count: 3 }, { name: 'Vida e Caffè', total: 110.50, count: 5 },
+          { name: 'Wimpy', total: 90.00, count: 2 } ],
+    11: [ { name: 'Takealot', total: 680.20, count: 5 }, { name: 'Nike', total: 280.40, count: 1 },
+          { name: 'Mr Price', total: 240.00, count: 3 }, { name: 'Superbalist', total: 220.00, count: 2 },
+          { name: 'H&M', total: 156.30, count: 2 } ],
+    14: [ { name: 'Uber', total: 380.90, count: 14 }, { name: 'Engen', total: 320.00, count: 4 },
+          { name: 'Bolt', total: 220.60, count: 10 }, { name: 'Sasol', total: 180.00, count: 3 },
+          { name: 'Gautrain', total: 120.30, count: 8 } ],
+    9:  [ { name: 'Eskom', total: 420.00, count: 1 }, { name: 'Vodacom', total: 380.00, count: 1 },
+          { name: 'MTN', total: 300.00, count: 1 }, { name: 'DStv', total: 260.00, count: 1 },
+          { name: 'Telkom', total: 220.00, count: 1 } ],
+    15: [ { name: 'South African Airways', total: 1280.00, count: 1 }, { name: 'Airbnb', total: 620.00, count: 1 },
+          { name: 'FlySafair', total: 480.00, count: 1 }, { name: 'Booking.com', total: 464.50, count: 1 } ],
+    7:  [ { name: 'Clicks', total: 240.60, count: 4 }, { name: 'Dis-Chem', total: 220.30, count: 3 },
+          { name: 'Virgin Active', total: 350.00, count: 1 }, { name: 'Planet Fitness', total: 180.00, count: 1 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'Ster-Kinekor', total: 120.00, count: 2 },
+          { name: 'Netflix', total: 56.99, count: 1 }, { name: 'Showmax', total: 39.00, count: 1 },
+          { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'SnapScan', total: 180.40, count: 5 }, { name: 'Zapper', total: 120.00, count: 3 },
+          { name: 'PayPal', total: 212.40, count: 2 } ],
+    16: [ { name: 'Standard Bank', total: 1150.00, count: 1 }, { name: 'FNB', total: 840.00, count: 1 },
+          { name: 'Absa', total: 620.00, count: 1 }, { name: 'Capitec', total: 480.00, count: 1 },
+          { name: 'Nedbank', total: 380.00, count: 1 } ],
+    17: [ { name: 'Discovery', total: 520.00, count: 1 }, { name: 'Old Mutual', total: 330.00, count: 1 },
+          { name: 'Santam', total: 280.00, count: 1 }, { name: 'OUTsurance', total: 240.00, count: 1 } ],
+    18: SAAS,
+  };
+
+  // Region registry: display meta + currency (symbol/rate/decimals) + catalog.
+  // rate converts base units to local display units; dec 0 = whole yen.
+  window.REGIONS = {
+    me: { name: 'Middle East', flag: '🌍', code: 'AED', symbol: null, rate: 1,    dec: 2, catalog: CATALOG_ME },
+    eu: { name: 'Europe',      flag: '🇪🇺', code: 'EUR', symbol: '€',  rate: 0.25, dec: 2, catalog: CATALOG_EU },
+    jp: { name: 'Japan',       flag: '🇯🇵', code: 'JPY', symbol: '¥',  rate: 41,   dec: 0, catalog: CATALOG_JP },
+    my: { name: 'Malaysia',    flag: '🇲🇾', code: 'MYR', symbol: 'RM', rate: 1.2,  dec: 2, catalog: CATALOG_MY },
+    sg: { name: 'Singapore',   flag: '🇸🇬', code: 'SGD', symbol: 'S$', rate: 0.37, dec: 2, catalog: CATALOG_SG },
+    za: { name: 'South Africa', flag: '🇿🇦', code: 'ZAR', symbol: 'R',  rate: 5,    dec: 2, catalog: CATALOG_ZA },
+  };
+
+  // Build (or rebuild) the entire dataset for one region — everything below
+  // closes over that region's BRANDS, and window.EXP_DATA is replaced wholesale.
+  function build(regionKey) {
+    const REG = window.REGIONS[regionKey] || window.REGIONS.me;
+    window.CURRENT_REGION = { key: regionKey, name: REG.name, code: REG.code, symbol: REG.symbol, rate: REG.rate, dec: REG.dec };
+    const BRANDS = REG.catalog;
+
   const MERCHANT_CAT = {};
   Object.keys(BRANDS).forEach((cid) => { BRANDS[cid].forEach((b) => { MERCHANT_CAT[b.name] = Number(cid); }); });
+
+  // Which card each brand settles on: loans/insurance/utilities/BNPL out of the
+  // savings account, travel/shopping/entertainment/SaaS on credit, everyday
+  // spend on debit — with a sprinkle of dining/groceries on credit for realism.
+  const CARD_OF_CAT = { 16: 'savings', 17: 'savings', 9: 'savings', 1: 'savings', 15: 'credit', 11: 'credit', 4: 'credit', 18: 'credit', 6: 'debit', 10: 'debit', 14: 'debit', 7: 'debit', 3: 'debit', 5: 'debit', 19: 'debit' };
+  const CARD_TYPE = {};
+  Object.keys(BRANDS).forEach((cid) => { BRANDS[cid].forEach((b, i) => {
+    let ct = CARD_OF_CAT[cid] || 'debit';
+    if ((cid === '10' || cid === '6') && i % 3 === 2) ct = 'credit';
+    CARD_TYPE[b.name] = ct;
+  }); });
+  const cardOK = (name) => { const f = window.EXP_CARD_FILTER || 'all'; return f === 'all' || CARD_TYPE[name] === f; };
 
   const rng = (seed) => { let s = (seed >>> 0) || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; };
   const r2 = (n) => Math.round(n * 100) / 100;
@@ -180,7 +384,7 @@
   // Sum brand-months [start,end) into category + brand aggregates.
   function aggregate(start, end) {
     const cats = CATEGORIES.map((c) => {
-      const bms = BRAND_MONTHLY[c.id] || [];
+      const bms = (BRAND_MONTHLY[c.id] || []).filter((bm) => cardOK(bm.name));
       const brands = bms.map((bm) => {
         let total = 0, count = 0;
         for (let m = start; m < end; m++) { total += bm.months[m].amount; count += bm.months[m].count; }
@@ -199,12 +403,12 @@
   function categoryMonths(cid) {
     const bms = BRAND_MONTHLY[cid] || [];
     const vals = [];
-    for (let m = 0; m < NUM_MONTHS; m++) { let t = 0; bms.forEach((bm) => { t += bm.months[m].amount; }); vals.push(Math.round(t)); }
+    for (let m = 0; m < NUM_MONTHS; m++) { let t = 0; bms.forEach((bm) => { if (cardOK(bm.name)) t += bm.months[m].amount; }); vals.push(Math.round(t)); }
     return { labels: MONTH_LABELS, vals };
   }
   function monthlyTotals() {
     const vals = MONTH_LABELS.map(() => 0);
-    Object.keys(BRAND_MONTHLY).forEach((cid) => { BRAND_MONTHLY[cid].forEach((bm) => { bm.months.forEach((mm, i) => { vals[i] += mm.amount; }); }); });
+    Object.keys(BRAND_MONTHLY).forEach((cid) => { BRAND_MONTHLY[cid].forEach((bm) => { if (!cardOK(bm.name)) return; bm.months.forEach((mm, i) => { vals[i] += mm.amount; }); }); });
     return { labels: MONTH_LABELS, vals: vals.map((v) => Math.round(v)) };
   }
 
@@ -232,7 +436,7 @@
     const out = [];
     for (let m = end - 1; m >= start; m--) {
       const monthTxns = [];
-      CATEGORIES.forEach((c) => { (BRAND_MONTHLY[c.id] || []).forEach((bm) => { const mm = bm.months[m]; if (mm.amount > 0) monthTxns.push(...bucketTxns(bm.name, c.id, m, mm.amount, mm.count)); }); });
+      CATEGORIES.forEach((c) => { (BRAND_MONTHLY[c.id] || []).forEach((bm) => { const mm = bm.months[m]; if (mm.amount > 0 && cardOK(bm.name)) monthTxns.push(...bucketTxns(bm.name, c.id, m, mm.amount, mm.count)); }); });
       monthTxns.sort((a, b) => Number(b.day) - Number(a.day));
       out.push(...monthTxns);
       if (cap && out.length >= cap) break;
@@ -241,7 +445,7 @@
   }
   function txnsForCategory(cid, n) {
     const N = n || 1; const out = [];
-    for (let m = NUM_MONTHS - 1; m >= NUM_MONTHS - N; m--) { (BRAND_MONTHLY[cid] || []).forEach((bm) => { const mm = bm.months[m]; if (mm.amount > 0) out.push(...bucketTxns(bm.name, cid, m, mm.amount, mm.count)); }); }
+    for (let m = NUM_MONTHS - 1; m >= NUM_MONTHS - N; m--) { (BRAND_MONTHLY[cid] || []).forEach((bm) => { const mm = bm.months[m]; if (mm.amount > 0 && cardOK(bm.name)) out.push(...bucketTxns(bm.name, cid, m, mm.amount, mm.count)); }); }
     return out.slice(0, 80);
   }
   function txnsForBrand(cid, brandName, n) {
@@ -251,7 +455,7 @@
     return out.slice(0, 60);
   }
   function txnsForCategoryMonth(cid, monthIdx) {
-    const out = []; (BRAND_MONTHLY[cid] || []).forEach((bm) => { const mm = bm.months[monthIdx]; if (mm.amount > 0) out.push(...bucketTxns(bm.name, cid, monthIdx, mm.amount, mm.count)); });
+    const out = []; (BRAND_MONTHLY[cid] || []).forEach((bm) => { const mm = bm.months[monthIdx]; if (mm.amount > 0 && cardOK(bm.name)) out.push(...bucketTxns(bm.name, cid, monthIdx, mm.amount, mm.count)); });
     return out.sort((a, b) => Number(b.day) - Number(a.day));
   }
   function brandMonths(cid, brandName) {
@@ -300,12 +504,16 @@
   }
 
   window.EXP_DATA = {
-    CATEGORIES, BRANDS, CATEGORY_SPEND, TOTAL, PREV, TRANSACTIONS, MERCHANT_CAT,
+    CATEGORIES, BRANDS, CATEGORY_SPEND, TOTAL, PREV, TRANSACTIONS, MERCHANT_CAT, CARD_TYPE,
     MONTH_LABELS, MONTH_YEAR, NUM_MONTHS,
     txnsForCategory, txnsForBrand, txnsForCategoryMonth, categoryMonths, brandMonths, monthlyTotals,
     forPeriod, monthsForPeriod, PERIOD_PRESETS, makePeriod, periodOfDays, ANCHOR_MS: +ANCHOR,
     CURRENT_PERIOD: periodOfDays(30),
   };
+  } // end build()
+
+  window.BUILD_EXP_DATA = build;
+  build('me');
 })();
 
 </script>
@@ -1304,6 +1512,60 @@ const MERCHANT_DOMAIN = {
   'Udacity': 'udacity.com', 'Coursera': 'coursera.org', 'Udemy': 'udemy.com', 'Skillshare': 'skillshare.com',
   'Adobe': 'adobe.com', 'ChatGPT': 'openai.com', 'Microsoft 365': 'microsoft.com', 'Canva': 'canva.com',
   'Notion': 'notion.so', 'Dropbox': 'dropbox.com', 'Google One': 'google.com', 'iCloud+': 'apple.com',
+  // ── Europe
+  'Lidl': 'lidl.com', 'Aldi': 'aldi.us', "Sainsbury's": 'sainsburys.co.uk', 'Just Eat': 'just-eat.com',
+  "Nando's": 'nandos.com', 'Pret A Manger': 'pret.com', 'Greggs': 'greggs.co.uk', 'Zalando': 'zalando.com',
+  'Decathlon': 'decathlon.com', 'Primark': 'primark.com', 'Deutsche Bahn': 'bahn.de', 'TotalEnergies': 'totalenergies.com',
+  'Orange': 'orange.com', 'O2': 'o2.co.uk', 'E.ON': 'eon.com', 'Ryanair': 'ryanair.com', 'easyJet': 'easyjet.com',
+  'Eurostar': 'eurostar.com', 'dm': 'dm.de', 'PureGym': 'puregym.com', 'Basic-Fit': 'basic-fit.com',
+  'Sky': 'sky.com', 'N26': 'n26.com', 'Santander': 'santander.com', 'ING': 'ing.com', 'Zurich': 'zurich.com',
+  // ── Japan (native name + transliteration keys)
+  'セブン-イレブン 7-Eleven': '7-eleven.com', 'ローソン Lawson': 'lawson.co.jp', 'ファミリーマート FamilyMart': 'family.co.jp',
+  'イオン AEON': 'aeon.info', 'スターバックス Starbucks': 'starbucks.com', "マクドナルド McDonald's": 'mcdonalds.com',
+  '吉野家 Yoshinoya': 'yoshinoya.com', 'すき家 Sukiya': 'sukiya.jp', 'くら寿司 Kura Sushi': 'kurasushi.co.jp',
+  'サイゼリヤ Saizeriya': 'saizeriya.co.jp', '楽天市場 Rakuten': 'rakuten.co.jp', 'ユニクロ Uniqlo': 'uniqlo.com',
+  '無印良品 MUJI': 'muji.com', 'ドン・キホーテ Don Quijote': 'donki.com', 'ヨドバシカメラ Yodobashi': 'yodobashi.com',
+  'ニトリ Nitori': 'nitori.co.jp', 'JR東日本 JR East': 'jreast.co.jp', '東京メトロ Tokyo Metro': 'tokyometro.jp',
+  'ENEOS': 'eneos.co.jp', 'NTTドコモ docomo': 'nttdocomo.co.jp', 'ソフトバンク SoftBank': 'softbank.jp', 'au': 'au.com',
+  '東京電力 TEPCO': 'tepco.co.jp', '東京ガス Tokyo Gas': 'tokyo-gas.co.jp', 'ANA 全日空': 'ana.co.jp',
+  'JAL 日本航空': 'jal.com', 'アパホテル APA Hotel': 'apahotel.com', 'マツモトキヨシ Matsumoto Kiyoshi': 'matsukiyo.co.jp',
+  'Anytime Fitness': 'anytimefitness.com', '任天堂 Nintendo': 'nintendo.com', 'TOHOシネマズ TOHO Cinemas': 'tohotheater.jp',
+  'U-NEXT': 'unext.jp', 'PayPay': 'paypay.ne.jp', 'LINE Pay': 'line.me', '三菱UFJ銀行 MUFG': 'mufg.jp',
+  'みずほ銀行 Mizuho': 'mizuhogroup.com', '三井住友銀行 SMBC': 'smbc.co.jp', '東京海上日動 Tokio Marine': 'tokiomarine.com',
+  '日本生命 Nissay': 'nissay.co.jp',
+  // ── Malaysia
+  'Jaya Grocer': 'jayagrocer.com', 'Village Grocer': 'villagegrocer.com', "Lotus's": 'lotuss.com.my',
+  '99 Speedmart': '99speedmart.com.my', 'AEON': 'aeon.info', 'GrabFood': 'grab.com', 'OldTown White Coffee': 'oldtown.com.my',
+  'Secret Recipe': 'secretrecipe.com.my', 'ZUS Coffee': 'zuscoffee.com', 'Tealive': 'tealive.com.my',
+  'Shopee': 'shopee.com', 'Lazada': 'lazada.com', 'Mr DIY': 'mrdiy.com', 'Padini': 'padini.com', 'Zalora': 'zalora.com',
+  'Grab': 'grab.com', 'Petronas': 'petronas.com', "Touch 'n Go": 'touchngo.com.my', 'Rapid KL': 'myrapid.com.my',
+  'Tenaga Nasional': 'tnb.com.my', 'Maxis': 'maxis.com.my', 'CelcomDigi': 'celcomdigi.com', 'Astro': 'astro.com.my',
+  'Unifi': 'unifi.com.my', 'Malaysia Airlines': 'malaysiaairlines.com', 'AirAsia': 'airasia.com',
+  'GSC Cinemas': 'gsc.com.my', 'TGV Cinemas': 'tgv.com.my', 'Boost': 'myboost.com.my', 'BigPay': 'bigpayme.com',
+  'Maybank': 'maybank.com', 'CIMB': 'cimb.com', 'RHB Bank': 'rhbgroup.com', 'AIA': 'aia.com',
+  'Prudential': 'prudential.com', 'Etiqa': 'etiqa.com.my',
+  // ── Singapore
+  'FairPrice': 'fairprice.com.sg', 'Cold Storage': 'coldstorage.com.sg', 'Sheng Siong': 'shengsiong.com.sg',
+  'foodpanda': 'foodpanda.com', 'Ya Kun Kaya Toast': 'yakun.com', 'Toast Box': 'toastbox.com.sg',
+  'Charles & Keith': 'charleskeith.com', 'Courts': 'courts.com.sg', 'Gojek': 'gojek.com',
+  'ComfortDelGro': 'comfortdelgro.com', 'EZ-Link': 'ezlink.com.sg', 'SMRT': 'smrt.com.sg',
+  'SP Group': 'spgroup.com.sg', 'Singtel': 'singtel.com', 'StarHub': 'starhub.com', 'M1': 'm1.com.sg',
+  'Singapore Airlines': 'singaporeair.com', 'Scoot': 'flyscoot.com', 'Marina Bay Sands': 'marinabaysands.com',
+  'Jetstar': 'jetstar.com', 'Watsons': 'watsons.com.sg', 'Guardian': 'guardian.com.sg',
+  'Golden Village': 'gv.com.sg', 'YouTrip': 'you.co', 'DBS': 'dbs.com', 'OCBC': 'ocbc.com', 'UOB': 'uob.com.sg',
+  'Great Eastern': 'greateasternlife.com',
+  // ── South Africa
+  'Checkers': 'checkers.co.za', 'Pick n Pay': 'pnp.co.za', 'Woolworths': 'woolworths.co.za', 'SPAR': 'spar.co.za',
+  'Shoprite': 'shoprite.co.za', 'Steers': 'steers.co.za', 'Mugg & Bean': 'muggandbean.co.za', 'Wimpy': 'wimpy.co.za',
+  'Vida e Caffè': 'vidaecaffe.com', 'Takealot': 'takealot.com', 'Mr Price': 'mrp.com', 'Superbalist': 'superbalist.com',
+  'Engen': 'engen.co.za', 'Sasol': 'sasol.com', 'Gautrain': 'gautrain.co.za', 'Eskom': 'eskom.co.za',
+  'Vodacom': 'vodacom.co.za', 'MTN': 'mtn.com', 'DStv': 'dstv.com', 'Telkom': 'telkom.co.za',
+  'South African Airways': 'flysaa.com', 'FlySafair': 'flysafair.co.za', 'Clicks': 'clicks.co.za',
+  'Dis-Chem': 'dischem.co.za', 'Virgin Active': 'virginactive.co.za', 'Planet Fitness': 'planetfitness.co.za',
+  'Ster-Kinekor': 'sterkinekor.com', 'Showmax': 'showmax.com', 'SnapScan': 'snapscan.co.za', 'Zapper': 'zapper.com',
+  'Standard Bank': 'standardbank.co.za', 'FNB': 'fnb.co.za', 'Absa': 'absa.co.za', 'Capitec': 'capitecbank.co.za',
+  'Nedbank': 'nedbank.co.za', 'Discovery': 'discovery.co.za', 'Old Mutual': 'oldmutual.com', 'Santam': 'santam.co.za',
+  'OUTsurance': 'outsurance.co.za',
 };
 // Best-available logo sources, tried in order: Clearbit (real logos) →
 // Google favicon @128 → brand monogram. Anything without a domain (ATM,
@@ -1414,7 +1676,15 @@ function hexA(hex, a) {
 
 // UAE Dirham currency symbol (official 2025 mark). Inline SVG, currentColor,
 // baseline-aligned so it reads like a glyph before an amount.
+// Currency mark for the ACTIVE region: the official UAE Dirham glyph for AED,
+// or the region's text symbol (€, ¥, RM, S$, R) otherwise.
 function Dirham({ size = 14, color = 'currentColor', style = {} }) {
+  const R = window.CURRENT_REGION;
+  if (R && R.symbol) {
+    return (
+      <span style={{ display: 'inline-block', fontSize: size * 1.4, fontWeight: 640, lineHeight: 1, color, flexShrink: 0, verticalAlign: '-0.02em', letterSpacing: '-0.02em', ...style }}>{R.symbol}</span>
+    );
+  }
   const w = size * (344.84 / 299.91);
   return (
     <svg width={w} height={size} viewBox="0 0 344.84 299.91" fill={color} aria-label="AED"
@@ -1446,9 +1716,13 @@ function LuneMark({ size = 24, disc = '#002E2A', crescent = '#10A37F' }) {
 
 const { useState: chUseState } = React;
 
+// Formats a base-unit amount in the ACTIVE region's currency: converts by the
+// region's rate and respects its decimal convention (JPY = whole yen).
 function fmtAED(n, withDec = false) {
-  const v = withDec ? n.toFixed(2) : Math.round(n);
-  return Number(v).toLocaleString('en-US', { minimumFractionDigits: withDec ? 2 : 0, maximumFractionDigits: withDec ? 2 : 0 });
+  const R = window.CURRENT_REGION || {};
+  const v0 = n * (R.rate || 1);
+  const dec = R.dec === 0 ? 0 : (withDec ? 2 : 0);
+  return Number(dec ? v0.toFixed(2) : Math.round(v0)).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
 }
 
 // ── DONUT (tap once → show share, tap selected slice again → open) ───
@@ -1757,7 +2031,7 @@ function SectionTitle({ T, children, action, onAction }) {
 }
 
 // Top app header with optional back + period selector
-function AppHeader({ T, title, eyebrow, onBack, onPeriod, period, right }) {
+function AppHeader({ T, title, eyebrow, onBack, onPeriod, period, right, extra }) {
   return (
     <div style={{ paddingTop: onBack ? 8 : 6 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 40 }}>
@@ -1774,7 +2048,12 @@ function AppHeader({ T, title, eyebrow, onBack, onPeriod, period, right }) {
         </div>
         {right}
       </div>
-      {onPeriod && <PeriodPill T={T} period={period} onClick={onPeriod} />}
+      {onPeriod && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 14 }}>
+          <PeriodPill T={T} period={period} onClick={onPeriod} inline />
+          {extra}
+        </div>
+      )}
     </div>
   );
 }
@@ -2292,7 +2571,94 @@ function PeriodSheet({ T, open, onClose, period, onPick }) {
   );
 }
 
-Object.assign(window, { SearchField, TxnDetailSheet, PeriodSheet });
+// ── Region picker — the first question when entering the app. Localises
+// brands, language and currency; Asia fans out to Japan / Malaysia / Singapore.
+function RegionPicker({ T, open, onClose, onPick }) {
+  const [step, setStep] = React.useState('region');
+  React.useEffect(() => { if (open) setStep('region'); }, [open]);
+  const row = (key, flag, title, sub, onClick) => (
+    <button key={key} className="pressable-row" onClick={onClick} style={{
+      display: 'flex', alignItems: 'center', gap: 13, width: '100%', padding: '13px 14px', borderRadius: 16,
+      border: `1px solid ${T.line}`, background: T.surface, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', marginBottom: 10,
+    }}>
+      <span style={{ fontSize: 26, lineHeight: 1 }}>{flag}</span>
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: 'block', fontSize: 15.5, fontWeight: 650, color: T.ink }}>{title}</span>
+        <span style={{ display: 'block', fontSize: 12.5, color: T.muted, marginTop: 2 }}>{sub}</span>
+      </span>
+      <UIIcon name="chevR" size={16} stroke={T.muted} />
+    </button>
+  );
+  return (
+    <div style={{ position: 'absolute', inset: 0, zIndex: 380, pointerEvents: open ? 'auto' : 'none' }}>
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', opacity: open ? 1 : 0, transition: 'opacity .3s' }} />
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0, background: T.bg,
+        borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: '22px 18px 26px',
+        transform: open ? 'translateY(0)' : 'translateY(102%)', transition: 'transform .42s cubic-bezier(.22,1,.36,1)',
+        boxShadow: '0 -10px 40px rgba(0,0,0,0.25)',
+      }}>
+        {step === 'region' ? (
+          <React.Fragment>
+            <div style={{ fontSize: 19, fontWeight: 700, color: T.ink, letterSpacing: '-0.02em' }}>Where is your bank?</div>
+            <div style={{ fontSize: 13, color: T.muted, margin: '6px 0 16px', lineHeight: 1.5 }}>The app localises brands, language and currency to your market.</div>
+            {row('me', '🌍', 'Middle East', 'Global brands · AED', () => onPick('me'))}
+            {row('eu', '🇪🇺', 'Europe', 'European brands · EUR €', () => onPick('eu'))}
+            {row('asia', '🌏', 'Asia', 'Japan · Malaysia · Singapore', () => setStep('asia'))}
+            {row('za', '🇿🇦', 'South Africa', 'South African brands · ZAR R', () => onPick('za'))}
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <button className="pressable" onClick={() => setStep('region')} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 12px 7px 9px', borderRadius: 999,
+              border: `1px solid ${T.line}`, background: T.surface, cursor: 'pointer', fontFamily: 'inherit',
+              fontSize: 12.5, fontWeight: 620, color: T.ink, marginBottom: 12,
+            }}><UIIcon name="chevL" size={14} stroke="currentColor" />Regions</button>
+            <div style={{ fontSize: 19, fontWeight: 700, color: T.ink, letterSpacing: '-0.02em', marginBottom: 16 }}>Choose your market</div>
+            {row('jp', '🇯🇵', 'Japan', '日本のブランド · JPY ¥', () => onPick('jp'))}
+            {row('my', '🇲🇾', 'Malaysia', 'Malaysian brands · MYR RM', () => onPick('my'))}
+            {row('sg', '🇸🇬', 'Singapore', 'Singaporean brands · SGD S$', () => onPick('sg'))}
+          </React.Fragment>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Card-type filter — aggregated view or a single card's spend ─────
+function CardTypeSheet({ T, open, onClose, value, onPick }) {
+  const OPTS = [
+    ['all', 'All cards', 'Aggregated across every account'],
+    ['debit', 'Debit card', 'Everyday spending'],
+    ['credit', 'Credit card', 'Travel, shopping & subscriptions'],
+    ['savings', 'Savings account', 'Bills, loans & standing orders'],
+  ];
+  return (
+    <Sheet T={T} open={open} onClose={onClose} title="Card type" z={350}>
+      {OPTS.map(([k, label, sub]) => {
+        const active = value === k;
+        return (
+          <button key={k} className="pressable-row" onClick={() => { onPick(k); onClose(); }} style={{
+            display: 'flex', alignItems: 'center', gap: 13, width: '100%', padding: '13px 14px', borderRadius: 16,
+            border: `1.5px solid ${active ? T.accent : T.line}`, background: active ? hexA(T.accent, T.dark ? 0.14 : 0.07) : T.surface,
+            cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', marginBottom: 10,
+          }}>
+            <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: hexA(T.accent, T.dark ? 0.2 : 0.11), color: T.accent }}>
+              <WalletIcon size={19} stroke={T.accent} />
+            </span>
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <span style={{ display: 'block', fontSize: 15, fontWeight: 640, color: T.ink }}>{label}</span>
+              <span style={{ display: 'block', fontSize: 12.5, color: T.muted, marginTop: 2 }}>{sub}</span>
+            </span>
+            {active && <span style={{ fontSize: 16, fontWeight: 700, color: T.accent }}>✓</span>}
+          </button>
+        );
+      })}
+    </Sheet>
+  );
+}
+
+Object.assign(window, { SearchField, TxnDetailSheet, PeriodSheet, RegionPicker, CardTypeSheet });
 
 </script>
 
@@ -2372,9 +2738,15 @@ function SpendRing({ data, total, prevTotal, dark, ink, muted, surface, onSlice 
       {/* centre: just the total — two calm lines, no crowding */}
       <div style={{ position: 'absolute', left: 0, right: 0, top: cy, transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', pointerEvents: 'none' }}>
         <div style={{ fontSize: 10.5, fontWeight: 680, letterSpacing: '0.09em', textTransform: 'uppercase', color: muted }}>Total spent</div>
-        <div style={{ fontSize: total >= 100000 ? 24 : 29, fontWeight: 730, color: ink, marginTop: 5, letterSpacing: '-0.035em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-          <span style={{ display: 'inline-flex', color: muted, marginRight: 4 }}><Dirham size={total >= 100000 ? 14 : 17} color="currentColor" /></span>{fmtAED(total)}
-        </div>
+        {(() => {
+          const disp = total * ((window.CURRENT_REGION || {}).rate || 1);
+          const fs = disp >= 1000000 ? 20 : disp >= 100000 ? 24 : 29;
+          return (
+            <div style={{ fontSize: fs, fontWeight: 730, color: ink, marginTop: 5, letterSpacing: '-0.035em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+              <span style={{ display: 'inline-flex', color: muted, marginRight: 4 }}><Dirham size={fs * 0.58} color="currentColor" /></span>{fmtAED(total)}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Category name + % callouts — anchored to left/right columns beside the
@@ -2516,17 +2888,31 @@ function LuneToggle({ T, enriched, onChange }) {
   );
 }
 
-// Curated order for the enrich feed — globally-recognised brands first
-// (fast food + coffee → apparel → e-commerce/tech → subscriptions → transport →
-// travel → wellness → financial), groceries last.
-const ENRICH_ORDER = [
-  "McDonald's", 'Starbucks', 'Nike', 'Zara', 'Amazon', 'IKEA',
-  'Netflix', 'Disney+', 'Prime Video', 'PlayStation',
-  'Subway', 'Uber', 'Emirates', 'Airbnb', 'Whole Foods Market', 'Spotify', 'H&M',
-  'Louis Vuitton', 'Google Play Store',
-  // remaining curated globals to round out the feed
-  'Apple', 'Adidas', 'Mercedes-Benz', 'British Airways', 'Carrefour',
-];
+// Curated order for the enrich feed, per region — most-recognisable brands
+// first; any remaining merchants from the feed fill the tail up to 24 rows.
+const ENRICH_ORDERS = {
+  me: ["McDonald's", 'Starbucks', 'Nike', 'Zara', 'Amazon', 'IKEA',
+    'Netflix', 'Disney+', 'Prime Video', 'PlayStation',
+    'Subway', 'Uber', 'Emirates', 'Airbnb', 'Whole Foods Market', 'Spotify', 'H&M',
+    'Louis Vuitton', 'Google Play Store',
+    'Apple', 'Adidas', 'Mercedes-Benz', 'British Airways', 'Carrefour'],
+  eu: ["McDonald's", 'Starbucks', 'Zara', 'H&M', 'Amazon', 'IKEA', 'Netflix', 'Spotify',
+    'Zalando', 'Uber', 'Lufthansa', 'Ryanair', 'Airbnb', 'Deliveroo', 'Lidl', 'PayPal',
+    'Vodafone', 'Deutsche Bahn', 'Decathlon', 'Primark', 'PlayStation', 'Carrefour'],
+  jp: ['スターバックス Starbucks', "マクドナルド McDonald's", 'ユニクロ Uniqlo', '無印良品 MUJI', 'Amazon',
+    '楽天市場 Rakuten', 'セブン-イレブン 7-Eleven', 'ローソン Lawson', '任天堂 Nintendo', 'PlayStation',
+    'Netflix', 'JR東日本 JR East', 'ANA 全日空', 'PayPay', '吉野家 Yoshinoya', 'くら寿司 Kura Sushi',
+    'ヨドバシカメラ Yodobashi', 'ニトリ Nitori', 'Uber Eats', 'Spotify'],
+  my: ['GrabFood', 'Shopee', 'Lazada', "McDonald's", 'Starbucks', 'AirAsia', 'Petronas',
+    'Maybank', 'Uniqlo', 'Netflix', 'Spotify', "Touch 'n Go", 'ZUS Coffee', 'Tealive',
+    'Jaya Grocer', 'Mr DIY', 'Boost', 'GSC Cinemas', 'Grab', 'AEON'],
+  sg: ['Grab', 'Shopee', 'foodpanda', 'Starbucks', "McDonald's", 'Singapore Airlines', 'DBS',
+    'FairPrice', 'Uniqlo', 'Netflix', 'Spotify', 'Charles & Keith', 'Ya Kun Kaya Toast',
+    'Marina Bay Sands', 'Gojek', 'EZ-Link', 'Lazada', 'IKEA', 'Golden Village', 'Singtel'],
+  za: ['Checkers', 'Pick n Pay', 'Woolworths', "Nando's", 'Uber', 'Takealot', 'Netflix',
+    'Vodacom', 'MTN', 'Capitec', 'FNB', 'Mr Price', 'Clicks', 'Dis-Chem', 'Steers',
+    'Uber Eats', 'Showmax', 'DStv', 'FlySafair', 'Spotify'],
+};
 
 // Small 4-point sparkle to hint "tap to enrich".
 function Sparkle({ size = 12, color = 'currentColor' }) {
@@ -2547,9 +2933,13 @@ function RawTransactions({ T, period, enriched, onToggle, ctaLabel = 'Open in ap
   const txns = React.useMemo(() => {
     // Use the uncapped current-month feed so every curated brand is present
     // (forPeriod caps at 120 + day-sorts, which drops low-frequency brands).
+    const regionKey = (window.CURRENT_REGION || {}).key || 'me';
+    const ORDER = ENRICH_ORDERS[regionKey] || [];
     const byMerchant = new Map();
     for (const t of D().TRANSACTIONS) { if (!byMerchant.has(t.merchant)) byMerchant.set(t.merchant, t); }
-    return ENRICH_ORDER.map((n) => byMerchant.get(n)).filter(Boolean).slice(0, 24);
+    const ordered = ORDER.map((n) => byMerchant.get(n)).filter(Boolean);
+    const rest = [...byMerchant.values()].filter((t) => !ordered.includes(t));
+    return [...ordered, ...rest].slice(0, 24);
   }, [period]);
   const mono = "'SF Mono', ui-monospace, 'Roboto Mono', Menlo, monospace";
   const [done, setDone] = React.useState({});
@@ -2680,7 +3070,8 @@ function RawTransactions({ T, period, enriched, onToggle, ctaLabel = 'Open in ap
   );
 }
 
-function Spends({ T, showLogos, period, actions, enriched, onToggle }) {
+function Spends({ T, showLogos, period, actions, enriched, onToggle, cardType = 'all', onCardType }) {
+  const CARD_LABEL = { all: 'All cards', debit: 'Debit card', credit: 'Credit card', savings: 'Savings account' };
   const scoped = D().forPeriod(period);
   const { CATEGORY_SPEND, TOTAL, TRANSACTIONS, PREV } = scoped;
   const prevTotal = scoped.hasPrev ? scoped.prevTotal : null;
@@ -2698,7 +3089,20 @@ function Spends({ T, showLogos, period, actions, enriched, onToggle }) {
           border: `1px solid ${T.line}`, background: T.surface, fontFamily: 'inherit', fontSize: 13, fontWeight: 620, color: T.ink,
         }}><UIIcon name="chevL" size={15} stroke="currentColor" />Transactions</button>
       </div>
-      <AppHeader T={T} title="Spends" period={period} onPeriod={actions.openPeriod} />
+      <AppHeader T={T} title="Spends" period={period} onPeriod={actions.openPeriod}
+        extra={onCardType && (
+          <button className="pressable" onClick={onCardType} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+            background: cardType === 'all' ? T.surface : hexA(T.accent, T.dark ? 0.18 : 0.10),
+            border: `1px solid ${cardType === 'all' ? T.line : hexA(T.accent, 0.4)}`, borderRadius: 999,
+            padding: '8px 13px', color: T.ink, fontFamily: 'inherit',
+            fontSize: 13.5, fontWeight: 580, boxShadow: T.dark ? 'none' : T.cardShadow,
+          }}>
+            <span style={{ color: T.accent, display: 'flex' }}><WalletIcon size={15} stroke={T.accent} /></span>
+            {CARD_LABEL[cardType]}
+            <UIIcon name="chevD" size={15} stroke={T.muted} />
+          </button>
+        )} />
 
       {/* Hero: the clean ring + the ranked category list, one focal block. */}
       <div style={{ marginTop: 16 }}>
@@ -3060,6 +3464,20 @@ function ExpensesApp() {
   const [periodOpen, setPeriodOpen] = React.useState(false);
 
   const [enriched, setEnriched] = React.useState(false); // start on the raw feed, enrich, then "In your app"
+  // Region + card-type: entering the app first asks the region (localised
+  // brands + currency); inside the PFM a card-type dropdown filters everything.
+  const [region, setRegion] = React.useState('me');
+  const [regionOpen, setRegionOpen] = React.useState(false);
+  const [cardType, setCardType] = React.useState('all');
+  const [cardOpen, setCardOpen] = React.useState(false);
+  window.EXP_CARD_FILTER = cardType; // data layer reads this at query time
+  const applyRegion = (key) => {
+    window.BUILD_EXP_DATA(key);
+    setRegion(key); setCardType('all'); window.EXP_CARD_FILTER = 'all';
+    setPeriod(window.EXP_DATA.CURRENT_PERIOD); setTrends(null);
+    setRegionOpen(false); setEnriched(true);
+  };
+  const toggleApp = (v) => { if (v) setRegionOpen(true); else setEnriched(false); };
   const [breakdownOpen, setBreakdownOpen] = React.useState(false);
   const [trends, setTrends] = React.useState(null); // null | { mode, catId }
   const [allTxnsOpen, setAllTxnsOpen] = React.useState(false);
@@ -3133,6 +3551,7 @@ function ExpensesApp() {
       <TxnDetailSheet T={T} txn={txn} open={txnOpen} onClose={() => setTxnOpen(false)} showLogos={t.showLogos} onImprove={(tx) => { setTxnOpen(false); actions.openFeedback(tx); }} />
       <FeedbackSheet T={T} txn={fbTxn} open={fbOpen} onClose={() => setFbOpen(false)} showLogos={t.showLogos} />
       <PeriodSheet T={T} open={periodOpen} onClose={() => setPeriodOpen(false)} period={period} onPick={setPeriod} />
+      <CardTypeSheet T={T} open={cardOpen} onClose={() => setCardOpen(false)} value={cardType} onPick={setCardType} />
     </React.Fragment>
   );
 
@@ -3140,13 +3559,14 @@ function ExpensesApp() {
     <IOSDevice dark={T.dark} width={390} height={844}>
         <div style={{ position: 'relative', height: '100%', overflow: 'hidden', background: T.bg }}>
           <div className="exp-screens" style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', paddingTop: 56 }}>
-            <div key={enriched ? 'app' : 'txns'} style={{ animation: `${enriched ? 'slideFwd' : 'slideBack'} .34s cubic-bezier(.32,.72,0,1) both` }}>
+            <div key={(enriched ? 'app' : 'txns') + '-' + region} style={{ animation: `${enriched ? 'slideFwd' : 'slideBack'} .34s cubic-bezier(.32,.72,0,1) both` }}>
               {enriched
-                ? <Spends T={T} showLogos={t.showLogos} period={period} actions={actions} enriched={enriched} onToggle={setEnriched} />
-                : <RawTransactions T={T} period={period} enriched={enriched} onToggle={setEnriched} />}
+                ? <Spends key={region + cardType} T={T} showLogos={t.showLogos} period={period} actions={actions} enriched={enriched} onToggle={toggleApp} cardType={cardType} onCardType={() => setCardOpen(true)} />
+                : <RawTransactions key={region} T={T} period={period} enriched={enriched} onToggle={toggleApp} />}
             </div>
           </div>
           {enriched && sheets}
+          <RegionPicker T={T} open={regionOpen} onClose={() => setRegionOpen(false)} onPick={applyRegion} />
         </div>
       </IOSDevice>
   );
@@ -3227,7 +3647,7 @@ function ExpensesApp() {
         {/* The enrich list lives directly on the page — no phone-in-phone. */}
         <div style={{ marginTop: 28, borderRadius: 24, border: `1px solid ${LINE}`, background: T.bg, overflow: 'hidden', boxShadow: '0 14px 40px rgba(11,36,31,0.10)' }}>
           <div style={{ paddingTop: 20 }}>
-            <RawTransactions T={T} period={period} enriched={enriched} onToggle={setEnriched} ctaLabel="How it looks in your app" standalone />
+            <RawTransactions key={region} T={T} period={period} enriched={enriched} onToggle={toggleApp} ctaLabel="How it looks in your app" standalone />
           </div>
         </div>
 
@@ -3256,12 +3676,17 @@ function ExpensesApp() {
         <div style={{ position: 'fixed', inset: 0, zIndex: 500, background: T.bg, animation: 'slideFwd .34s cubic-bezier(.32,.72,0,1) both' }}>
           <div className="exp-screens" style={{ position: 'absolute', inset: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <div style={{ maxWidth: 560, margin: '0 auto', paddingTop: 18 }}>
-              <Spends T={T} showLogos={t.showLogos} period={period} actions={actions} enriched={enriched} onToggle={setEnriched} />
+              <Spends key={region + cardType} T={T} showLogos={t.showLogos} period={period} actions={actions} enriched={enriched} onToggle={toggleApp} cardType={cardType} onCardType={() => setCardOpen(true)} />
             </div>
           </div>
           {sheets}
         </div>
       )}
+
+      {/* Region question — first thing you answer when entering the app */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 600, pointerEvents: 'none' }}>
+        <RegionPicker T={T} open={regionOpen} onClose={() => setRegionOpen(false)} onPick={applyRegion} />
+      </div>
     </div>
   );
 }
