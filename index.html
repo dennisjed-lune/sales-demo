@@ -54,6 +54,12 @@
      Google favicons (good for global brands, weaker for some regional ones). -->
 <script>window.LOGODEV_TOKEN = "pk_PCfI5A2ISc2tZmQNIql7Ww";</script>
 
+<!-- Brand intelligence: paste a context.dev API key below (get one at
+     https://context.dev) and the "Add your bank" step will pull the bank's
+     real brand colors + logo and skin the PFM with them. Without a key the
+     demo falls back to extracting a color from the bank's logo via logo.dev. -->
+<script>window.CONTEXTDEV_TOKEN = "";</script>
+
 <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
@@ -2571,11 +2577,122 @@ function PeriodSheet({ T, open, onClose, period, onPick }) {
   );
 }
 
+// ── Bank brand lookup — context.dev Brand API (colors + logo by name) with a
+// logo.dev canvas-extraction fallback, so the flow works even without a key. ──
+function relLum(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+  return 0.2126 * f((n >> 16) & 255) + 0.7152 * f((n >> 8) & 255) + 0.0722 * f(n & 255);
+}
+function darkenHex(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const d = (v) => Math.max(0, Math.round(v * (1 - amt)));
+  return '#' + [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => d(v).toString(16).padStart(2, '0')).join('');
+}
+// A usable UI accent: saturated enough to be a brand, dark enough for white text.
+function usableAccent(hex) {
+  if (!/^#[0-9a-fA-F]{6}$/.test(hex || '')) return null;
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  if (Math.max(r, g, b) - Math.min(r, g, b) < 16) return null; // gray/white/black
+  let out = hex;
+  if (relLum(hex) > 0.9) return null; // near-white only; dark brand navies are ideal accents
+  while (relLum(out) > 0.35) out = darkenHex(out, 0.12); // guarantee white-on-accent contrast
+  return out;
+}
+function pickBrandColor(hexes) {
+  const ok = (hexes || []).map(usableAccent).filter(Boolean);
+  return ok[0] || null;
+}
+function loadImg(url) {
+  return new Promise((res) => {
+    const i = new Image();
+    i.crossOrigin = 'anonymous';
+    i.onload = () => res(i.naturalWidth > 10 ? i : null);
+    i.onerror = () => res(null);
+    i.src = url;
+  });
+}
+// Dominant non-neutral color of a logo, via canvas quantization.
+function dominantColor(img) {
+  try {
+    const c = document.createElement('canvas'); c.width = 48; c.height = 48;
+    const x = c.getContext('2d'); x.drawImage(img, 0, 0, 48, 48);
+    const d = x.getImageData(0, 0, 48, 48).data;
+    const buckets = {};
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i], g = d[i + 1], b = d[i + 2], a = d[i + 3];
+      if (a < 200) continue;
+      if (r > 235 && g > 235 && b > 235) continue;           // white
+      if (r < 25 && g < 25 && b < 25) continue;              // black
+      if (Math.max(r, g, b) - Math.min(r, g, b) < 18) continue; // gray
+      const k = ((r >> 4) << 8) | ((g >> 4) << 4) | (b >> 4);
+      (buckets[k] = buckets[k] || [0, 0, 0, 0])[0]++;
+      buckets[k][1] += r; buckets[k][2] += g; buckets[k][3] += b;
+    }
+    let best = null;
+    for (const k in buckets) if (!best || buckets[k][0] > best[0]) best = buckets[k];
+    if (!best || best[0] < 20) return null;
+    const hex = '#' + [best[1], best[2], best[3]].map((s) => Math.round(s / best[0]).toString(16).padStart(2, '0')).join('');
+    return usableAccent(hex);
+  } catch (e) { return null; }
+}
+async function fetchBankBrand(rawName) {
+  const name = rawName.trim();
+  const cacheKey = 'ctxbrand:' + name.toLowerCase();
+  try { const c = sessionStorage.getItem(cacheKey); if (c) return JSON.parse(c); } catch (e) {}
+  let brand = null;
+  const token = window.CONTEXTDEV_TOKEN || '';
+  if (token) {
+    try {
+      const res = await fetch('https://api.context.dev/v1/brand/retrieve', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'by_name', name }),
+      });
+      if (res.ok) {
+        const j = await res.json();
+        const b = (j && j.brand) || {};
+        const color = pickBrandColor((b.colors || []).map((c) => c.hex));
+        const logos = b.logos || [];
+        const icon = logos.find((l) => l.type === 'icon') || logos[0];
+        if (color || icon) brand = { name: b.title || name, domain: b.domain || null, color, logo: icon ? icon.url : null, via: 'context.dev' };
+      }
+    } catch (e) {}
+  }
+  if (!brand) {
+    // Fallback: guess the domain, take the logo from logo.dev, extract its color.
+    const domain = name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com';
+    const logoUrl = `https://img.logo.dev/${domain}?token=${window.LOGODEV_TOKEN || ''}&size=128&format=png&retina=true`;
+    const img = await loadImg(logoUrl);
+    if (img) {
+      const color = dominantColor(img);
+      brand = { name, domain, color, logo: logoUrl, via: 'logo.dev' };
+    }
+  }
+  try { if (brand) sessionStorage.setItem(cacheKey, JSON.stringify(brand)); } catch (e) {}
+  return brand;
+}
+
 // ── Region picker — the first question when entering the app. Localises
 // brands, language and currency; Asia fans out to Japan / Malaysia / Singapore.
 function RegionPicker({ T, open, onClose, onPick }) {
   const [step, setStep] = React.useState('region');
-  React.useEffect(() => { if (open) setStep('region'); }, [open]);
+  const [pending, setPending] = React.useState(null); // region key awaiting the bank step
+  const [bankName, setBankName] = React.useState('');
+  const [busy, setBusy] = React.useState(false);
+  const [err, setErr] = React.useState(null);
+  React.useEffect(() => { if (open) { setStep('region'); setPending(null); setBankName(''); setBusy(false); setErr(null); } }, [open]);
+  const toBank = (key) => { setPending(key); setErr(null); setStep('bank'); };
+  const finish = (brand) => onPick(pending, brand || null);
+  const submitBank = async () => {
+    if (!bankName.trim() || busy) return;
+    setBusy(true); setErr(null);
+    const brand = await fetchBankBrand(bankName);
+    setBusy(false);
+    if (brand && (brand.color || brand.logo)) finish(brand);
+    else setErr("Couldn't find that brand — check the spelling, or skip.");
+  };
   const row = (key, flag, title, sub, onClick) => (
     <button key={key} className="pressable-row" onClick={onClick} style={{
       display: 'flex', alignItems: 'center', gap: 13, width: '100%', padding: '13px 14px', borderRadius: 16,
@@ -2598,16 +2715,17 @@ function RegionPicker({ T, open, onClose, onPick }) {
         transform: open ? 'translateY(0)' : 'translateY(102%)', transition: 'transform .42s cubic-bezier(.22,1,.36,1)',
         boxShadow: '0 -10px 40px rgba(0,0,0,0.25)',
       }}>
-        {step === 'region' ? (
+        {step === 'region' && (
           <React.Fragment>
             <div style={{ fontSize: 19, fontWeight: 700, color: T.ink, letterSpacing: '-0.02em' }}>Where is your bank?</div>
             <div style={{ fontSize: 13, color: T.muted, margin: '6px 0 16px', lineHeight: 1.5 }}>The app localises brands, language and currency to your market.</div>
-            {row('me', '🌍', 'Middle East', 'Global brands · AED', () => onPick('me'))}
-            {row('eu', '🇪🇺', 'Europe', 'European brands · EUR €', () => onPick('eu'))}
+            {row('me', '🌍', 'Middle East', 'Global brands · AED', () => toBank('me'))}
+            {row('eu', '🇪🇺', 'Europe', 'European brands · EUR €', () => toBank('eu'))}
             {row('asia', '🌏', 'Asia', 'Japan · Malaysia · Singapore', () => setStep('asia'))}
-            {row('za', '🇿🇦', 'South Africa', 'South African brands · ZAR R', () => onPick('za'))}
+            {row('za', '🇿🇦', 'South Africa', 'South African brands · ZAR R', () => toBank('za'))}
           </React.Fragment>
-        ) : (
+        )}
+        {step === 'asia' && (
           <React.Fragment>
             <button className="pressable" onClick={() => setStep('region')} style={{
               display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 12px 7px 9px', borderRadius: 999,
@@ -2615,9 +2733,42 @@ function RegionPicker({ T, open, onClose, onPick }) {
               fontSize: 12.5, fontWeight: 620, color: T.ink, marginBottom: 12,
             }}><UIIcon name="chevL" size={14} stroke="currentColor" />Regions</button>
             <div style={{ fontSize: 19, fontWeight: 700, color: T.ink, letterSpacing: '-0.02em', marginBottom: 16 }}>Choose your market</div>
-            {row('jp', '🇯🇵', 'Japan', '日本のブランド · JPY ¥', () => onPick('jp'))}
-            {row('my', '🇲🇾', 'Malaysia', 'Malaysian brands · MYR RM', () => onPick('my'))}
-            {row('sg', '🇸🇬', 'Singapore', 'Singaporean brands · SGD S$', () => onPick('sg'))}
+            {row('jp', '🇯🇵', 'Japan', '日本のブランド · JPY ¥', () => toBank('jp'))}
+            {row('my', '🇲🇾', 'Malaysia', 'Malaysian brands · MYR RM', () => toBank('my'))}
+            {row('sg', '🇸🇬', 'Singapore', 'Singaporean brands · SGD S$', () => toBank('sg'))}
+          </React.Fragment>
+        )}
+        {step === 'bank' && (
+          <React.Fragment>
+            <button className="pressable" onClick={() => setStep('region')} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 12px 7px 9px', borderRadius: 999,
+              border: `1px solid ${T.line}`, background: T.surface, cursor: 'pointer', fontFamily: 'inherit',
+              fontSize: 12.5, fontWeight: 620, color: T.ink, marginBottom: 12,
+            }}><UIIcon name="chevL" size={14} stroke="currentColor" />Region</button>
+            <div style={{ fontSize: 19, fontWeight: 700, color: T.ink, letterSpacing: '-0.02em' }}>Make it yours</div>
+            <div style={{ fontSize: 13, color: T.muted, margin: '6px 0 14px', lineHeight: 1.5 }}>Type your bank or payment company — the app takes on its brand colours and logo.</div>
+            <input
+              value={bankName}
+              onChange={(e) => { setBankName(e.target.value); setErr(null); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') submitBank(); }}
+              placeholder="e.g. Emirates NBD, Revolut, DBS…"
+              autoFocus
+              style={{
+                width: '100%', boxSizing: 'border-box', padding: '13px 15px', borderRadius: 14,
+                border: `1.5px solid ${err ? '#C2402F' : T.line}`, background: T.surface, color: T.ink,
+                fontFamily: 'inherit', fontSize: 15, fontWeight: 560, outline: 'none',
+              }} />
+            {err && <div style={{ fontSize: 12.5, color: '#C2402F', marginTop: 8, fontWeight: 560 }}>{err}</div>}
+            <button className="pressable" onClick={submitBank} disabled={!bankName.trim() || busy} style={{
+              width: '100%', marginTop: 12, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              padding: '13px 16px', borderRadius: 14, border: 'none', fontFamily: 'inherit', fontSize: 14.5, fontWeight: 680,
+              color: '#fff', background: (!bankName.trim() || busy) ? hexA(T.accent, 0.45) : T.accent,
+              boxShadow: busy ? 'none' : `0 6px 16px ${hexA(T.accent, 0.30)}`, cursor: (!bankName.trim() || busy) ? 'default' : 'pointer',
+            }}>{busy ? 'Fetching brand…' : 'Apply my brand →'}</button>
+            <button className="pressable" onClick={() => finish(null)} disabled={busy} style={{
+              width: '100%', marginTop: 8, padding: '11px 16px', borderRadius: 14, border: 'none', background: 'transparent',
+              fontFamily: 'inherit', fontSize: 13, fontWeight: 620, color: T.muted, cursor: 'pointer',
+            }}>Skip — use Lune branding</button>
           </React.Fragment>
         )}
       </div>
@@ -3055,7 +3206,7 @@ function RawTransactions({ T, period, enriched, onToggle, ctaLabel = 'Open in ap
   );
 }
 
-function Spends({ T, showLogos, period, actions, enriched, onToggle, cardType = 'all', onCardType }) {
+function Spends({ T, showLogos, period, actions, enriched, onToggle, cardType = 'all', onCardType, bankBrand }) {
   const CARD_LABEL = { all: 'All cards', debit: 'Debit card', credit: 'Credit card', savings: 'Savings account' };
   const scoped = D().forPeriod(period);
   const { CATEGORY_SPEND, TOTAL, TRANSACTIONS, PREV } = scoped;
@@ -3075,6 +3226,12 @@ function Spends({ T, showLogos, period, actions, enriched, onToggle, cardType = 
         }}><UIIcon name="chevL" size={15} stroke="currentColor" />Transactions</button>
       </div>
       <AppHeader T={T} title="Spends" period={period} onPeriod={actions.openPeriod}
+        right={bankBrand && (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, maxWidth: 150, padding: '6px 11px 6px 7px', borderRadius: 999, background: T.surface, border: `1px solid ${T.line}`, boxShadow: T.dark ? 'none' : T.cardShadow }}>
+            {bankBrand.logo && <img src={bankBrand.logo} alt="" style={{ width: 22, height: 22, borderRadius: 6, objectFit: 'contain', flexShrink: 0 }} />}
+            <span style={{ fontSize: 12.5, fontWeight: 650, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{bankBrand.name}</span>
+          </span>
+        )}
         extra={onCardType && (
           <button className="pressable" onClick={onCardType} style={{
             display: 'inline-flex', alignItems: 'center', gap: 7, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
@@ -3455,14 +3612,18 @@ function ExpensesApp() {
   const [regionOpen, setRegionOpen] = React.useState(false);
   const [cardType, setCardType] = React.useState('all');
   const [cardOpen, setCardOpen] = React.useState(false);
+  const [bankBrand, setBankBrand] = React.useState(null); // {name, color, logo} from context.dev / logo.dev
   window.EXP_CARD_FILTER = cardType; // data layer reads this at query time
-  const applyRegion = (key) => {
+  const applyRegion = (key, brand) => {
     window.BUILD_EXP_DATA(key);
     setRegion(key); setCardType('all'); window.EXP_CARD_FILTER = 'all';
+    setBankBrand(brand || null);
     setPeriod(window.EXP_DATA.CURRENT_PERIOD); setTrends(null);
     setRegionOpen(false); setEnriched(true);
   };
   const toggleApp = (v) => { if (v) setRegionOpen(true); else setEnriched(false); };
+  // The PFM (and its sheets) wear the prospect's brand accent; landing stays Lune.
+  const TApp = bankBrand && bankBrand.color ? makeTheme(t.dark, bankBrand.color) : T;
   const [breakdownOpen, setBreakdownOpen] = React.useState(false);
   const [trends, setTrends] = React.useState(null); // null | { mode, catId }
   const [allTxnsOpen, setAllTxnsOpen] = React.useState(false);
@@ -3529,14 +3690,14 @@ function ExpensesApp() {
   // Rendered inside the desktop phone AND inside the mobile PFM portal.
   const sheets = (
     <React.Fragment>
-      <BreakdownSheet T={T} open={breakdownOpen} onClose={() => setBreakdownOpen(false)} showLogos={t.showLogos} period={period} actions={actions} z={210} />
-      <AllTxnsSheet T={T} open={allTxnsOpen} onClose={() => setAllTxnsOpen(false)} showLogos={t.showLogos} period={period} onTxn={(tx) => actions.openTxn(tx)} z={230} />
-      {trends && <TrendsPage key={trends.mode + '-' + trends.catId} T={T} showLogos={t.showLogos} period={period} actions={actions} mode={trends.mode} initialCatId={trends.catId} onClose={() => setTrends(null)} />}
-      <TxnListSheet T={T} open={listOpen} onClose={() => setListOpen(false)} title={list.title} subtitle={list.subtitle} txns={list.txns} total={list.total} showLogos={t.showLogos} onTxn={(tx) => actions.openTxn(tx)} z={300} />
-      <TxnDetailSheet T={T} txn={txn} open={txnOpen} onClose={() => setTxnOpen(false)} showLogos={t.showLogos} onImprove={(tx) => { setTxnOpen(false); actions.openFeedback(tx); }} />
-      <FeedbackSheet T={T} txn={fbTxn} open={fbOpen} onClose={() => setFbOpen(false)} showLogos={t.showLogos} />
-      <PeriodSheet T={T} open={periodOpen} onClose={() => setPeriodOpen(false)} period={period} onPick={setPeriod} />
-      <CardTypeSheet T={T} open={cardOpen} onClose={() => setCardOpen(false)} value={cardType} onPick={setCardType} />
+      <BreakdownSheet T={TApp} open={breakdownOpen} onClose={() => setBreakdownOpen(false)} showLogos={t.showLogos} period={period} actions={actions} z={210} />
+      <AllTxnsSheet T={TApp} open={allTxnsOpen} onClose={() => setAllTxnsOpen(false)} showLogos={t.showLogos} period={period} onTxn={(tx) => actions.openTxn(tx)} z={230} />
+      {trends && <TrendsPage key={trends.mode + '-' + trends.catId} T={TApp} showLogos={t.showLogos} period={period} actions={actions} mode={trends.mode} initialCatId={trends.catId} onClose={() => setTrends(null)} />}
+      <TxnListSheet T={TApp} open={listOpen} onClose={() => setListOpen(false)} title={list.title} subtitle={list.subtitle} txns={list.txns} total={list.total} showLogos={t.showLogos} onTxn={(tx) => actions.openTxn(tx)} z={300} />
+      <TxnDetailSheet T={TApp} txn={txn} open={txnOpen} onClose={() => setTxnOpen(false)} showLogos={t.showLogos} onImprove={(tx) => { setTxnOpen(false); actions.openFeedback(tx); }} />
+      <FeedbackSheet T={TApp} txn={fbTxn} open={fbOpen} onClose={() => setFbOpen(false)} showLogos={t.showLogos} />
+      <PeriodSheet T={TApp} open={periodOpen} onClose={() => setPeriodOpen(false)} period={period} onPick={setPeriod} />
+      <CardTypeSheet T={TApp} open={cardOpen} onClose={() => setCardOpen(false)} value={cardType} onPick={setCardType} />
     </React.Fragment>
   );
 
@@ -3546,7 +3707,7 @@ function ExpensesApp() {
           <div className="exp-screens" style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', paddingTop: 56 }}>
             <div key={(enriched ? 'app' : 'txns') + '-' + region} style={{ animation: `${enriched ? 'slideFwd' : 'slideBack'} .34s cubic-bezier(.32,.72,0,1) both` }}>
               {enriched
-                ? <Spends key={region + cardType} T={T} showLogos={t.showLogos} period={period} actions={actions} enriched={enriched} onToggle={toggleApp} cardType={cardType} onCardType={() => setCardOpen(true)} />
+                ? <Spends key={region + cardType} T={TApp} showLogos={t.showLogos} period={period} actions={actions} enriched={enriched} onToggle={toggleApp} cardType={cardType} onCardType={() => setCardOpen(true)} bankBrand={bankBrand} />
                 : <RawTransactions key={region} T={T} period={period} enriched={enriched} onToggle={toggleApp} />}
             </div>
           </div>
@@ -3661,7 +3822,7 @@ function ExpensesApp() {
         <div style={{ position: 'fixed', inset: 0, zIndex: 500, background: T.bg, animation: 'slideFwd .34s cubic-bezier(.32,.72,0,1) both' }}>
           <div className="exp-screens" style={{ position: 'absolute', inset: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <div style={{ maxWidth: 560, margin: '0 auto', paddingTop: 18 }}>
-              <Spends key={region + cardType} T={T} showLogos={t.showLogos} period={period} actions={actions} enriched={enriched} onToggle={toggleApp} cardType={cardType} onCardType={() => setCardOpen(true)} />
+              <Spends key={region + cardType} T={TApp} showLogos={t.showLogos} period={period} actions={actions} enriched={enriched} onToggle={toggleApp} cardType={cardType} onCardType={() => setCardOpen(true)} bankBrand={bankBrand} />
             </div>
           </div>
           {sheets}
