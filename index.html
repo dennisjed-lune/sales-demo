@@ -2642,6 +2642,21 @@ function dominantColor(img) {
     return usableAccent(hex);
   } catch (e) { return null; }
 }
+// Local daily budget for brand-API calls (mirrors the worker's server-side
+// cap): 5 uncached lookups per browser per day, then the logo.dev fallback.
+const BRAND_DAILY_LIMIT = 5;
+function brandQuota() {
+  try {
+    const day = new Date().toISOString().slice(0, 10);
+    const cur = JSON.parse(localStorage.getItem('ctxbrand-quota') || '{}');
+    const n = cur.day === day ? (cur.n || 0) : 0;
+    return {
+      ok: n < BRAND_DAILY_LIMIT,
+      bump() { try { localStorage.setItem('ctxbrand-quota', JSON.stringify({ day, n: n + 1 })); } catch (e) {} },
+    };
+  } catch (e) { return { ok: true, bump() {} }; }
+}
+
 async function fetchBankBrand(rawName) {
   const name = rawName.trim();
   const cacheKey = 'ctxbrand:' + name.toLowerCase();
@@ -2649,8 +2664,10 @@ async function fetchBankBrand(rawName) {
   let brand = null;
   const proxy = window.BRAND_PROXY_URL || '';
   const token = window.CONTEXTDEV_TOKEN || '';
-  if (proxy || token) {
+  const quota = brandQuota();
+  if ((proxy || token) && quota.ok) {
     try {
+      quota.bump(); // count the attempt, cached lookups never reach here
       // Preferred: the proxy (key stays server-side). Direct token = local dev only.
       const res = await fetch(proxy || 'https://api.context.dev/v1/brand/retrieve', {
         method: 'POST',

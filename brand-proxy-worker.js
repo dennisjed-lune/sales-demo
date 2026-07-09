@@ -14,6 +14,11 @@
  *   window.BRAND_PROXY_URL = "https://lune-brand-proxy.<your-subdomain>.workers.dev";
  */
 
+// Hard cap on context.dev calls per UTC day (edge-cache hits don't count).
+// Counter uses the Cache API — per-colo and best-effort, which is fine at
+// this scale; raise the number here when the demo needs more headroom.
+const DAILY_LIMIT = 5;
+
 const ALLOWED_ORIGINS = [
   'https://sales.lunedata.io',
   'https://dennisjed-lune.github.io',
@@ -54,6 +59,17 @@ export default {
       return cached;
     }
 
+    // Daily quota — only uncached upstream calls count.
+    const day = new Date().toISOString().slice(0, 10);
+    const quotaKey = new Request('https://brand-proxy.cache/__quota/' + day);
+    const q = await cache.match(quotaKey);
+    const used = q ? (parseInt(await q.text(), 10) || 0) : 0;
+    if (used >= DAILY_LIMIT) {
+      return new Response(JSON.stringify({ status: 'quota_exceeded', limit: DAILY_LIMIT }), {
+        status: 429, headers: { ...cors, 'Content-Type': 'application/json' },
+      });
+    }
+
     const upstream = await fetch('https://api.context.dev/v1/brand/retrieve', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${env.CONTEXT_DEV_API_KEY}`, 'Content-Type': 'application/json' },
@@ -64,6 +80,7 @@ export default {
       status: upstream.status,
       headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' },
     });
+    await cache.put(quotaKey, new Response(String(used + 1), { headers: { 'Cache-Control': 'public, max-age=93600' } }));
     if (upstream.ok) await cache.put(cacheKey, res.clone());
     return res;
   },
