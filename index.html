@@ -323,10 +323,89 @@
     18: SAAS,
   };
 
+  const CATALOG_SA = {
+    6:  [ { name: 'Panda', total: 1180.40, count: 8 }, { name: 'Tamimi Markets', total: 620.10, count: 5 },
+          { name: 'Danube', total: 480.30, count: 4 }, { name: 'Carrefour', total: 420.00, count: 4 },
+          { name: 'Al Othaim', total: 240.00, count: 3 } ],
+    10: [ { name: 'Jahez', total: 620.30, count: 11 }, { name: 'HungerStation', total: 420.00, count: 9 },
+          { name: 'Al Baik', total: 280.20, count: 8 }, { name: 'Starbucks', total: 240.00, count: 7 },
+          { name: "McDonald's", total: 190.20, count: 6 }, { name: 'Kudu', total: 150.00, count: 5 },
+          { name: 'Herfy', total: 120.00, count: 4 } ],
+    11: [ { name: 'Amazon', total: 880.20, count: 6 }, { name: 'Noon', total: 540.00, count: 5 },
+          { name: 'Jarir', total: 420.40, count: 2 }, { name: 'Extra', total: 320.00, count: 2 } ],
+    14: [ { name: 'Uber', total: 420.90, count: 15 }, { name: 'Careem', total: 320.00, count: 12 } ],
+    9:  [ { name: 'STC', total: 480.00, count: 1 }, { name: 'Saudi Electricity', total: 380.00, count: 1 },
+          { name: 'Mobily', total: 320.00, count: 1 }, { name: 'Zain', total: 260.00, count: 1 } ],
+    15: [ { name: 'Saudia', total: 1980.00, count: 1 }, { name: 'flynas', total: 980.00, count: 1 },
+          { name: 'Almosafer', total: 512.30, count: 1 }, { name: 'Booking.com', total: 464.50, count: 1 } ],
+    7:  [ { name: 'Fitness Time', total: 350.00, count: 1 }, { name: 'Nahdi', total: 240.60, count: 4 },
+          { name: 'Al Dawaa', total: 190.30, count: 3 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'Netflix', total: 56.99, count: 1 },
+          { name: 'Shahid', total: 39.00, count: 1 }, { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'STC Pay', total: 240.40, count: 6 }, { name: 'Tamara', total: 188.00, count: 2 },
+          { name: 'Tabby', total: 160.00, count: 3 } ],
+    16: [ { name: 'Al Rajhi Bank', total: 1150.00, count: 1 }, { name: 'Saudi National Bank', total: 840.00, count: 1 } ],
+    17: [ { name: 'Bupa Arabia', total: 480.00, count: 1 }, { name: 'Tawuniya', total: 320.00, count: 1 } ],
+    18: SAAS,
+  };
+
+  const CATALOG_BH = {
+    6:  [ { name: 'Lulu', total: 880.40, count: 7 }, { name: 'Carrefour', total: 460.10, count: 4 },
+          { name: 'Ramez', total: 260.00, count: 3 } ],
+    10: [ { name: 'Talabat', total: 520.30, count: 10 }, { name: 'Starbucks', total: 240.00, count: 7 },
+          { name: 'Jasmis', total: 220.20, count: 5 }, { name: "McDonald's", total: 190.20, count: 6 },
+          { name: 'Costa Coffee', total: 140.00, count: 5 } ],
+    11: [ { name: 'Amazon', total: 680.20, count: 6 }, { name: 'Noon', total: 440.00, count: 4 },
+          { name: 'Sharaf DG', total: 320.00, count: 2 } ],
+    14: [ { name: 'Uber', total: 420.90, count: 14 }, { name: 'Bapco', total: 320.00, count: 4 },
+          { name: 'Careem', total: 260.00, count: 10 } ],
+    9:  [ { name: 'Batelco', total: 480.00, count: 1 }, { name: 'EWA', total: 380.00, count: 1 },
+          { name: 'Zain', total: 320.00, count: 1 }, { name: 'STC', total: 260.00, count: 1 } ],
+    15: [ { name: 'Gulf Air', total: 1480.00, count: 1 }, { name: 'Almosafer', total: 512.30, count: 1 },
+          { name: 'Booking.com', total: 464.50, count: 1 } ],
+    7:  [ { name: 'Fitness First', total: 350.00, count: 1 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'VOX Cinemas', total: 120.00, count: 2 },
+          { name: 'Netflix', total: 56.99, count: 1 }, { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'Benefit', total: 240.40, count: 6 }, { name: 'Tabby', total: 160.00, count: 3 },
+          { name: 'Tamara', total: 120.00, count: 2 } ],
+    16: [ { name: 'NBB', total: 1150.00, count: 1 }, { name: 'BBK', total: 840.00, count: 1 },
+          { name: 'Bahrain Islamic Bank', total: 620.00, count: 1 } ],
+    17: [ { name: 'Solidarity', total: 420.00, count: 1 }, { name: 'GIG', total: 320.00, count: 1 } ],
+    18: SAAS,
+  };
+
+  const CATALOG_QA = {
+    6:  [ { name: 'Lulu', total: 880.40, count: 7 }, { name: 'Carrefour', total: 460.10, count: 4 },
+          { name: 'Al Meera', total: 360.30, count: 4 } ],
+    10: [ { name: 'Talabat', total: 520.30, count: 10 }, { name: 'Snoonu', total: 340.00, count: 8 },
+          { name: 'Starbucks', total: 240.00, count: 7 }, { name: "McDonald's", total: 190.20, count: 6 },
+          { name: 'Rafeeq', total: 180.00, count: 5 } ],
+    11: [ { name: 'Amazon', total: 680.20, count: 6 }, { name: 'Noon', total: 440.00, count: 4 },
+          { name: 'Virgin Megastore', total: 220.00, count: 2 } ],
+    14: [ { name: 'Uber', total: 420.90, count: 14 }, { name: 'Woqod', total: 320.00, count: 4 },
+          { name: 'Karwa', total: 180.00, count: 6 } ],
+    9:  [ { name: 'Ooredoo', total: 480.00, count: 1 }, { name: 'Kahramaa', total: 380.00, count: 1 },
+          { name: 'Vodafone', total: 320.00, count: 1 } ],
+    15: [ { name: 'Qatar Airways', total: 1980.00, count: 1 }, { name: 'Almosafer', total: 512.30, count: 1 },
+          { name: 'Booking.com', total: 464.50, count: 1 } ],
+    7:  [ { name: 'Fitness First', total: 350.00, count: 1 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'Novo Cinemas', total: 120.00, count: 2 },
+          { name: 'beIN', total: 99.00, count: 1 }, { name: 'Netflix', total: 56.99, count: 1 },
+          { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'Tabby', total: 160.00, count: 3 }, { name: 'Tamara', total: 120.00, count: 2 } ],
+    16: [ { name: 'QNB', total: 1150.00, count: 1 }, { name: 'QIB', total: 840.00, count: 1 },
+          { name: 'Doha Bank', total: 620.00, count: 1 }, { name: 'CBQ', total: 480.00, count: 1 } ],
+    17: [ { name: 'Qatar Insurance', total: 420.00, count: 1 } ],
+    18: SAAS,
+  };
+
   // Region registry: display meta + currency (symbol/rate/decimals) + catalog.
-  // rate converts base units to local display units; dec 0 = whole yen.
+  // rate converts base units to local display units; dec 0 = whole yen, 3 = BHD fils.
   window.REGIONS = {
-    me: { name: 'Middle East', flag: '🌍', code: 'AED', symbol: null, rate: 1,    dec: 2, catalog: CATALOG_ME },
+    me: { name: 'United Arab Emirates', flag: '🇦🇪', code: 'AED', symbol: null, rate: 1,    dec: 2, catalog: CATALOG_ME },
+    sa: { name: 'Saudi Arabia', flag: '🇸🇦', code: 'SAR', symbol: 'SR', rate: 1.02, dec: 2, catalog: CATALOG_SA },
+    bh: { name: 'Bahrain',      flag: '🇧🇭', code: 'BHD', symbol: 'BD', rate: 0.102, dec: 3, catalog: CATALOG_BH },
+    qa: { name: 'Qatar',        flag: '🇶🇦', code: 'QAR', symbol: 'QR', rate: 1,    dec: 2, catalog: CATALOG_QA },
     eu: { name: 'Europe',      flag: '🇪🇺', code: 'EUR', symbol: '€',  rate: 0.25, dec: 2, catalog: CATALOG_EU },
     jp: { name: 'Japan',       flag: '🇯🇵', code: 'JPY', symbol: '¥',  rate: 41,   dec: 0, catalog: CATALOG_JP },
     my: { name: 'Malaysia',    flag: '🇲🇾', code: 'MYR', symbol: 'RM', rate: 1.2,  dec: 2, catalog: CATALOG_MY },
@@ -1523,6 +1602,25 @@ const MERCHANT_DOMAIN = {
   'Udacity': 'udacity.com', 'Coursera': 'coursera.org', 'Udemy': 'udemy.com', 'Skillshare': 'skillshare.com',
   'Adobe': 'adobe.com', 'ChatGPT': 'openai.com', 'Microsoft 365': 'microsoft.com', 'Canva': 'canva.com',
   'Notion': 'notion.so', 'Dropbox': 'dropbox.com', 'Google One': 'google.com', 'iCloud+': 'apple.com',
+  // ── GCC shared
+  'Lulu': 'luluhypermarket.com', 'Talabat': 'talabat.com', 'Sharaf DG': 'sharafdg.com', 'Noon': 'noon.com',
+  'Almosafer': 'almosafer.com', 'Careem': 'careem.com', 'STC': 'stc.com.sa', 'Zain': 'sa.zain.com',
+  'VOX Cinemas': 'voxcinemas.com', 'Tamara': 'tamara.co', 'Tabby': 'tabby.ai', 'Virgin Megastore': 'virginmegastore.qa',
+  // ── Saudi Arabia
+  'Panda': 'panda.com.sa', 'Tamimi Markets': 'tamimimarkets.com', 'Danube': 'danube.sa', 'Al Othaim': 'othaimmarkets.com',
+  'Jahez': 'jahez.net', 'HungerStation': 'hungerstation.com', 'Al Baik': 'albaik.com', 'Kudu': 'kudu.com.sa',
+  'Herfy': 'herfy.com', 'Jarir': 'jarir.com', 'Extra': 'extra.com', 'Saudia': 'saudia.com', 'flynas': 'flynas.com',
+  'Nahdi': 'nahdi.sa', 'Al Dawaa': 'aldawaa.com', 'Fitness Time': 'fitnesstime.com.sa', 'Shahid': 'shahid.mbc.net',
+  'Saudi Electricity': 'se.com.sa', 'Mobily': 'mobily.com.sa', 'STC Pay': 'stcpay.com.sa',
+  'Al Rajhi Bank': 'alrajhibank.com.sa', 'Saudi National Bank': 'alahli.com', 'Bupa Arabia': 'bupa.com.sa', 'Tawuniya': 'tawuniya.com',
+  // ── Bahrain
+  'Ramez': 'ramezgroup.com', 'Jasmis': 'jasmis.com', 'Bapco': 'bapco.net', 'Batelco': 'batelco.com', 'EWA': 'ewa.bh',
+  'Gulf Air': 'gulfair.com', 'NBB': 'nbbonline.com', 'BBK': 'bbkonline.com', 'Bahrain Islamic Bank': 'bisb.com',
+  'Benefit': 'benefit.bh', 'Solidarity': 'solidarity.com.bh', 'GIG': 'gig.com.bh',
+  // ── Qatar
+  'Al Meera': 'almeera.com.qa', 'Snoonu': 'snoonu.com', 'Rafeeq': 'rafeeq.qa', 'Karwa': 'mowasalat.com', 'Woqod': 'woqod.com',
+  'Ooredoo': 'ooredoo.qa', 'Kahramaa': 'km.qa', 'Qatar Airways': 'qatarairways.com', 'Novo Cinemas': 'novocinemas.com',
+  'beIN': 'bein.com', 'QNB': 'qnb.com', 'Doha Bank': 'dohabank.com', 'QIB': 'qib.com.qa', 'CBQ': 'cbq.qa', 'Qatar Insurance': 'qatarinsurance.com',
   // ── Europe
   'Lidl': 'lidl.com', 'Aldi': 'aldi.us', "Sainsbury's": 'sainsburys.co.uk', 'Just Eat': 'just-eat.com',
   "Nando's": 'nandos.com', 'Pret A Manger': 'pret.com', 'Greggs': 'greggs.co.uk', 'Zalando': 'zalando.com',
@@ -1732,8 +1830,10 @@ const { useState: chUseState } = React;
 function fmtAED(n, withDec = false) {
   const R = window.CURRENT_REGION || {};
   const v0 = n * (R.rate || 1);
-  const dec = R.dec === 0 ? 0 : (withDec ? 2 : 0);
-  return Number(dec ? v0.toFixed(2) : Math.round(v0)).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  // Whole numbers for headline/totals; per-txn amounts use the region's own
+  // decimal convention (JPY = 0, BHD = 3 fils, everything else = 2).
+  const dec = withDec ? (R.dec == null ? 2 : R.dec) : 0;
+  return Number(dec ? v0.toFixed(dec) : Math.round(v0)).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
 }
 
 // ── DONUT (tap once → show share, tap selected slice again → open) ───
@@ -2800,10 +2900,24 @@ function RegionPicker({ T, open, onClose, onPick }) {
           <React.Fragment>
             <div style={{ fontSize: 19, fontWeight: 700, color: T.ink, letterSpacing: '-0.02em' }}>Where is your bank?</div>
             <div style={{ fontSize: 13, color: T.muted, margin: '6px 0 16px', lineHeight: 1.5 }}>The app localises brands, language and currency to your market.</div>
-            {row('me', '🌍', 'Middle East', 'Global brands · AED', () => toBank('me'))}
+            {row('me', '🌍', 'Middle East', 'UAE · Saudi · Bahrain · Qatar', () => setStep('me'))}
             {row('eu', '🇪🇺', 'Europe', 'European brands · EUR €', () => toBank('eu'))}
             {row('asia', '🌏', 'Asia', 'Japan · Malaysia · Singapore', () => setStep('asia'))}
             {row('za', '🇿🇦', 'South Africa', 'South African brands · ZAR R', () => toBank('za'))}
+          </React.Fragment>
+        )}
+        {step === 'me' && (
+          <React.Fragment>
+            <button className="pressable" onClick={() => setStep('region')} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 12px 7px 9px', borderRadius: 999,
+              border: `1px solid ${T.line}`, background: T.surface, cursor: 'pointer', fontFamily: 'inherit',
+              fontSize: 12.5, fontWeight: 620, color: T.ink, marginBottom: 12,
+            }}><UIIcon name="chevL" size={14} stroke="currentColor" />Regions</button>
+            <div style={{ fontSize: 19, fontWeight: 700, color: T.ink, letterSpacing: '-0.02em', marginBottom: 16 }}>Choose your market</div>
+            {row('me', '🇦🇪', 'United Arab Emirates', 'Global brands · AED', () => toBank('me'))}
+            {row('sa', '🇸🇦', 'Saudi Arabia', 'Saudi brands · SAR SR', () => toBank('sa'))}
+            {row('bh', '🇧🇭', 'Bahrain', 'Bahraini brands · BHD BD', () => toBank('bh'))}
+            {row('qa', '🇶🇦', 'Qatar', 'Qatari brands · QAR QR', () => toBank('qa'))}
           </React.Fragment>
         )}
         {step === 'asia' && (
@@ -3115,6 +3229,15 @@ const ENRICH_ORDERS = {
     'Subway', 'Uber', 'Emirates', 'Airbnb', 'Whole Foods Market', 'Spotify', 'H&M',
     'Louis Vuitton', 'Google Play Store',
     'Apple', 'Adidas', 'Mercedes-Benz', 'British Airways', 'Carrefour'],
+  sa: ['STC', 'Al Rajhi Bank', 'Starbucks', "McDonald's", 'Amazon', 'Noon', 'Jahez', 'Al Baik',
+    'Careem', 'Uber', 'Saudia', 'Netflix', 'Jarir', 'Panda', 'HungerStation', 'Nahdi',
+    'Spotify', 'PlayStation', 'STC Pay', 'flynas', 'Tamimi Markets', 'Mobily'],
+  bh: ['Talabat', 'Starbucks', "McDonald's", 'Amazon', 'Noon', 'Uber', 'Gulf Air', 'Batelco',
+    'NBB', 'Netflix', 'Lulu', 'Careem', 'Benefit', 'Jasmis', 'Spotify', 'PlayStation',
+    'Sharaf DG', 'VOX Cinemas', 'Bapco', 'Zain'],
+  qa: ['Talabat', 'Snoonu', 'Starbucks', "McDonald's", 'Amazon', 'Noon', 'Qatar Airways', 'Ooredoo',
+    'QNB', 'Netflix', 'Lulu', 'Uber', 'beIN', 'Spotify', 'PlayStation', 'Al Meera',
+    'Virgin Megastore', 'Novo Cinemas', 'Woqod', 'Vodafone'],
   eu: ["McDonald's", 'Starbucks', 'Zara', 'H&M', 'Amazon', 'IKEA', 'Netflix', 'Spotify',
     'Zalando', 'Uber', 'Lufthansa', 'Ryanair', 'Airbnb', 'Deliveroo', 'Lidl', 'PayPal',
     'Vodafone', 'Deutsche Bahn', 'Decathlon', 'Primark', 'PlayStation', 'Carrefour'],
@@ -3856,7 +3979,7 @@ function ExpensesApp() {
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 30 }}>
                 {btn('Book a demo', 'mailto:salman@lunedata.io?subject=Lune%20demo%20request', true)}
-                {btn('Visit lunedata.io', 'https://lunedata.io', false)}
+                {btn('Read case studies', 'https://www.lunedata.io/case-studies', false)}
               </div>
             </div>
             {phoneStage(dScale)}
@@ -3905,7 +4028,7 @@ function ExpensesApp() {
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
             {btn('Book a demo', 'mailto:salman@lunedata.io?subject=Lune%20demo%20request', true)}
-            {btn('Visit lunedata.io', 'https://lunedata.io', false)}
+            {btn('Read case studies', 'https://www.lunedata.io/case-studies', false)}
           </div>
         </section>
 
