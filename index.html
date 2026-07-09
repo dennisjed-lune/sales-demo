@@ -1588,7 +1588,12 @@ function RankedBars({ data, total, dark = false, ink, muted, max, onBar }) {
             onClick={() => onBar && onBar(d)}
             onMouseEnter={() => setHover(key)} onMouseLeave={() => setHover(null)}
             style={{ cursor: onBar ? 'pointer' : 'default', padding: '9px 10px', margin: '0 -10px', borderRadius: 12,
+              display: 'flex', alignItems: 'center', gap: 11,
               background: hot ? (dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.035)') : 'transparent', transition: 'background .15s' }}>
+            {d.logoName && (
+              <MerchantMark name={d.logoName} glyph={d.glyph} catColor={d.color} showLogos={true} dark={dark} size={36} radius={11} />
+            )}
+            <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 7, gap: 10 }}>
               <span style={{ fontSize: 14.5, fontWeight: 560, color: ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{d.name}</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
@@ -1601,6 +1606,7 @@ function RankedBars({ data, total, dark = false, ink, muted, max, onBar }) {
             <div style={{ height: 9, borderRadius: 999, background: dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)', overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${pct}%`, background: d.color, borderRadius: 999,
                 transformOrigin: 'left center', animation: `growX .6s cubic-bezier(.23,1,.32,1) ${i * 0.04}s both` }} />
+            </div>
             </div>
           </div>
         );
@@ -2677,7 +2683,11 @@ function Spends({ T, showLogos, period, actions, enriched, onToggle }) {
   const scoped = D().forPeriod(period);
   const { CATEGORY_SPEND, TOTAL, TRANSACTIONS, PREV } = scoped;
   const prevTotal = scoped.hasPrev ? scoped.prevTotal : null;
-  const topCats = [...CATEGORY_SPEND].sort((a, b) => b.total - a.total).slice(0, 5);
+  // Top brands across ALL categories for the selected timeframe — the donut
+  // above carries category share; this list carries where the money went.
+  const topBrands = CATEGORY_SPEND
+    .flatMap((c) => (c.brands || []).map((b) => ({ ...b, catId: c.id, catName: c.name, color: c.color, glyph: c.glyph })))
+    .sort((a, b) => b.total - a.total).slice(0, 6);
   return (
     <Screen T={T}>
       {/* top nav — back to the raw transactions feed */}
@@ -2698,13 +2708,16 @@ function Spends({ T, showLogos, period, actions, enriched, onToggle }) {
 
           <div style={{ height: 1, background: T.faint, margin: '18px -20px 8px' }} />
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '6px 0 2px' }}>
-            <span style={{ fontSize: 13, fontWeight: 640, color: T.ink, letterSpacing: '-0.01em' }}>Top categories</span>
-            <button className="pressable" onClick={actions.openBreakdown} style={{ border: 'none', background: 'none', padding: 0, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 600, color: T.accent }}>See all</button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '6px 0 8px' }}>
+            <span style={{ fontSize: 13, fontWeight: 640, color: T.ink, letterSpacing: '-0.01em' }}>Top brands</span>
+            <button className="pressable" onClick={actions.openBreakdown} style={{ border: 'none', background: 'none', padding: 0, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 600, color: T.accent }}>All categories</button>
           </div>
-          {topCats.map((c, i, a) => (
-            <CategoryRankRow key={c.id} T={T} cat={c} total={TOTAL} onClick={() => actions.openCategory(c.id)} divider={i < a.length - 1} />
-          ))}
+          <RankedBars
+            data={topBrands.map((b) => ({ id: b.name, name: b.name, total: b.total, color: b.color, logoName: b.name, glyph: b.glyph }))}
+            total={TOTAL} max={topBrands[0] ? topBrands[0].total : 1}
+            dark={T.dark} ink={T.ink} muted={T.muted}
+            onBar={(d) => { const b = topBrands.find((x) => x.name === d.name); if (!b) return;
+              actions.openTxnList({ title: b.name, subtitle: `${b.catName} · ${b.count} transaction${b.count === 1 ? '' : 's'}`, total: b.total, txns: D().txnsForBrand(b.catId, b.name, scoped.months) }); }} />
         </Card>
       </div>
 
@@ -2905,7 +2918,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
               </Card>
               <SectionTitle T={T} action="View all" onAction={() => actions.openCategoryTxns(cat.id)}>Top brands</SectionTitle>
               <Card T={T} pad={20}>
-                <RankedBars data={[...(cat.brands || [])].sort((a, b) => b.total - a.total).map((b) => ({ id: b.name, name: b.name, total: b.total, color: cat.color }))} total={cat.total} max={(cat.brands || [])[0] ? [...cat.brands].sort((a, b) => b.total - a.total)[0].total : 1} dark={T.dark} ink={T.ink} muted={T.muted} onBar={(d) => openBrand({ name: d.name, catId: cat.id, catName: cat.name })} />
+                <RankedBars data={[...(cat.brands || [])].sort((a, b) => b.total - a.total).map((b) => ({ id: b.name, name: b.name, total: b.total, color: cat.color, logoName: b.name, glyph: cat.glyph }))} total={cat.total} max={(cat.brands || [])[0] ? [...cat.brands].sort((a, b) => b.total - a.total)[0].total : 1} dark={T.dark} ink={T.ink} muted={T.muted} onBar={(d) => openBrand({ name: d.name, catId: cat.id, catName: cat.name })} />
               </Card>
             </React.Fragment>
           ) : (
@@ -2926,8 +2939,8 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
           cat ? (() => {
             const brands = [...(cat.brands || [])].sort((a, b) => brandSort === 'count' ? b.count - a.count : b.total - a.total);
             const barData = brands.map((b) => (brandSort === 'count'
-              ? { id: b.name, name: b.name, total: b.count, color: cat.color, label: `${b.count} txns` }
-              : { id: b.name, name: b.name, total: b.total, color: cat.color }));
+              ? { id: b.name, name: b.name, total: b.count, color: cat.color, label: `${b.count} txns`, logoName: b.name, glyph: cat.glyph }
+              : { id: b.name, name: b.name, total: b.total, color: cat.color, logoName: b.name, glyph: cat.glyph }));
             const barMax = barData[0] ? barData[0].total : 1;
             return (
             <React.Fragment>
