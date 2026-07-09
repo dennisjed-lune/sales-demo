@@ -54,10 +54,15 @@
      Google favicons (good for global brands, weaker for some regional ones). -->
 <script>window.LOGODEV_TOKEN = "pk_PCfI5A2ISc2tZmQNIql7Ww";</script>
 
-<!-- Brand intelligence: paste a context.dev API key below (get one at
-     https://context.dev) and the "Add your bank" step will pull the bank's
-     real brand colors + logo and skin the PFM with them. Without a key the
-     demo falls back to extracting a color from the bank's logo via logo.dev. -->
+<!-- Brand intelligence (context.dev): the "Add your bank" step pulls the
+     bank's published brand colors + logo and skins the PFM with them.
+     - BRAND_PROXY_URL: the SAFE way for the public demo — a tiny worker that
+       holds the ctxt_secret_ key server-side (see brand-proxy-worker.js).
+     - CONTEXTDEV_TOKEN: direct key, LOCAL TESTING ONLY — context.dev keys are
+       secret; never ship one in client-side code.
+     Without either, the demo falls back to extracting a colour from the
+     bank's logo via logo.dev. -->
+<script>window.BRAND_PROXY_URL = "";</script>
 <script>window.CONTEXTDEV_TOKEN = "";</script>
 
 <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
@@ -2642,13 +2647,17 @@ async function fetchBankBrand(rawName) {
   const cacheKey = 'ctxbrand:' + name.toLowerCase();
   try { const c = sessionStorage.getItem(cacheKey); if (c) return JSON.parse(c); } catch (e) {}
   let brand = null;
+  const proxy = window.BRAND_PROXY_URL || '';
   const token = window.CONTEXTDEV_TOKEN || '';
-  if (token) {
+  if (proxy || token) {
     try {
-      const res = await fetch('https://api.context.dev/v1/brand/retrieve', {
+      // Preferred: the proxy (key stays server-side). Direct token = local dev only.
+      const res = await fetch(proxy || 'https://api.context.dev/v1/brand/retrieve', {
         method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'by_name', name }),
+        headers: proxy
+          ? { 'Content-Type': 'application/json' }
+          : { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(proxy ? { name } : { type: 'by_name', name }),
       });
       if (res.ok) {
         const j = await res.json();
