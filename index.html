@@ -2018,10 +2018,13 @@ function Screen({ T, children, pad = true }) {
 }
 
 function Card({ T, children, style = {}, onClick, pad = 18 }) {
+  // Brand theme: lightly tinted background + a hairline brand border.
+  const brandBg = !T.dark && T.cardTint ? T.cardTint : T.surface;
+  const brandBorder = !T.dark && T.cardBorder ? `1px solid ${T.cardBorder}` : (T.dark ? `1px solid ${T.line}` : 'none');
   return (
     <div onClick={onClick} style={{
-      background: T.surface, borderRadius: T.radius, padding: pad, boxShadow: T.cardShadow,
-      border: T.dark ? `1px solid ${T.line}` : 'none',
+      background: brandBg, borderRadius: T.radius, padding: pad, boxShadow: T.cardShadow,
+      border: brandBorder,
       cursor: onClick ? 'pointer' : 'default', ...style,
     }}>{children}</div>
   );
@@ -2108,9 +2111,10 @@ function TxnRow({ T, txn, showLogos, onClick, showCategory = true, divider }) {
 function CategoryRow({ T, cat, total, onClick, divider }) {
   const pct = total ? Math.min(Math.abs(cat.total) / Math.abs(total), 1) : 0;
   const pctText = (pct * 100).toFixed(1) + '%';
+  const col = cc(T, cat.id, cat.color);
   return (
     <div onClick={onClick} style={{ display: 'flex', alignItems: 'flex-start', gap: 13, padding: '14px 0', cursor: 'pointer', position: 'relative' }}>
-      <CategoryMark glyph={cat.glyph} color={cat.color} dark={T.dark} size={44} />
+      <CategoryMark glyph={cat.glyph} color={col} dark={T.dark} size={44} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
           <span style={{ fontSize: 15, fontWeight: 600, color: T.ink }}>{cat.name}</span>
@@ -2120,8 +2124,8 @@ function CategoryRow({ T, cat, total, onClick, divider }) {
           <span style={{ fontSize: 12.5, color: T.muted }}>{cat.count} transactions</span>
           <span style={{ fontSize: 12.5, color: T.muted, fontVariantNumeric: 'tabular-nums' }}>{pctText}</span>
         </div>
-        <div style={{ height: 6, borderRadius: 4, background: hexA(cat.color, T.dark ? 0.22 : 0.15), overflow: 'hidden', marginTop: 8 }}>
-          <div style={{ height: '100%', width: `${pct * 100}%`, background: cat.color, borderRadius: 4 }} />
+        <div style={{ height: 6, borderRadius: 4, background: hexA(col, T.dark ? 0.22 : 0.15), overflow: 'hidden', marginTop: 8 }}>
+          <div style={{ height: '100%', width: `${pct * 100}%`, background: col, borderRadius: 4 }} />
         </div>
       </div>
       {divider && <div style={{ position: 'absolute', left: 57, right: 0, bottom: 0, height: 1, background: T.faint }} />}
@@ -2217,7 +2221,7 @@ function CategoryGrid({ T, selectedId, onPick }) {
             padding: '12px 13px', borderRadius: 15, background: on ? hexA(c.color, T.dark ? 0.22 : 0.12) : T.surface,
             border: `1.5px solid ${on ? c.color : T.line}`, color: T.ink, transition: 'all .15s',
           }}>
-            <CategoryMark glyph={c.glyph} color={c.color} dark={T.dark} size={34} radius={10} />
+            <CategoryMark glyph={c.glyph} color={cc(T, c.id, c.color)} dark={T.dark} size={34} radius={10} />
             <span style={{ fontSize: 13.5, fontWeight: 560, lineHeight: 1.15 }}>{c.name}</span>
           </button>
         );
@@ -2287,8 +2291,8 @@ function FeedbackSheet({ T, txn, open, onClose, showLogos }) {
             <MerchantMark name={txn.merchant} glyph={txn.glyph} catColor={txn.categoryColor} showLogos={showLogos} dark={T.dark} size={48} radius={14} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 16, fontWeight: 620, color: T.ink }}>{txn.merchant}</div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 4, fontSize: 12.5, color: cat.color, fontWeight: 560, background: hexA(cat.color, T.dark ? 0.2 : 0.1), padding: '3px 9px', borderRadius: 999 }}>
-                <CatGlyph glyph={cat.glyph} size={13} color={cat.color} />{cat.name}
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 4, fontSize: 12.5, color: cc(T, cat.id, cat.color), fontWeight: 560, background: hexA(cc(T, cat.id, cat.color), T.dark ? 0.2 : 0.1), padding: '3px 9px', borderRadius: 999 }}>
+                <CatGlyph glyph={cat.glyph} size={13} color={cc(T, cat.id, cat.color)} />{cat.name}
               </div>
             </div>
           </div>
@@ -2467,8 +2471,8 @@ function TxnDetailSheet({ T, txn, open, onClose, showLogos, onImprove }) {
           <Card T={T} pad="2px 18px">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '13px 0', position: 'relative' }}>
               <span style={{ fontSize: 14.5, color: T.muted }}>Category</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 14, fontWeight: 560, color: cat.color, background: hexA(cat.color, T.dark ? 0.2 : 0.1), padding: '4px 10px', borderRadius: 999 }}>
-                <CatGlyph glyph={cat.glyph} size={14} color={cat.color} />{cat.name}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 14, fontWeight: 560, color: cc(T, cat.id, cat.color), background: hexA(cc(T, cat.id, cat.color), T.dark ? 0.2 : 0.1), padding: '4px 10px', borderRadius: 999 }}>
+                <CatGlyph glyph={cat.glyph} size={14} color={cc(T, cat.id, cat.color)} />{cat.name}
               </span>
               <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 1, background: T.faint }} />
             </div>
@@ -2609,6 +2613,57 @@ function pickBrandColor(hexes) {
   const ok = (hexes || []).map(usableAccent).filter(Boolean);
   return ok[0] || null;
 }
+
+// ── sRGB ↔ OKLCH — for perceptually-even brand ramps (graphs in the bank's
+// colour). Reviewed 6 schemes; shipping "rich sequential": one hue, lightness
+// ramp with chroma tapering as it lightens. ─────────────────────────────────
+function _sL(c) { c /= 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+function _lS(c) { const v = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055; return Math.round(Math.min(1, Math.max(0, v)) * 255); }
+function _hexRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function _rgbHex(r, g, b) { return '#' + [r, g, b].map((x) => x.toString(16).padStart(2, '0')).join(''); }
+function hexToOklch(h) {
+  let [r, g, b] = _hexRgb(h); r = _sL(r); g = _sL(g); b = _sL(b);
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  const L = 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s;
+  const A = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+  const B = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+  let H = Math.atan2(B, A) * 180 / Math.PI; if (H < 0) H += 360;
+  return { L, C: Math.hypot(A, B), H };
+}
+function oklchToHex(L, C, H) {
+  const a = C * Math.cos(H * Math.PI / 180), b = C * Math.sin(H * Math.PI / 180);
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  return _rgbHex(
+    _lS(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s),
+    _lS(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s),
+    _lS(-0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s));
+}
+// From one brand hex → the full graph palette + tinted surfaces.
+function buildBrandPalette(hex) {
+  const base = hexToOklch(hex);
+  const H = base.H, C0 = base.C > 0.03 ? base.C : 0.12;
+  const N = 8, shades = [];
+  for (let i = 0; i < N; i++) {
+    const t = i / (N - 1);
+    const L = 0.45 + (0.86 - 0.45) * t;
+    const C = Math.max(0.045, Math.min(0.17, C0) * (1 - 0.62 * t));
+    shades.push(oklchToHex(L, C, H));
+  }
+  return {
+    shades,
+    other: oklchToHex(0.83, 0.018, H),      // brand-tinted neutral for the "Other" slice
+    cardTint: oklchToHex(0.985, 0.006, H),  // barely-there tinted card background
+    cardBorder: oklchToHex(0.90, 0.02, H),  // light brand border
+    sunken: oklchToHex(0.955, 0.01, H),     // bar tracks / faint fills
+  };
+}
+// Resolve a category's colour: brand shade when a brand theme is active, else
+// the category's own hue. Used everywhere a graph draws a category.
+function cc(T, id, orig) { return (T && T.catColors && T.catColors[id]) || orig; }
 function loadImg(url) {
   return new Promise((res) => {
     const i = new Image();
@@ -2874,9 +2929,10 @@ function WalletIcon({ size = 18, stroke, sw = 1.8 }) {
 //    centre. Each segment is labelled with its category NAME and % right on
 //    the ring (quadrant-anchored, width-clamped so it never clips), and a
 //    single tap opens that category — no reveal-then-open double tap.
-function SpendRing({ data, total, prevTotal, dark, ink, muted, surface, onSlice }) {
+function SpendRing({ data, total, prevTotal, dark, ink, muted, surface, onSlice, catColors, otherColor }) {
   const [hover, setHover] = React.useState(null);
   const W = 164, H = 164, cx = 82, cy = 82, R = 63, stroke = 17, gapDeg = 4;
+  const colOf = (s) => s.other ? (otherColor || s.color) : ((catColors && catColors[s.id]) || s.color);
 
   const sorted = [...data].sort((a, b) => b.total - a.total);
   const topN = sorted.slice(0, 5);
@@ -2907,7 +2963,7 @@ function SpendRing({ data, total, prevTotal, dark, ink, muted, surface, onSlice 
             const dim = hover != null && hover !== s.id;
             return (
               <path key={s.id} d={arc(R, s.start + gapDeg / 2, s.end - gapDeg / 2)} fill="none"
-                stroke={s.color} strokeWidth={hover === s.id ? stroke + 3 : stroke} strokeLinecap="round"
+                stroke={colOf(s)} strokeWidth={hover === s.id ? stroke + 3 : stroke} strokeLinecap="round"
                 opacity={dim ? 0.4 : 1} onClick={() => open(s)}
                 onMouseEnter={() => setHover(s.id)} onMouseLeave={() => setHover(null)}
                 style={{ transition: 'opacity .2s var(--ease-out), stroke-width .18s var(--ease-out)', cursor: 'pointer' }} />
@@ -2941,7 +2997,7 @@ function SpendRing({ data, total, prevTotal, dark, ink, muted, surface, onSlice 
                 border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
                 opacity: dim ? 0.4 : 1, transition: 'opacity .2s',
               }}>
-              <span style={{ width: 9, height: 9, borderRadius: 3, background: s.color, flexShrink: 0 }} />
+              <span style={{ width: 9, height: 9, borderRadius: 3, background: colOf(s), flexShrink: 0 }} />
               <span style={{ fontSize: 12, fontWeight: 600, color: ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{s.name}</span>
               <span style={{ fontSize: 11.5, fontWeight: 600, color: muted, fontVariantNumeric: 'tabular-nums', marginLeft: 'auto', flexShrink: 0 }}>{s.pct}%</span>
             </button>
@@ -2969,20 +3025,21 @@ function T_NEG_BG(d) { return d ? 'rgba(153,242,172,0.16)' : 'rgba(153,242,172,0
 //    This is where names live now; it ranks at a glance (the ring can't).
 function CategoryRankRow({ T, cat, total, onClick, divider }) {
   const pct = total ? Math.round((cat.total / total) * 100) : 0;
+  const col = cc(T, cat.id, cat.color);
   return (
     <button className="pressable-row" onClick={onClick} style={{
       display: 'flex', alignItems: 'center', gap: 13, width: '100%', padding: '11px 0',
       border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', position: 'relative',
     }}>
-      <CategoryMark glyph={cat.glyph} color={cat.color} dark={T.dark} size={38} />
+      <CategoryMark glyph={cat.glyph} color={col} dark={T.dark} size={38} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
           <span style={{ fontSize: 14.5, fontWeight: 600, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.name}</span>
           <span style={{ fontSize: 14.5, fontWeight: 600, color: T.ink, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}><Dirham size={12} color="currentColor" style={{ marginRight: 3 }} />{fmtAED(cat.total)}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginTop: 8 }}>
-          <div style={{ flex: 1, height: 5, borderRadius: 999, background: hexA(cat.color, T.dark ? 0.22 : 0.14), overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${pct}%`, background: cat.color, borderRadius: 999, transformOrigin: 'left center', animation: 'growX .55s var(--ease-out, cubic-bezier(.23,1,.32,1)) both' }} />
+          <div style={{ flex: 1, height: 5, borderRadius: 999, background: hexA(col, T.dark ? 0.22 : 0.14), overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${pct}%`, background: col, borderRadius: 999, transformOrigin: 'left center', animation: 'growX .55s var(--ease-out, cubic-bezier(.23,1,.32,1)) both' }} />
           </div>
           <span style={{ fontSize: 11.5, fontWeight: 600, color: T.muted, fontVariantNumeric: 'tabular-nums', width: 30, textAlign: 'right' }}>{pct}%</span>
         </div>
@@ -3240,7 +3297,7 @@ function Spends({ T, showLogos, period, actions, enriched, onToggle, cardType = 
   // Top brands across ALL categories for the selected timeframe — the donut
   // above carries category share; this list carries where the money went.
   const topBrands = CATEGORY_SPEND
-    .flatMap((c) => (c.brands || []).map((b) => ({ ...b, catId: c.id, catName: c.name, color: c.color, glyph: c.glyph })))
+    .flatMap((c) => (c.brands || []).map((b) => ({ ...b, catId: c.id, catName: c.name, color: cc(T, c.id, c.color), glyph: c.glyph })))
     .sort((a, b) => b.total - a.total).slice(0, 6);
   return (
     <Screen T={T}>
@@ -3277,6 +3334,7 @@ function Spends({ T, showLogos, period, actions, enriched, onToggle, cardType = 
         <Card T={T} pad={20}>
           <SpendRing data={CATEGORY_SPEND} total={TOTAL} prevTotal={prevTotal}
             dark={T.dark} ink={T.ink} muted={T.muted} surface={T.surface}
+            catColors={T.catColors} otherColor={T.otherColor}
             onSlice={(id) => (id === '__other' ? actions.openBreakdown() : actions.openCategory(id))} />
 
           <div style={{ height: 1, background: T.faint, margin: '18px -20px 8px' }} />
@@ -3414,7 +3472,7 @@ function CategoryPickerSheet({ T, open, onClose, categories, value, onPick, z })
           value == null, () => { onPick(null); onClose(); })}
         {categories.map((c) => row(c.id,
           <React.Fragment>
-            <CategoryMark glyph={c.glyph} color={c.color} dark={T.dark} size={36} />
+            <CategoryMark glyph={c.glyph} color={cc(T, c.id, c.color)} dark={T.dark} size={36} />
             <span style={{ flex: 1, fontSize: 15, fontWeight: 560, color: T.ink }}>{c.name}</span>
             <span style={{ fontSize: 13.5, fontWeight: 600, color: T.muted, fontVariantNumeric: 'tabular-nums' }}><Dirham size={12} color="currentColor" style={{ marginRight: 3 }} />{fmtAED(c.total)}</span>
           </React.Fragment>,
@@ -3452,7 +3510,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
   const title = mode === 'overtime' ? 'Spending over time' : (cat ? 'Brand trends' : 'Category trends');
   const catHeader = (c) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: 13, marginBottom: 16 }}>
-      <CategoryMark glyph={c.glyph} color={c.color} dark={T.dark} size={46} solid />
+      <CategoryMark glyph={c.glyph} color={cc(T, c.id, c.color)} dark={T.dark} size={46} solid />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 22, fontWeight: 720, color: T.ink, letterSpacing: '-0.025em', fontVariantNumeric: 'tabular-nums' }}>
           <span style={{ display: 'inline-flex', color: T.muted, marginRight: 3 }}><Dirham size={13} color="currentColor" /></span>{fmtAED(c.total)}
@@ -3475,7 +3533,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
           {mode === 'overtime'
             ? <span style={{ fontSize: 12.5, fontWeight: 600, color: T.muted, background: T.surface, border: `1px solid ${T.line}`, borderRadius: 999, padding: '8px 13px', whiteSpace: 'nowrap', flexShrink: 0 }}>Last 12 months</span>
             : <PeriodPill T={T} period={period} onClick={actions.openPeriod} inline />}
-          <CategoryDropdown T={T} label={cat ? cat.name : 'All categories'} glyph={cat && cat.glyph} color={cat && cat.color} onOpen={() => setPickerOpen(true)} />
+          <CategoryDropdown T={T} label={cat ? cat.name : 'All categories'} glyph={cat && cat.glyph} color={cat ? cc(T, cat.id, cat.color) : null} onOpen={() => setPickerOpen(true)} />
         </div>
       </div>
 
@@ -3486,12 +3544,12 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
               <SectionTitle T={T}>{cat.name} · per month</SectionTitle>
               <Card T={T} pad={20}>
                 {catHeader(cat)}
-                <ColumnTrend values={categoryMonths(cat.id).vals} labels={categoryMonths(cat.id).labels} color={cat.color} dark={T.dark} ink={T.ink} muted={T.muted} height={150} onMonth={(i) => actions.openCatMonth(cat.id, i)} solid />
+                <ColumnTrend values={categoryMonths(cat.id).vals} labels={categoryMonths(cat.id).labels} color={cc(T, cat.id, cat.color)} dark={T.dark} ink={T.ink} muted={T.muted} height={150} onMonth={(i) => actions.openCatMonth(cat.id, i)} solid />
                 <div style={{ fontSize: 11.5, color: T.muted, textAlign: 'center', marginTop: 12 }}>Tap a month for its transactions</div>
               </Card>
               <SectionTitle T={T} action="View all" onAction={() => actions.openCategoryTxns(cat.id)}>Top brands</SectionTitle>
               <Card T={T} pad={20}>
-                <RankedBars data={[...(cat.brands || [])].sort((a, b) => b.total - a.total).map((b) => ({ id: b.name, name: b.name, total: b.total, color: cat.color, logoName: b.name, glyph: cat.glyph }))} total={cat.total} max={(cat.brands || [])[0] ? [...cat.brands].sort((a, b) => b.total - a.total)[0].total : 1} dark={T.dark} ink={T.ink} muted={T.muted} onBar={(d) => openBrand({ name: d.name, catId: cat.id, catName: cat.name })} />
+                <RankedBars data={[...(cat.brands || [])].sort((a, b) => b.total - a.total).map((b) => ({ id: b.name, name: b.name, total: b.total, color: cc(T, cat.id, cat.color), logoName: b.name, glyph: cat.glyph }))} total={cat.total} max={(cat.brands || [])[0] ? [...cat.brands].sort((a, b) => b.total - a.total)[0].total : 1} dark={T.dark} ink={T.ink} muted={T.muted} onBar={(d) => openBrand({ name: d.name, catId: cat.id, catName: cat.name })} />
               </Card>
             </React.Fragment>
           ) : (
@@ -3511,9 +3569,10 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
         ) : (
           cat ? (() => {
             const brands = [...(cat.brands || [])].sort((a, b) => brandSort === 'count' ? b.count - a.count : b.total - a.total);
+            const barCol = cc(T, cat.id, cat.color);
             const barData = brands.map((b) => (brandSort === 'count'
-              ? { id: b.name, name: b.name, total: b.count, color: cat.color, label: `${b.count} txns`, logoName: b.name, glyph: cat.glyph }
-              : { id: b.name, name: b.name, total: b.total, color: cat.color, logoName: b.name, glyph: cat.glyph }));
+              ? { id: b.name, name: b.name, total: b.count, color: barCol, label: `${b.count} txns`, logoName: b.name, glyph: cat.glyph }
+              : { id: b.name, name: b.name, total: b.total, color: barCol, logoName: b.name, glyph: cat.glyph }));
             const barMax = barData[0] ? barData[0].total : 1;
             return (
             <React.Fragment>
@@ -3530,7 +3589,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
               <Card T={T} pad="2px 18px">
                 {brands.map((b, i, a) => (
                   <div key={b.name} className="pressable-row" onClick={() => openBrand({ ...b, catId: cat.id, catName: cat.name })} style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '12px 0', cursor: 'pointer', position: 'relative' }}>
-                    <MerchantMark name={b.name} glyph={cat.glyph} catColor={cat.color} showLogos={showLogos} dark={T.dark} size={40} />
+                    <MerchantMark name={b.name} glyph={cat.glyph} catColor={cc(T, cat.id, cat.color)} showLogos={showLogos} dark={T.dark} size={40} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 15, fontWeight: 560, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{b.name}</div>
                       <div style={{ fontSize: 12.5, color: T.muted, marginTop: 2 }}>{b.count} transactions</div>
@@ -3557,7 +3616,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
                   const up = delta >= 0;
                   return (
                     <div key={c.id} className="pressable-row" onClick={() => goCat(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '13px 0', cursor: 'pointer', position: 'relative' }}>
-                      <CategoryMark glyph={c.glyph} color={c.color} dark={T.dark} size={40} />
+                      <CategoryMark glyph={c.glyph} color={cc(T, c.id, c.color)} dark={T.dark} size={40} />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 15, fontWeight: 560, color: T.ink }}>{c.name}</div>
                         <div style={{ fontSize: 12.5, color: T.muted, marginTop: 2 }}><Dirham size={12} color="currentColor" style={{ marginRight: 3 }} />{fmtAED(c.total)}</div>
@@ -3648,8 +3707,24 @@ function ExpensesApp() {
     setRegionOpen(false); setEnriched(true);
   };
   const toggleApp = (v) => { if (v) setRegionOpen(true); else setEnriched(false); };
-  // The PFM (and its sheets) wear the prospect's brand accent; landing stays Lune.
-  const TApp = bankBrand && bankBrand.color ? makeTheme(t.dark, bankBrand.color) : T;
+  // The PFM (and its sheets) wear the prospect's brand: accent + a full graph
+  // palette (category shades) + tinted surfaces. Landing stays Lune.
+  const brandPal = React.useMemo(
+    () => (bankBrand && bankBrand.color ? buildBrandPalette(bankBrand.color) : null),
+    [bankBrand]);
+  const catColors = React.useMemo(() => {
+    if (!brandPal) return null;
+    const cats = [...window.EXP_DATA.forPeriod(period).CATEGORY_SPEND].sort((a, b) => b.total - a.total);
+    const m = {}; cats.forEach((c, i) => { m[c.id] = brandPal.shades[Math.min(i, brandPal.shades.length - 1)]; });
+    return m;
+  }, [brandPal, period, cardType]);
+  const TApp = React.useMemo(() => {
+    if (!brandPal) return T;
+    const th = makeTheme(t.dark, bankBrand.color);
+    th.catColors = catColors; th.otherColor = brandPal.other;
+    th.cardTint = brandPal.cardTint; th.cardBorder = brandPal.cardBorder; th.brandSunken = brandPal.sunken;
+    return th;
+  }, [brandPal, catColors, bankBrand, t.dark, T]);
   const [breakdownOpen, setBreakdownOpen] = React.useState(false);
   const [trends, setTrends] = React.useState(null); // null | { mode, catId }
   const [allTxnsOpen, setAllTxnsOpen] = React.useState(false);
