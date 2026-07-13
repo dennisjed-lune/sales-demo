@@ -2943,13 +2943,19 @@ async function fetchBankBrand(rawName) {
     } catch (e) {}
   }
   if (!brand) {
-    // Fallback: guess the domain, take the logo from logo.dev, extract its color.
-    const domain = name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com';
-    const logoUrl = `https://img.logo.dev/${domain}?token=${window.LOGODEV_TOKEN || ''}&size=128&format=png&retina=true`;
-    const img = await loadImg(logoUrl);
-    if (img) {
-      const color = dominantColor(img);
-      brand = { name, domain, color, logo: logoUrl, via: 'logo.dev' };
+    // Fallback: resolve the domain, take the logo from logo.dev, extract its
+    // colour. Prefer a known brand's real domain (e.g. Absa → absa.co.za) over
+    // a naive "<name>.com" guess, which misfires for non-.com banks.
+    const key = name.toLowerCase();
+    let known = null;
+    try {
+      for (const bn in MERCHANT_DOMAIN) { if (bn.toLowerCase() === key) { known = MERCHANT_DOMAIN[bn]; break; } }
+    } catch (e) {}
+    const candidates = known ? [known] : [key.replace(/[^a-z0-9]/g, '') + '.com', key.replace(/[^a-z0-9]/g, '') + '.co.za', key.replace(/[^a-z0-9]/g, '') + '.ae', key.replace(/[^a-z0-9]/g, '') + '.co.uk'];
+    for (const domain of candidates) {
+      const logoUrl = `https://img.logo.dev/${domain}?token=${window.LOGODEV_TOKEN || ''}&size=128&format=png&retina=true`;
+      const img = await loadImg(logoUrl);
+      if (img) { brand = { name, domain, color: dominantColor(img), logo: logoUrl, via: 'logo.dev' }; break; }
     }
   }
   try { if (brand) sessionStorage.setItem(cacheKey, JSON.stringify(brand)); } catch (e) {}
@@ -3554,7 +3560,7 @@ function Spends({ T, showLogos, period, actions, enriched, onToggle, cardType = 
       <AppHeader T={T} title="Spends" period={period} onPeriod={actions.openPeriod}
         right={bankBrand && (
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, maxWidth: 150, padding: '6px 11px 6px 7px', borderRadius: 999, background: T.surface, border: `1px solid ${T.line}`, boxShadow: T.dark ? 'none' : T.cardShadow }}>
-            {bankBrand.logo && <img src={bankBrand.logo} alt="" style={{ width: 22, height: 22, borderRadius: 6, objectFit: 'contain', flexShrink: 0 }} />}
+            {bankBrand.logo && <img src={bankBrand.logo} alt="" onError={(e) => { e.target.style.display = 'none'; }} style={{ width: 22, height: 22, borderRadius: 6, objectFit: 'contain', flexShrink: 0 }} />}
             <span style={{ fontSize: 12.5, fontWeight: 650, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{bankBrand.name}</span>
           </span>
         )}
