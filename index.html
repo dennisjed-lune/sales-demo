@@ -399,6 +399,81 @@
     18: SAAS,
   };
 
+  const CATALOG_US = {
+    6:  [ { name: 'Walmart', total: 1180.40, count: 8 }, { name: 'Costco', total: 720.10, count: 4 },
+          { name: 'Target', total: 480.30, count: 5 }, { name: 'Kroger', total: 360.00, count: 4 },
+          { name: "Trader Joe's", total: 240.00, count: 3 }, { name: 'Whole Foods Market', total: 220.00, count: 2 } ],
+    10: [ { name: 'DoorDash', total: 520.30, count: 9 }, { name: 'Starbucks', total: 392.00, count: 14 },
+          { name: 'Uber Eats', total: 340.00, count: 7 }, { name: 'Chipotle', total: 210.20, count: 6 },
+          { name: "McDonald's", total: 190.20, count: 6 }, { name: 'Chick-fil-A', total: 160.00, count: 5 },
+          { name: "Dunkin'", total: 90.00, count: 6 }, { name: 'Subway', total: 80.00, count: 3 } ],
+    11: [ { name: 'Amazon', total: 984.20, count: 6 }, { name: 'Apple', total: 749.00, count: 1 },
+          { name: 'Best Buy', total: 320.40, count: 2 }, { name: 'Nike', total: 280.00, count: 2 },
+          { name: 'Home Depot', total: 260.00, count: 2 }, { name: "Macy's", total: 160.00, count: 2 } ],
+    14: [ { name: 'Uber', total: 420.90, count: 15 }, { name: 'Shell', total: 320.00, count: 5 },
+          { name: 'Lyft', total: 220.50, count: 10 }, { name: 'Chevron', total: 180.00, count: 3 },
+          { name: 'ExxonMobil', total: 120.00, count: 4 } ],
+    9:  [ { name: 'Verizon', total: 480.00, count: 1 }, { name: 'AT&T', total: 380.00, count: 1 },
+          { name: 'Xfinity', total: 320.00, count: 1 }, { name: 'T-Mobile', total: 240.00, count: 1 } ],
+    15: [ { name: 'Delta', total: 1980.00, count: 1 }, { name: 'United', total: 1280.00, count: 1 },
+          { name: 'American Airlines', total: 980.00, count: 1 }, { name: 'Marriott', total: 720.00, count: 1 },
+          { name: 'Airbnb', total: 640.00, count: 1 }, { name: 'Hilton', total: 512.30, count: 1 },
+          { name: 'Expedia', total: 420.00, count: 1 }, { name: 'Southwest', total: 380.00, count: 1 } ],
+    7:  [ { name: 'Planet Fitness', total: 250.00, count: 1 }, { name: 'CVS Pharmacy', total: 240.60, count: 4 },
+          { name: 'Equinox', total: 220.00, count: 1 }, { name: 'Walgreens', total: 190.30, count: 3 },
+          { name: 'GNC', total: 90.00, count: 1 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'Xbox', total: 132.00, count: 2 },
+          { name: 'Disney+', total: 99.00, count: 1 }, { name: 'Max', total: 96.00, count: 1 },
+          { name: 'Hulu', total: 79.00, count: 1 }, { name: 'Netflix', total: 56.99, count: 1 },
+          { name: 'YouTube Premium', total: 21.00, count: 1 }, { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'PayPal', total: 312.40, count: 3 }, { name: 'Venmo', total: 240.00, count: 6 },
+          { name: 'Cash App', total: 200.00, count: 5 }, { name: 'Chime', total: 180.00, count: 3 },
+          { name: 'Robinhood', total: 160.00, count: 2 }, { name: 'Coinbase', total: 140.00, count: 2 },
+          { name: 'Affirm', total: 96.00, count: 2 }, { name: 'Klarna', total: 80.00, count: 2 } ],
+    16: [ { name: 'Chase', total: 1150.00, count: 1 }, { name: 'Bank of America', total: 840.00, count: 1 },
+          { name: 'Wells Fargo', total: 620.00, count: 1 }, { name: 'Capital One', total: 480.00, count: 1 },
+          { name: 'Citi', total: 380.00, count: 1 }, { name: 'SoFi', total: 320.00, count: 1 },
+          { name: 'American Express', total: 260.00, count: 1 } ],
+    17: [ { name: 'GEICO', total: 480.00, count: 1 }, { name: 'State Farm', total: 320.00, count: 1 },
+          { name: 'Progressive', total: 240.00, count: 1 }, { name: 'Allstate', total: 180.00, count: 1 } ],
+    18: SAAS,
+  };
+
+  const CATALOG_CA = {
+    6:  [ { name: 'Loblaws', total: 980.40, count: 7 }, { name: 'Costco', total: 620.10, count: 4 },
+          { name: 'Metro', total: 460.30, count: 5 }, { name: 'Sobeys', total: 340.00, count: 4 },
+          { name: 'No Frills', total: 240.00, count: 4 }, { name: 'Walmart', total: 220.00, count: 3 } ],
+    10: [ { name: 'Tim Hortons', total: 320.30, count: 14 }, { name: 'SkipTheDishes', total: 340.00, count: 7 },
+          { name: 'Uber Eats', total: 280.00, count: 6 }, { name: 'Starbucks', total: 240.00, count: 8 },
+          { name: "McDonald's", total: 190.20, count: 6 }, { name: 'A&W', total: 150.00, count: 5 },
+          { name: 'DoorDash', total: 180.00, count: 4 } ],
+    11: [ { name: 'Amazon', total: 880.20, count: 6 }, { name: 'Apple', total: 749.00, count: 1 },
+          { name: 'Best Buy', total: 320.40, count: 2 }, { name: 'Canadian Tire', total: 280.00, count: 2 },
+          { name: 'Lululemon', total: 240.00, count: 2 }, { name: "Hudson's Bay", total: 160.00, count: 1 } ],
+    14: [ { name: 'Uber', total: 380.90, count: 14 }, { name: 'Petro-Canada', total: 320.00, count: 5 },
+          { name: 'Esso', total: 220.00, count: 4 }, { name: 'Lyft', total: 180.50, count: 8 },
+          { name: 'Presto', total: 120.00, count: 12 } ],
+    9:  [ { name: 'Rogers', total: 480.00, count: 1 }, { name: 'Bell', total: 380.00, count: 1 },
+          { name: 'Telus', total: 320.00, count: 1 }, { name: 'Freedom Mobile', total: 200.00, count: 1 } ],
+    15: [ { name: 'Air Canada', total: 1780.00, count: 1 }, { name: 'WestJet', total: 980.00, count: 1 },
+          { name: 'Marriott', total: 620.00, count: 1 }, { name: 'Airbnb', total: 512.30, count: 1 },
+          { name: 'Expedia', total: 420.00, count: 1 } ],
+    7:  [ { name: 'Shoppers Drug Mart', total: 260.60, count: 4 }, { name: 'GoodLife Fitness', total: 350.00, count: 1 },
+          { name: 'Rexall', total: 160.30, count: 3 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'Cineplex', total: 120.00, count: 2 },
+          { name: 'Disney+', total: 99.00, count: 1 }, { name: 'Netflix', total: 56.99, count: 1 },
+          { name: 'Crave', total: 20.00, count: 1 }, { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'PayPal', total: 240.40, count: 3 }, { name: 'Wealthsimple', total: 220.00, count: 3 },
+          { name: 'Interac', total: 200.00, count: 8 }, { name: 'KOHO', total: 160.00, count: 4 },
+          { name: 'Neo Financial', total: 120.00, count: 2 }, { name: 'Shakepay', total: 90.00, count: 2 } ],
+    16: [ { name: 'RBC', total: 1150.00, count: 1 }, { name: 'TD', total: 840.00, count: 1 },
+          { name: 'Scotiabank', total: 620.00, count: 1 }, { name: 'BMO', total: 480.00, count: 1 },
+          { name: 'CIBC', total: 380.00, count: 1 }, { name: 'National Bank', total: 240.00, count: 1 } ],
+    17: [ { name: 'Manulife', total: 480.00, count: 1 }, { name: 'Sun Life', total: 320.00, count: 1 },
+          { name: 'Intact', total: 240.00, count: 1 }, { name: 'Desjardins', total: 180.00, count: 1 } ],
+    18: SAAS,
+  };
+
   // Region registry: display meta + currency (symbol/rate/decimals) + catalog.
   // rate converts base units to local display units; dec 0 = whole yen, 3 = BHD fils.
   window.REGIONS = {
@@ -411,6 +486,8 @@
     my: { name: 'Malaysia',    flag: '🇲🇾', code: 'MYR', symbol: 'RM', rate: 1.2,  dec: 2, catalog: CATALOG_MY },
     sg: { name: 'Singapore',   flag: '🇸🇬', code: 'SGD', symbol: 'S$', rate: 0.37, dec: 2, catalog: CATALOG_SG },
     za: { name: 'South Africa', flag: '🇿🇦', code: 'ZAR', symbol: 'R',  rate: 5,    dec: 2, catalog: CATALOG_ZA },
+    us: { name: 'United States', flag: '🇺🇸', code: 'USD', symbol: '$',  rate: 0.272, dec: 2, catalog: CATALOG_US },
+    ca: { name: 'Canada',       flag: '🇨🇦', code: 'CAD', symbol: 'C$', rate: 0.368, dec: 2, catalog: CATALOG_CA },
   };
 
   // Build (or rebuild) the entire dataset for one region — everything below
@@ -1621,6 +1698,24 @@ const MERCHANT_DOMAIN = {
   'Al Meera': 'almeera.com.qa', 'Snoonu': 'snoonu.com', 'Rafeeq': 'rafeeq.qa', 'Karwa': 'mowasalat.com', 'Woqod': 'woqod.com',
   'Ooredoo': 'ooredoo.qa', 'Kahramaa': 'km.qa', 'Qatar Airways': 'qatarairways.com', 'Novo Cinemas': 'novocinemas.com',
   'beIN': 'bein.com', 'QNB': 'qnb.com', 'Doha Bank': 'dohabank.com', 'QIB': 'qib.com.qa', 'CBQ': 'cbq.qa', 'Qatar Insurance': 'qatarinsurance.com',
+  // ── United States
+  'Chevron': 'chevron.com', 'Max': 'max.com',
+  'Walmart': 'walmart.com', 'Target': 'target.com', 'Kroger': 'kroger.com', 'Safeway': 'safeway.com', 'Publix': 'publix.com',
+  'Chipotle': 'chipotle.com', 'Chick-fil-A': 'chick-fil-a.com', 'DoorDash': 'doordash.com', "Dunkin'": 'dunkindonuts.com',
+  'Home Depot': 'homedepot.com', "Macy's": 'macys.com', 'United': 'united.com', 'American Airlines': 'aa.com', 'Southwest': 'southwest.com',
+  'Planet Fitness': 'planetfitness.com', 'Equinox': 'equinox.com', 'Hulu': 'hulu.com',
+  'Venmo': 'venmo.com', 'Cash App': 'cash.app', 'Chime': 'chime.com', 'Robinhood': 'robinhood.com', 'Coinbase': 'coinbase.com', 'Affirm': 'affirm.com',
+  'Chase': 'chase.com', 'Bank of America': 'bankofamerica.com', 'Wells Fargo': 'wellsfargo.com', 'Citi': 'citi.com', 'Capital One': 'capitalone.com',
+  'GEICO': 'geico.com', 'State Farm': 'statefarm.com', 'Progressive': 'progressive.com', 'Allstate': 'allstate.com',
+  // ── Canada
+  'Loblaws': 'loblaws.ca', 'Metro': 'metro.ca', 'Sobeys': 'sobeys.com', 'No Frills': 'nofrills.ca', 'Tim Hortons': 'timhortons.com',
+  'A&W': 'aw.ca', 'SkipTheDishes': 'skipthedishes.com', 'Canadian Tire': 'canadiantire.ca', "Hudson's Bay": 'thebay.com', 'Lululemon': 'lululemon.com',
+  'Petro-Canada': 'petro-canada.ca', 'Esso': 'esso.ca', 'Presto': 'prestocard.ca', 'Rogers': 'rogers.com', 'Bell': 'bell.ca', 'Telus': 'telus.com',
+  'Freedom Mobile': 'freedommobile.ca', 'Air Canada': 'aircanada.com', 'WestJet': 'westjet.com', 'Shoppers Drug Mart': 'shoppersdrugmart.ca',
+  'GoodLife Fitness': 'goodlifefitness.com', 'Rexall': 'rexall.ca', 'Crave': 'crave.ca', 'Cineplex': 'cineplex.com',
+  'Wealthsimple': 'wealthsimple.com', 'Interac': 'interac.ca', 'KOHO': 'koho.ca', 'Neo Financial': 'neofinancial.com', 'Shakepay': 'shakepay.com',
+  'RBC': 'rbc.com', 'TD': 'td.com', 'Scotiabank': 'scotiabank.com', 'BMO': 'bmo.com', 'CIBC': 'cibc.com', 'National Bank': 'nbc.ca',
+  'Manulife': 'manulife.ca', 'Sun Life': 'sunlife.ca', 'Intact': 'intact.ca', 'Desjardins': 'desjardins.com',
   // ── Europe
   'Lidl': 'lidl.com', 'Aldi': 'aldi.us', "Sainsbury's": 'sainsburys.co.uk', 'Just Eat': 'just-eat.com',
   "Nando's": 'nandos.com', 'Pret A Manger': 'pret.com', 'Greggs': 'greggs.co.uk', 'Zalando': 'zalando.com',
@@ -2901,9 +2996,22 @@ function RegionPicker({ T, open, onClose, onPick }) {
             <div style={{ fontSize: 19, fontWeight: 700, color: T.ink, letterSpacing: '-0.02em' }}>Where is your bank?</div>
             <div style={{ fontSize: 13, color: T.muted, margin: '6px 0 16px', lineHeight: 1.5 }}>The app localises brands, language and currency to your market.</div>
             {row('me', '🌍', 'Middle East', 'UAE · Saudi · Bahrain · Qatar', () => setStep('me'))}
+            {row('na', '🌎', 'North America', 'United States · Canada', () => setStep('na'))}
             {row('eu', '🇪🇺', 'Europe', 'European brands · EUR €', () => toBank('eu'))}
             {row('asia', '🌏', 'Asia', 'Japan · Malaysia · Singapore', () => setStep('asia'))}
             {row('za', '🇿🇦', 'South Africa', 'South African brands · ZAR R', () => toBank('za'))}
+          </React.Fragment>
+        )}
+        {step === 'na' && (
+          <React.Fragment>
+            <button className="pressable" onClick={() => setStep('region')} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 12px 7px 9px', borderRadius: 999,
+              border: `1px solid ${T.line}`, background: T.surface, cursor: 'pointer', fontFamily: 'inherit',
+              fontSize: 12.5, fontWeight: 620, color: T.ink, marginBottom: 12,
+            }}><UIIcon name="chevL" size={14} stroke="currentColor" />Regions</button>
+            <div style={{ fontSize: 19, fontWeight: 700, color: T.ink, letterSpacing: '-0.02em', marginBottom: 16 }}>Choose your market</div>
+            {row('us', '🇺🇸', 'United States', 'US banks, fintechs & brands · USD $', () => toBank('us'))}
+            {row('ca', '🇨🇦', 'Canada', 'Canadian banks, fintechs & brands · CAD C$', () => toBank('ca'))}
           </React.Fragment>
         )}
         {step === 'me' && (
@@ -3238,6 +3346,12 @@ const ENRICH_ORDERS = {
   qa: ['Talabat', 'Snoonu', 'Starbucks', "McDonald's", 'Amazon', 'Noon', 'Qatar Airways', 'Ooredoo',
     'QNB', 'Netflix', 'Lulu', 'Uber', 'beIN', 'Spotify', 'PlayStation', 'Al Meera',
     'Virgin Megastore', 'Novo Cinemas', 'Woqod', 'Vodafone'],
+  us: ['Starbucks', "McDonald's", 'Amazon', 'Apple', 'Chase', 'Venmo', 'Cash App', 'DoorDash',
+    'Netflix', 'Uber', 'Target', 'Chipotle', 'PayPal', 'Robinhood', 'Delta', 'Nike',
+    'Spotify', 'Walmart', 'Chime', 'Bank of America', 'Costco', 'Disney+'],
+  ca: ['Tim Hortons', 'Starbucks', 'Amazon', 'Apple', 'RBC', 'Wealthsimple', 'Interac', 'SkipTheDishes',
+    'Netflix', 'Uber', 'Loblaws', 'Lululemon', 'PayPal', 'Air Canada', 'Spotify', 'Canadian Tire',
+    'TD', 'Shoppers Drug Mart', 'Rogers', 'KOHO', 'Cineplex'],
   eu: ["McDonald's", 'Starbucks', 'Zara', 'H&M', 'Amazon', 'IKEA', 'Netflix', 'Spotify',
     'Zalando', 'Uber', 'Lufthansa', 'Ryanair', 'Airbnb', 'Deliveroo', 'Lidl', 'PayPal',
     'Vodafone', 'Deutsche Bahn', 'Decathlon', 'Primark', 'PlayStation', 'Carrefour'],
