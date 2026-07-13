@@ -2053,7 +2053,7 @@ function DonutDial({ data, total, dark = false, ink, muted, surface, onSlice }) 
 // ── HORIZONTAL RANKED BARS (tap once → show share, tap again → open) ─
 // Ranked bars — stats (value + share, or a custom label) are ALWAYS visible;
 // a single tap drills in (no reveal-first step) when onBar is provided.
-function RankedBars({ data, total, dark = false, ink, muted, max, onBar }) {
+function RankedBars({ data, total, dark = false, ink, muted, max, onBar, track }) {
   const [hover, setHover] = chUseState(null);
   const peak = max || Math.max(...data.map((d) => d.total)) || 1;
   return (
@@ -2083,7 +2083,7 @@ function RankedBars({ data, total, dark = false, ink, muted, max, onBar }) {
                 {onBar && <span style={{ display: 'flex', marginRight: -2 }}><UIIcon name="chevR" size={13} stroke={muted} /></span>}
               </span>
             </div>
-            <div style={{ height: 9, borderRadius: 999, background: dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+            <div style={{ height: 9, borderRadius: 999, background: track || (dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'), overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${pct}%`, background: d.color, borderRadius: 999,
                 transformOrigin: 'left center', animation: `growX .6s cubic-bezier(.23,1,.32,1) ${i * 0.04}s both` }} />
             </div>
@@ -2851,9 +2851,11 @@ function buildBrandPalette(hex) {
   return {
     shades,
     other: oklchToHex(0.83, 0.018, H),      // brand-tinted neutral for the "Other" slice
-    cardTint: oklchToHex(0.985, 0.006, H),  // barely-there tinted card background
-    cardBorder: oklchToHex(0.90, 0.02, H),  // light brand border
-    sunken: oklchToHex(0.955, 0.01, H),     // bar tracks / faint fills
+    bg: oklchToHex(0.966, 0.010, H),        // page + sheet background — soft brand wash
+    cardTint: oklchToHex(0.992, 0.005, H),  // cards sit just above the washed bg
+    cardBorder: oklchToHex(0.89, 0.024, H), // hairline brand border on cards
+    line: oklchToHex(0.88, 0.024, H),       // pills, dividers, input borders
+    faint: oklchToHex(0.935, 0.016, H),     // bar tracks / faint fills / progress rails
   };
 }
 // Resolve a category's colour: brand shade when a brand theme is active, else
@@ -3583,7 +3585,7 @@ function Spends({ T, showLogos, period, actions, enriched, onToggle, cardType = 
           <RankedBars
             data={topBrands.map((b) => ({ id: b.name, name: b.name, total: b.total, color: b.color, logoName: b.name, glyph: b.glyph }))}
             total={TOTAL} max={topBrands[0] ? topBrands[0].total : 1}
-            dark={T.dark} ink={T.ink} muted={T.muted}
+            dark={T.dark} ink={T.ink} muted={T.muted} track={T.brandSunken}
             onBar={(d) => { const b = topBrands.find((x) => x.name === d.name); if (!b) return;
               actions.openTxnList({ title: b.name, subtitle: `${b.catName} · ${b.count} transaction${b.count === 1 ? '' : 's'}`, total: b.total, txns: D().txnsForBrand(b.catId, b.name, scoped.months) }); }} />
         </Card>
@@ -3786,7 +3788,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
               </Card>
               <SectionTitle T={T} action="View all" onAction={() => actions.openCategoryTxns(cat.id)}>Top brands</SectionTitle>
               <Card T={T} pad={20}>
-                <RankedBars data={[...(cat.brands || [])].sort((a, b) => b.total - a.total).map((b) => ({ id: b.name, name: b.name, total: b.total, color: cc(T, cat.id, cat.color), logoName: b.name, glyph: cat.glyph }))} total={cat.total} max={(cat.brands || [])[0] ? [...cat.brands].sort((a, b) => b.total - a.total)[0].total : 1} dark={T.dark} ink={T.ink} muted={T.muted} onBar={(d) => openBrand({ name: d.name, catId: cat.id, catName: cat.name })} />
+                <RankedBars data={[...(cat.brands || [])].sort((a, b) => b.total - a.total).map((b) => ({ id: b.name, name: b.name, total: b.total, color: cc(T, cat.id, cat.color), logoName: b.name, glyph: cat.glyph }))} total={cat.total} max={(cat.brands || [])[0] ? [...cat.brands].sort((a, b) => b.total - a.total)[0].total : 1} dark={T.dark} ink={T.ink} muted={T.muted} track={T.brandSunken} onBar={(d) => openBrand({ name: d.name, catId: cat.id, catName: cat.name })} />
               </Card>
             </React.Fragment>
           ) : (
@@ -3799,7 +3801,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
               <SectionTitle T={T}>Ranked by spend</SectionTitle>
               <Card T={T} pad={20}>
                 <div style={{ fontSize: 13, color: T.muted, fontWeight: 540, marginBottom: 16 }}>Tap a category for its monthly trend</div>
-                <RankedBars data={ranked} total={TOTAL} max={ranked[0] ? ranked[0].total : 1} dark={T.dark} ink={T.ink} muted={T.muted} onBar={(d) => goCat(d.id)} />
+                <RankedBars data={ranked} total={TOTAL} max={ranked[0] ? ranked[0].total : 1} dark={T.dark} ink={T.ink} muted={T.muted} track={T.brandSunken} onBar={(d) => goCat(d.id)} />
               </Card>
             </React.Fragment>
           )
@@ -3820,7 +3822,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
               <Card T={T} pad={20}>
                 {catHeader(cat)}
                 <div style={{ fontSize: 13, color: T.muted, fontWeight: 540, marginBottom: 16 }}>Where this category's spend goes · tap a brand for its transactions</div>
-                <RankedBars data={barData} total={brandSort === 'count' ? null : cat.total} max={barMax} dark={T.dark} ink={T.ink} muted={T.muted} onBar={(d) => openBrand({ name: d.name, catId: cat.id, catName: cat.name })} />
+                <RankedBars data={barData} total={brandSort === 'count' ? null : cat.total} max={barMax} dark={T.dark} ink={T.ink} muted={T.muted} track={T.brandSunken} onBar={(d) => openBrand({ name: d.name, catId: cat.id, catName: cat.name })} />
               </Card>
               <SectionTitle T={T} action="View all" onAction={() => actions.openCategoryTxns(cat.id)}>All brands</SectionTitle>
               <Card T={T} pad="2px 18px">
@@ -3843,7 +3845,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
               <SectionTitle T={T}>Ranked by spend</SectionTitle>
               <Card T={T} pad={20}>
                 <div style={{ fontSize: 13, color: T.muted, fontWeight: 540, marginBottom: 16 }}>Tap a category to see the brands inside it</div>
-                <RankedBars data={ranked} total={TOTAL} max={ranked[0] ? ranked[0].total : 1} dark={T.dark} ink={T.ink} muted={T.muted} onBar={(d) => goCat(d.id)} />
+                <RankedBars data={ranked} total={TOTAL} max={ranked[0] ? ranked[0].total : 1} dark={T.dark} ink={T.ink} muted={T.muted} track={T.brandSunken} onBar={(d) => goCat(d.id)} />
               </Card>
               <SectionTitle T={T}>Movers vs previous period</SectionTitle>
               <Card T={T} pad="2px 18px">
@@ -3959,7 +3961,12 @@ function ExpensesApp() {
     if (!brandPal) return T;
     const th = makeTheme(t.dark, bankBrand.color);
     th.catColors = catColors; th.otherColor = brandPal.other;
-    th.cardTint = brandPal.cardTint; th.cardBorder = brandPal.cardBorder; th.brandSunken = brandPal.sunken;
+    th.cardTint = brandPal.cardTint; th.cardBorder = brandPal.cardBorder;
+    if (!t.dark) {
+      // Wash the surfaces in the brand: page/sheet bg, borders, dividers, tracks.
+      th.bg = brandPal.bg; th.sunken = brandPal.bg; th.surfaceAlt = brandPal.faint;
+      th.line = brandPal.line; th.faint = brandPal.faint; th.brandSunken = brandPal.faint;
+    }
     return th;
   }, [brandPal, catColors, bankBrand, t.dark, T]);
   const [breakdownOpen, setBreakdownOpen] = React.useState(false);
@@ -4041,7 +4048,7 @@ function ExpensesApp() {
 
   const phone = (
     <IOSDevice dark={T.dark} width={390} height={844}>
-        <div style={{ position: 'relative', height: '100%', overflow: 'hidden', background: T.bg }}>
+        <div style={{ position: 'relative', height: '100%', overflow: 'hidden', background: enriched ? TApp.bg : T.bg }}>
           <div className="exp-screens" style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', paddingTop: 56 }}>
             <div key={(enriched ? 'app' : 'txns') + '-' + region} style={{ animation: `${enriched ? 'slideFwd' : 'slideBack'} .34s cubic-bezier(.32,.72,0,1) both` }}>
               {enriched
@@ -4157,7 +4164,7 @@ function ExpensesApp() {
       {/* PFM portal — a whole new full-screen page you enter and exit,
           not a container inside the landing. */}
       {enriched && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 500, background: T.bg, animation: 'slideFwd .34s cubic-bezier(.32,.72,0,1) both' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 500, background: TApp.bg, animation: 'slideFwd .34s cubic-bezier(.32,.72,0,1) both' }}>
           <div className="exp-screens" style={{ position: 'absolute', inset: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <div style={{ maxWidth: 560, margin: '0 auto', paddingTop: 18 }}>
               <Spends key={region + cardType} T={TApp} showLogos={t.showLogos} period={period} actions={actions} enriched={enriched} onToggle={toggleApp} cardType={cardType} onCardType={() => setCardOpen(true)} bankBrand={bankBrand} />
