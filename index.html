@@ -478,6 +478,104 @@
     18: SAAS,
   };
 
+  const CATALOG_AR = {
+    6:  [ { name: 'Coto', total: 1180.40, count: 8 }, { name: 'Carrefour', total: 620.10, count: 5 },
+          { name: 'Jumbo', total: 480.30, count: 3 }, { name: 'Día', total: 360.00, count: 4 } ],
+    10: [ { name: 'Rappi', total: 520.30, count: 9 }, { name: 'PedidosYa', total: 420.00, count: 8 },
+          { name: 'Starbucks', total: 240.00, count: 7 }, { name: "McDonald's", total: 190.20, count: 6 },
+          { name: 'Mostaza', total: 120.00, count: 4 } ],
+    11: [ { name: 'Mercado Libre', total: 984.20, count: 6 }, { name: 'Amazon', total: 320.00, count: 2 },
+          { name: 'Frávega', total: 260.00, count: 2 } ],
+    14: [ { name: 'YPF', total: 480.90, count: 6 }, { name: 'Uber', total: 340.00, count: 12 },
+          { name: 'Cabify', total: 180.00, count: 6 }, { name: 'Axion', total: 150.00, count: 3 } ],
+    9:  [ { name: 'Personal', total: 420.00, count: 1 }, { name: 'Movistar', total: 320.00, count: 1 },
+          { name: 'Claro', total: 260.00, count: 1 } ],
+    15: [ { name: 'Aerolíneas Argentinas', total: 1980.00, count: 1 }, { name: 'Despegar', total: 640.00, count: 1 },
+          { name: 'LATAM', total: 512.30, count: 1 }, { name: 'Booking.com', total: 464.50, count: 1 } ],
+    7:  [ { name: 'Farmacity', total: 260.60, count: 4 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'Disney+', total: 99.00, count: 1 },
+          { name: 'Netflix', total: 56.99, count: 1 }, { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'Mercado Pago', total: 520.40, count: 9 }, { name: 'Ualá', total: 240.00, count: 5 },
+          { name: 'Naranja X', total: 180.00, count: 3 }, { name: 'Brubank', total: 120.00, count: 2 } ],
+    16: [ { name: 'Banco Galicia', total: 1150.00, count: 1 }, { name: 'Banco Nación', total: 840.00, count: 1 },
+          { name: 'BBVA', total: 620.00, count: 1 }, { name: 'Santander', total: 480.00, count: 1 },
+          { name: 'Banco Macro', total: 380.00, count: 1 } ],
+    17: [ { name: 'Sancor Seguros', total: 420.00, count: 1 } ],
+    18: SAAS,
+  };
+
+  const CATALOG_CO = {
+    6:  [ { name: 'Éxito', total: 980.40, count: 7 }, { name: 'Carulla', total: 460.10, count: 4 },
+          { name: 'D1', total: 360.30, count: 5 } ],
+    10: [ { name: 'Rappi', total: 520.30, count: 9 }, { name: 'Juan Valdez', total: 240.00, count: 8 },
+          { name: "McDonald's", total: 190.20, count: 6 }, { name: 'Frisby', total: 160.00, count: 5 },
+          { name: 'Crepes & Waffles', total: 140.00, count: 3 } ],
+    11: [ { name: 'Mercado Libre', total: 880.20, count: 6 }, { name: 'Amazon', total: 320.00, count: 2 },
+          { name: 'Alkosto', total: 260.00, count: 2 } ],
+    14: [ { name: 'Terpel', total: 480.90, count: 6 }, { name: 'Uber', total: 320.00, count: 10 },
+          { name: 'DiDi', total: 180.00, count: 8 } ],
+    9:  [ { name: 'Claro', total: 480.00, count: 1 }, { name: 'Movistar', total: 320.00, count: 1 },
+          { name: 'Tigo', total: 260.00, count: 1 } ],
+    15: [ { name: 'Avianca', total: 1780.00, count: 1 }, { name: 'LATAM', total: 640.00, count: 1 },
+          { name: 'Despegar', total: 512.30, count: 1 }, { name: 'Booking.com', total: 464.50, count: 1 } ],
+    7:  [ { name: 'Cruz Verde', total: 260.60, count: 4 }, { name: 'Farmatodo', total: 190.30, count: 3 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'Disney+', total: 99.00, count: 1 },
+          { name: 'Netflix', total: 56.99, count: 1 }, { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'Nu', total: 320.40, count: 4 }, { name: 'Daviplata', total: 240.00, count: 6 } ],
+    16: [ { name: 'Bancolombia', total: 1150.00, count: 1 }, { name: 'Davivienda', total: 840.00, count: 1 },
+          { name: 'Banco de Bogotá', total: 620.00, count: 1 }, { name: 'BBVA', total: 480.00, count: 1 } ],
+    17: [ { name: 'Sura', total: 420.00, count: 1 } ],
+    18: SAAS,
+  };
+
+  const CATALOG_CL = {
+    6:  [ { name: 'Jumbo', total: 980.40, count: 7 }, { name: 'Líder', total: 620.10, count: 5 },
+          { name: 'Unimarc', total: 360.30, count: 4 } ],
+    10: [ { name: 'Rappi', total: 520.30, count: 9 }, { name: 'PedidosYa', total: 340.00, count: 7 },
+          { name: 'Starbucks', total: 240.00, count: 7 }, { name: "McDonald's", total: 190.20, count: 6 } ],
+    11: [ { name: 'Mercado Libre', total: 880.20, count: 6 }, { name: 'Ripley', total: 320.00, count: 2 },
+          { name: 'Paris', total: 260.00, count: 2 }, { name: 'Amazon', total: 240.00, count: 2 } ],
+    14: [ { name: 'Copec', total: 480.90, count: 6 }, { name: 'Uber', total: 340.00, count: 10 },
+          { name: 'Shell', total: 180.00, count: 3 }, { name: 'DiDi', total: 150.00, count: 6 } ],
+    9:  [ { name: 'Entel', total: 480.00, count: 1 }, { name: 'Movistar', total: 320.00, count: 1 },
+          { name: 'WOM', total: 260.00, count: 1 }, { name: 'Claro', total: 220.00, count: 1 } ],
+    15: [ { name: 'LATAM', total: 1780.00, count: 1 }, { name: 'Sky', total: 640.00, count: 1 },
+          { name: 'Despegar', total: 512.30, count: 1 }, { name: 'Booking.com', total: 464.50, count: 1 } ],
+    7:  [ { name: 'Cruz Verde', total: 260.60, count: 4 }, { name: 'Salcobrand', total: 190.30, count: 3 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'Disney+', total: 99.00, count: 1 },
+          { name: 'Netflix', total: 56.99, count: 1 }, { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'MACH', total: 320.40, count: 6 }, { name: 'Mercado Pago', total: 240.00, count: 5 },
+          { name: 'Tenpo', total: 160.00, count: 3 } ],
+    16: [ { name: 'Banco de Chile', total: 1150.00, count: 1 }, { name: 'BancoEstado', total: 840.00, count: 1 },
+          { name: 'Santander', total: 620.00, count: 1 }, { name: 'BCI', total: 480.00, count: 1 },
+          { name: 'Banco Falabella', total: 380.00, count: 1 }, { name: 'Scotiabank', total: 320.00, count: 1 } ],
+    17: [ { name: 'Consorcio', total: 420.00, count: 1 } ],
+    18: SAAS,
+  };
+
+  const CATALOG_PE = {
+    6:  [ { name: 'Plaza Vea', total: 980.40, count: 7 }, { name: 'Tottus', total: 620.10, count: 5 },
+          { name: 'Wong', total: 460.30, count: 4 } ],
+    10: [ { name: 'Rappi', total: 520.30, count: 9 }, { name: 'PedidosYa', total: 340.00, count: 7 },
+          { name: 'Starbucks', total: 240.00, count: 7 }, { name: 'Bembos', total: 160.00, count: 5 } ],
+    11: [ { name: 'Mercado Libre', total: 880.20, count: 6 }, { name: 'Ripley', total: 320.00, count: 2 },
+          { name: 'Oechsle', total: 240.00, count: 2 }, { name: 'Amazon', total: 200.00, count: 2 } ],
+    14: [ { name: 'Primax', total: 480.90, count: 6 }, { name: 'Uber', total: 340.00, count: 10 },
+          { name: 'Cabify', total: 150.00, count: 6 } ],
+    9:  [ { name: 'Movistar', total: 480.00, count: 1 }, { name: 'Claro', total: 320.00, count: 1 },
+          { name: 'Entel', total: 260.00, count: 1 } ],
+    15: [ { name: 'LATAM', total: 1780.00, count: 1 }, { name: 'Sky', total: 640.00, count: 1 },
+          { name: 'Despegar', total: 512.30, count: 1 }, { name: 'Booking.com', total: 464.50, count: 1 } ],
+    7:  [ { name: 'InkaFarma', total: 260.60, count: 4 }, { name: 'Mifarma', total: 190.30, count: 3 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'Disney+', total: 99.00, count: 1 },
+          { name: 'Netflix', total: 56.99, count: 1 }, { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'Yape', total: 520.40, count: 9 } ],
+    16: [ { name: 'BCP', total: 1150.00, count: 1 }, { name: 'Interbank', total: 840.00, count: 1 },
+          { name: 'BBVA', total: 620.00, count: 1 }, { name: 'Scotiabank', total: 480.00, count: 1 } ],
+    17: [ { name: 'Rimac', total: 420.00, count: 1 }, { name: 'Pacífico', total: 320.00, count: 1 } ],
+    18: SAAS,
+  };
+
   // Region registry: display meta + currency (symbol/rate/decimals) + catalog.
   // rate converts base units to local display units; dec 0 = whole yen, 3 = BHD fils.
   window.REGIONS = {
@@ -492,13 +590,17 @@
     za: { name: 'South Africa', flag: '🇿🇦', code: 'ZAR', symbol: 'R',  rate: 5,    dec: 2, catalog: CATALOG_ZA },
     us: { name: 'United States', flag: '🇺🇸', code: 'USD', symbol: '$',  rate: 0.272, dec: 2, catalog: CATALOG_US },
     ca: { name: 'Canada',       flag: '🇨🇦', code: 'CAD', symbol: 'C$', rate: 0.368, dec: 2, catalog: CATALOG_CA },
+    ar: { name: 'Argentina',    flag: '🇦🇷', code: 'ARS', symbol: '$',  rate: 300,  dec: 0, lang: 'es', catalog: CATALOG_AR },
+    co: { name: 'Colombia',     flag: '🇨🇴', code: 'COP', symbol: '$',  rate: 1090, dec: 0, lang: 'es', catalog: CATALOG_CO },
+    cl: { name: 'Chile',        flag: '🇨🇱', code: 'CLP', symbol: '$',  rate: 258,  dec: 0, lang: 'es', catalog: CATALOG_CL },
+    pe: { name: 'Perú',         flag: '🇵🇪', code: 'PEN', symbol: 'S/', rate: 1.02, dec: 2, lang: 'es', catalog: CATALOG_PE },
   };
 
   // Build (or rebuild) the entire dataset for one region — everything below
   // closes over that region's BRANDS, and window.EXP_DATA is replaced wholesale.
   function build(regionKey) {
     const REG = window.REGIONS[regionKey] || window.REGIONS.me;
-    window.CURRENT_REGION = { key: regionKey, name: REG.name, code: REG.code, symbol: REG.symbol, rate: REG.rate, dec: REG.dec };
+    window.CURRENT_REGION = { key: regionKey, name: REG.name, code: REG.code, symbol: REG.symbol, rate: REG.rate, dec: REG.dec, lang: REG.lang || 'en' };
     const BRANDS = REG.catalog;
 
   const MERCHANT_CAT = {};
@@ -1720,6 +1822,29 @@ const MERCHANT_DOMAIN = {
   'Wealthsimple': 'wealthsimple.com', 'Interac': 'interac.ca', 'KOHO': 'koho.ca', 'Neo Financial': 'neofinancial.com', 'Shakepay': 'shakepay.com',
   'RBC': 'rbc.com', 'TD': 'td.com', 'Scotiabank': 'scotiabank.com', 'BMO': 'bmo.com', 'CIBC': 'cibc.com', 'National Bank': 'nbc.ca',
   'Manulife': 'manulife.ca', 'Sun Life': 'sunlife.ca', 'Intact': 'intact.ca', 'Desjardins': 'desjardins.com',
+  // ── South America shared
+  'Rappi': 'rappi.com', 'PedidosYa': 'pedidosya.com', 'Mercado Libre': 'mercadolibre.com.ar', 'Mercado Pago': 'mercadopago.com.ar',
+  'DiDi': 'didiglobal.com', 'Cabify': 'cabify.com', 'Despegar': 'despegar.com', 'LATAM': 'latamairlines.com',
+  'Sky': 'skyairline.com', 'Movistar': 'movistar.com.ar', 'Claro': 'claro.com.ar', 'BBVA': 'bbva.com.ar',
+  'Santander': 'santander.com.ar', 'Scotiabank': 'scotiabank.com.pe', 'Ripley': 'ripley.cl', 'Sura': 'segurossura.com.co',
+  // ── Argentina
+  'Coto': 'coto.com.ar', 'Día': 'diaonline.com.ar', 'Jumbo': 'jumbo.com.ar', 'Mostaza': 'mostaza.com.ar', 'Frávega': 'fravega.com',
+  'YPF': 'ypf.com', 'Axion': 'axionenergy.com', 'Personal': 'personal.com.ar', 'Aerolíneas Argentinas': 'aerolineas.com.ar',
+  'Farmacity': 'farmacity.com', 'Ualá': 'uala.com.ar', 'Naranja X': 'naranjax.com', 'Brubank': 'brubank.com',
+  'Banco Galicia': 'bancogalicia.com', 'Banco Nación': 'bna.com.ar', 'Banco Macro': 'macro.com.ar', 'Sancor Seguros': 'sancorseguros.com.ar',
+  // ── Colombia
+  'Éxito': 'exito.com', 'Carulla': 'carulla.com', 'D1': 'tiendasd1.com', 'Juan Valdez': 'juanvaldezcafe.com',
+  'Frisby': 'frisby.com.co', 'Crepes & Waffles': 'crepesywaffles.com', 'Alkosto': 'alkosto.com', 'Terpel': 'terpel.com',
+  'Tigo': 'tigo.com.co', 'Avianca': 'avianca.com', 'Cruz Verde': 'cruzverde.com.co', 'Farmatodo': 'farmatodo.com',
+  'Nu': 'nu.com.co', 'Daviplata': 'daviplata.com', 'Bancolombia': 'bancolombia.com', 'Davivienda': 'davivienda.com', 'Banco de Bogotá': 'bancodebogota.com',
+  // ── Chile
+  'Líder': 'lider.cl', 'Unimarc': 'unimarc.cl', 'Paris': 'paris.cl', 'Copec': 'copec.cl', 'Entel': 'entel.cl',
+  'WOM': 'wom.cl', 'MACH': 'mach.cl', 'Tenpo': 'tenpo.cl', 'Banco de Chile': 'bancochile.cl', 'BancoEstado': 'bancoestado.cl',
+  'BCI': 'bci.cl', 'Banco Falabella': 'bancofalabella.com', 'Consorcio': 'consorcio.cl', 'Salcobrand': 'salcobrand.cl',
+  // ── Peru
+  'Plaza Vea': 'plazavea.com.pe', 'Tottus': 'tottus.com.pe', 'Wong': 'wong.pe', 'Bembos': 'bembos.com.pe',
+  'Oechsle': 'oechsle.pe', 'Primax': 'primax.com.pe', 'InkaFarma': 'inkafarma.pe', 'Mifarma': 'mifarma.com.pe',
+  'Yape': 'yape.com.pe', 'BCP': 'viabcp.com', 'Interbank': 'interbank.pe', 'Rimac': 'rimac.com', 'Pacífico': 'pacifico.com.pe',
   // ── Europe
   'Lidl': 'lidl.com', 'Aldi': 'aldi.us', "Sainsbury's": 'sainsburys.co.uk', 'Just Eat': 'just-eat.com',
   "Nando's": 'nandos.com', 'Pret A Manger': 'pret.com', 'Greggs': 'greggs.co.uk', 'Zalando': 'zalando.com',
@@ -2316,7 +2441,7 @@ function CategoryRow({ T, cat, total, onClick, divider }) {
       <CategoryMark glyph={cat.glyph} color={col} dark={T.dark} size={44} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
-          <span style={{ fontSize: 15, fontWeight: 600, color: T.ink }}>{cat.name}</span>
+          <span style={{ fontSize: 15, fontWeight: 600, color: T.ink }}>{trCat(cat.name)}</span>
           <span style={{ fontSize: 15, fontWeight: 600, color: T.ink, fontVariantNumeric: 'tabular-nums' }}><Dirham size={12} color="currentColor" style={{ marginRight: 3 }} />{fmtAED(cat.total)}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, marginTop: 5 }}>
@@ -2421,7 +2546,7 @@ function CategoryGrid({ T, selectedId, onPick }) {
             border: `1.5px solid ${on ? c.color : T.line}`, color: T.ink, transition: 'all .15s',
           }}>
             <CategoryMark glyph={c.glyph} color={cc(T, c.id, c.color)} dark={T.dark} size={34} radius={10} />
-            <span style={{ fontSize: 13.5, fontWeight: 560, lineHeight: 1.15 }}>{c.name}</span>
+            <span style={{ fontSize: 13.5, fontWeight: 560, lineHeight: 1.15 }}>{trCat(c.name)}</span>
           </button>
         );
       })}
@@ -2491,7 +2616,7 @@ function FeedbackSheet({ T, txn, open, onClose, showLogos }) {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 16, fontWeight: 620, color: T.ink }}>{txn.merchant}</div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 4, fontSize: 12.5, color: cc(T, cat.id, cat.color), fontWeight: 560, background: hexA(cc(T, cat.id, cat.color), T.dark ? 0.2 : 0.1), padding: '3px 9px', borderRadius: 999 }}>
-                <CatGlyph glyph={cat.glyph} size={13} color={cc(T, cat.id, cat.color)} />{cat.name}
+                <CatGlyph glyph={cat.glyph} size={13} color={cc(T, cat.id, cat.color)} />{trCat(cat.name)}
               </div>
             </div>
           </div>
@@ -2671,7 +2796,7 @@ function TxnDetailSheet({ T, txn, open, onClose, showLogos, onImprove }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '13px 0', position: 'relative' }}>
               <span style={{ fontSize: 14.5, color: T.muted }}>Category</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 14, fontWeight: 560, color: cc(T, cat.id, cat.color), background: hexA(cc(T, cat.id, cat.color), T.dark ? 0.2 : 0.1), padding: '4px 10px', borderRadius: 999 }}>
-                <CatGlyph glyph={cat.glyph} size={14} color={cc(T, cat.id, cat.color)} />{cat.name}
+                <CatGlyph glyph={cat.glyph} size={14} color={cc(T, cat.id, cat.color)} />{trCat(cat.name)}
               </span>
               <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 1, background: T.faint }} />
             </div>
@@ -2865,6 +2990,30 @@ function buildBrandPalette(hex) {
 // Resolve a category's colour: brand shade when a brand theme is active, else
 // the category's own hue. Used everywhere a graph draws a category.
 function cc(T, id, orig) { return (T && T.catColors && T.catColors[id]) || orig; }
+
+// ── Light i18n: Spanish for the LatAm regions. tr() = chrome strings,
+// trCat() = category names. Everything else stays English. ──────────────────
+const ES_UI = {
+  'Spends': 'Gastos', 'Top brands': 'Marcas principales', 'All categories': 'Todas las categorías',
+  'Recent': 'Recientes', 'View all': 'Ver todo', 'Total spent': 'Total gastado',
+  'vs last period': 'vs período anterior', 'Transactions': 'Transacciones',
+  'All cards': 'Todas las tarjetas', 'Debit card': 'Tarjeta de débito', 'Credit card': 'Tarjeta de crédito', 'Savings account': 'Cuenta de ahorros',
+  'Category trends': 'Tendencias por categoría', 'Spending over time': 'Gastos en el tiempo',
+  'Brand trends': 'Tendencias de marca', 'Brands in': 'Marcas en', 'All brands': 'Todas las marcas',
+  'By category, then brand': 'Por categoría, luego marca', 'Month by month · last 12 months': 'Mes a mes · últimos 12 meses',
+  'Aggregated across every account': 'Agregado de todas las cuentas', 'Everyday spending': 'Gastos diarios',
+  'Travel, shopping & subscriptions': 'Viajes, compras y suscripciones', 'Bills, loans & standing orders': 'Facturas, préstamos y débitos automáticos',
+  'Card type': 'Tipo de tarjeta',
+};
+const ES_CAT = {
+  'Groceries': 'Supermercado', 'Dining': 'Restaurantes', 'Shopping': 'Compras', 'Transportation': 'Transporte',
+  'Household': 'Hogar', 'Travel': 'Viajes', 'Wellness': 'Bienestar', 'Entertainment': 'Entretenimiento',
+  'Financial Services': 'Servicios financieros', 'Student': 'Educación', 'Loans': 'Préstamos', 'Insurance': 'Seguros',
+  'Government Services': 'Servicios públicos', 'Services': 'Servicios', 'Miscellaneous': 'Varios', 'Other': 'Otros',
+};
+function isES() { return !!(window.CURRENT_REGION && window.CURRENT_REGION.lang === 'es'); }
+function tr(s) { return isES() && ES_UI[s] ? ES_UI[s] : s; }
+function trCat(n) { return isES() && ES_CAT[n] ? ES_CAT[n] : n; }
 function loadImg(url) {
   return new Promise((res) => {
     const i = new Image();
@@ -3009,6 +3158,7 @@ function RegionPicker({ T, open, onClose, onPick }) {
             <div style={{ fontSize: 13, color: T.muted, margin: '6px 0 16px', lineHeight: 1.5 }}>The app localises brands, language and currency to your market.</div>
             {row('me', '🌍', 'Middle East', 'UAE · Saudi · Bahrain · Qatar', () => setStep('me'))}
             {row('na', '🌎', 'North America', 'United States · Canada', () => setStep('na'))}
+            {row('samer', '🌎', 'South America', 'Argentina · Colombia · Chile · Perú', () => setStep('samer'))}
             {row('eu', '🇪🇺', 'Europe', 'European brands · EUR €', () => toBank('eu'))}
             {row('asia', '🌏', 'Asia', 'Japan · Malaysia · Singapore', () => setStep('asia'))}
             {row('za', '🇿🇦', 'South Africa', 'South African brands · ZAR R', () => toBank('za'))}
@@ -3024,6 +3174,21 @@ function RegionPicker({ T, open, onClose, onPick }) {
             <div style={{ fontSize: 19, fontWeight: 700, color: T.ink, letterSpacing: '-0.02em', marginBottom: 16 }}>Choose your market</div>
             {row('us', '🇺🇸', 'United States', 'US banks, fintechs & brands · USD $', () => toBank('us'))}
             {row('ca', '🇨🇦', 'Canada', 'Canadian banks, fintechs & brands · CAD C$', () => toBank('ca'))}
+          </React.Fragment>
+        )}
+        {step === 'samer' && (
+          <React.Fragment>
+            <button className="pressable" onClick={() => setStep('region')} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 12px 7px 9px', borderRadius: 999,
+              border: `1px solid ${T.line}`, background: T.surface, cursor: 'pointer', fontFamily: 'inherit',
+              fontSize: 12.5, fontWeight: 620, color: T.ink, marginBottom: 12,
+            }}><UIIcon name="chevL" size={14} stroke="currentColor" />Regiones</button>
+            <div style={{ fontSize: 19, fontWeight: 700, color: T.ink, letterSpacing: '-0.02em', marginBottom: 4 }}>Elige tu mercado</div>
+            <div style={{ fontSize: 13, color: T.muted, margin: '0 0 16px', lineHeight: 1.5 }}>La app se traduce al español con bancos y marcas locales.</div>
+            {row('ar', '🇦🇷', 'Argentina', 'Bancos y fintechs · ARS $', () => toBank('ar'))}
+            {row('co', '🇨🇴', 'Colombia', 'Bancos y fintechs · COP $', () => toBank('co'))}
+            {row('cl', '🇨🇱', 'Chile', 'Bancos y fintechs · CLP $', () => toBank('cl'))}
+            {row('pe', '🇵🇪', 'Perú', 'Bancos y fintechs · PEN S/', () => toBank('pe'))}
           </React.Fragment>
         )}
         {step === 'me' && (
@@ -3094,13 +3259,13 @@ function RegionPicker({ T, open, onClose, onPick }) {
 // ── Card-type filter — aggregated view or a single card's spend ─────
 function CardTypeSheet({ T, open, onClose, value, onPick }) {
   const OPTS = [
-    ['all', 'All cards', 'Aggregated across every account'],
-    ['debit', 'Debit card', 'Everyday spending'],
-    ['credit', 'Credit card', 'Travel, shopping & subscriptions'],
-    ['savings', 'Savings account', 'Bills, loans & standing orders'],
+    ['all', tr('All cards'), tr('Aggregated across every account')],
+    ['debit', tr('Debit card'), tr('Everyday spending')],
+    ['credit', tr('Credit card'), tr('Travel, shopping & subscriptions')],
+    ['savings', tr('Savings account'), tr('Bills, loans & standing orders')],
   ];
   return (
-    <Sheet T={T} open={open} onClose={onClose} title="Card type" z={350}>
+    <Sheet T={T} open={open} onClose={onClose} title={tr('Card type')} z={350}>
       {OPTS.map(([k, label, sub]) => {
         const active = value === k;
         return (
@@ -3207,7 +3372,7 @@ function SpendRing({ data, total, prevTotal, dark, ink, muted, surface, onSlice,
 
         {/* centre: just the total — two calm lines, no crowding */}
         <div style={{ position: 'absolute', left: 0, right: 0, top: cy, transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', pointerEvents: 'none' }}>
-          <div style={{ fontSize: 9.5, fontWeight: 680, letterSpacing: '0.08em', textTransform: 'uppercase', color: muted }}>Total spent</div>
+          <div style={{ fontSize: 9.5, fontWeight: 680, letterSpacing: '0.08em', textTransform: 'uppercase', color: muted }}>{tr('Total spent')}</div>
           {(() => {
             const disp = total * ((window.CURRENT_REGION || {}).rate || 1);
             const fs = disp >= 10000000 ? 15 : disp >= 1000000 ? 18 : disp >= 100000 ? 21 : 24;
@@ -3232,7 +3397,7 @@ function SpendRing({ data, total, prevTotal, dark, ink, muted, surface, onSlice,
                 opacity: dim ? 0.4 : 1, transition: 'opacity .2s',
               }}>
               <span style={{ width: 9, height: 9, borderRadius: 3, background: colOf(s), flexShrink: 0 }} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{s.name}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{trCat(s.name)}</span>
               <span style={{ fontSize: 11.5, fontWeight: 600, color: muted, fontVariantNumeric: 'tabular-nums', marginLeft: 'auto', flexShrink: 0 }}>{s.pct}%</span>
             </button>
           );
@@ -3242,7 +3407,7 @@ function SpendRing({ data, total, prevTotal, dark, ink, muted, surface, onSlice,
     {delta != null && (
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: 14 }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 11px', borderRadius: 999, fontSize: 12, fontWeight: 640, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums', color: up ? T_POS_INK(dark) : T_NEG_INK(dark), background: up ? T_POS_BG(dark) : T_NEG_BG(dark) }}>
-          <UIIcon name={up ? 'arrowUp' : 'arrowDn'} size={12} stroke="currentColor" />{Math.abs(delta)}% vs last period
+          <UIIcon name={up ? 'arrowUp' : 'arrowDn'} size={12} stroke="currentColor" />{Math.abs(delta)}% {tr('vs last period')}
         </span>
       </div>
     )}
@@ -3268,7 +3433,7 @@ function CategoryRankRow({ T, cat, total, onClick, divider }) {
       <CategoryMark glyph={cat.glyph} color={col} dark={T.dark} size={38} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
-          <span style={{ fontSize: 14.5, fontWeight: 600, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.name}</span>
+          <span style={{ fontSize: 14.5, fontWeight: 600, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{trCat(cat.name)}</span>
           <span style={{ fontSize: 14.5, fontWeight: 600, color: T.ink, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}><Dirham size={12} color="currentColor" style={{ marginRight: 3 }} />{fmtAED(cat.total)}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginTop: 8 }}>
@@ -3364,6 +3529,15 @@ const ENRICH_ORDERS = {
   ca: ['Tim Hortons', 'Starbucks', 'Amazon', 'Apple', 'RBC', 'Wealthsimple', 'Interac', 'SkipTheDishes',
     'Netflix', 'Uber', 'Loblaws', 'Lululemon', 'PayPal', 'Air Canada', 'Spotify', 'Canadian Tire',
     'TD', 'Shoppers Drug Mart', 'Rogers', 'KOHO', 'Cineplex'],
+  ar: ['Mercado Pago', 'Mercado Libre', 'Rappi', 'Starbucks', "McDonald's", 'Ualá', 'Banco Galicia', 'YPF',
+    'Netflix', 'Uber', 'Coto', 'Naranja X', 'Aerolíneas Argentinas', 'Spotify', 'Carrefour', 'Despegar',
+    'Personal', 'Brubank', 'Farmacity', 'PedidosYa'],
+  co: ['Rappi', 'Bancolombia', 'Nu', 'Mercado Libre', "McDonald's", 'Daviplata', 'Avianca', 'Éxito',
+    'Netflix', 'Uber', 'Juan Valdez', 'Davivienda', 'Claro', 'Spotify', 'Alkosto', 'Terpel', 'Frisby', 'Cruz Verde'],
+  cl: ['Mercado Libre', 'Rappi', 'Starbucks', "McDonald's", 'Banco de Chile', 'MACH', 'Mercado Pago', 'LATAM',
+    'Netflix', 'Uber', 'Jumbo', 'Banco Falabella', 'Copec', 'Spotify', 'Ripley', 'Entel', 'BancoEstado', 'PedidosYa'],
+  pe: ['Yape', 'BCP', 'Rappi', 'Mercado Libre', 'Interbank', 'PedidosYa', 'LATAM', 'Netflix', 'Uber',
+    'Plaza Vea', 'Bembos', 'Tottus', 'Spotify', 'Ripley', 'Primax', 'InkaFarma', 'BBVA', 'Starbucks'],
   eu: ["McDonald's", 'Starbucks', 'Zara', 'H&M', 'Amazon', 'IKEA', 'Netflix', 'Spotify',
     'Zalando', 'Uber', 'Lufthansa', 'Ryanair', 'Airbnb', 'Deliveroo', 'Lidl', 'PayPal',
     'Vodafone', 'Deutsche Bahn', 'Decathlon', 'Primark', 'PlayStation', 'Carrefour'],
@@ -3539,7 +3713,7 @@ function RawTransactions({ T, period, enriched, onToggle, ctaLabel = 'Open in ap
 }
 
 function Spends({ T, showLogos, period, actions, enriched, onToggle, cardType = 'all', onCardType, bankBrand }) {
-  const CARD_LABEL = { all: 'All cards', debit: 'Debit card', credit: 'Credit card', savings: 'Savings account' };
+  const CARD_LABEL = { all: tr('All cards'), debit: tr('Debit card'), credit: tr('Credit card'), savings: tr('Savings account') };
   const scoped = D().forPeriod(period);
   const { CATEGORY_SPEND, TOTAL, TRANSACTIONS, PREV } = scoped;
   const prevTotal = scoped.hasPrev ? scoped.prevTotal : null;
@@ -3555,9 +3729,9 @@ function Spends({ T, showLogos, period, actions, enriched, onToggle, cardType = 
         <button className="pressable" onClick={() => onToggle(false)} style={{
           display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px 8px 11px', borderRadius: 999, cursor: 'pointer',
           border: `1px solid ${T.line}`, background: T.surface, fontFamily: 'inherit', fontSize: 13, fontWeight: 620, color: T.ink,
-        }}><UIIcon name="chevL" size={15} stroke="currentColor" />Transactions</button>
+        }}><UIIcon name="chevL" size={15} stroke="currentColor" />{tr('Transactions')}</button>
       </div>
-      <AppHeader T={T} title="Spends" period={period} onPeriod={actions.openPeriod}
+      <AppHeader T={T} title={tr('Spends')} period={period} onPeriod={actions.openPeriod}
         right={bankBrand && (
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, maxWidth: 150, padding: '6px 11px 6px 7px', borderRadius: 999, background: T.surface, border: `1px solid ${T.line}`, boxShadow: T.dark ? 'none' : T.cardShadow }}>
             {bankBrand.logo && <img src={bankBrand.logo} alt="" onError={(e) => { e.target.style.display = 'none'; }} style={{ width: 22, height: 22, borderRadius: 6, objectFit: 'contain', flexShrink: 0 }} />}
@@ -3589,8 +3763,8 @@ function Spends({ T, showLogos, period, actions, enriched, onToggle, cardType = 
           <div style={{ height: 1, background: T.faint, margin: '18px -20px 8px' }} />
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '6px 0 8px' }}>
-            <span style={{ fontSize: 13, fontWeight: 640, color: T.ink, letterSpacing: '-0.01em' }}>Top brands</span>
-            <button className="pressable" onClick={actions.openBreakdown} style={{ border: 'none', background: 'none', padding: 0, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 600, color: T.accent }}>All categories</button>
+            <span style={{ fontSize: 13, fontWeight: 640, color: T.ink, letterSpacing: '-0.01em' }}>{tr('Top brands')}</span>
+            <button className="pressable" onClick={actions.openBreakdown} style={{ border: 'none', background: 'none', padding: 0, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 600, color: T.accent }}>{tr('All categories')}</button>
           </div>
           <RankedBars
             data={topBrands.map((b) => ({ id: b.name, name: b.name, total: b.total, color: b.color, logoName: b.name, glyph: b.glyph }))}
@@ -3604,15 +3778,15 @@ function Spends({ T, showLogos, period, actions, enriched, onToggle, cardType = 
       {/* Two entry points: category (+brand) breakdown, and the historical view */}
       <div style={{ marginTop: 22 }}>
         <Card T={T} pad="2px 18px">
-          <TrendRow T={T} label="Category trends" caption="By category, then brand" onClick={actions.openCategoryTrends}
+          <TrendRow T={T} label={tr('Category trends')} caption={tr('By category, then brand')} onClick={actions.openCategoryTrends}
             icon={<WalletIcon size={19} stroke={T.accent} />} divider />
-          <TrendRow T={T} label="Spending over time" caption="Month by month · last 12 months" onClick={actions.openSpendOverTime}
+          <TrendRow T={T} label={tr('Spending over time')} caption={tr('Month by month · last 12 months')} onClick={actions.openSpendOverTime}
             icon={<UIIcon name="trend" size={19} stroke={T.accent} />} />
         </Card>
       </div>
 
       {/* listView() — recent transactions; longer periods surface more rows */}
-      <SectionTitle T={T} action={`View all (${scoped.TXN_COUNT})`} onAction={actions.openAllTxns}>Recent</SectionTitle>
+      <SectionTitle T={T} action={`${tr('View all')} (${scoped.TXN_COUNT})`} onAction={actions.openAllTxns}>{tr('Recent')}</SectionTitle>
       <Card T={T} pad="2px 18px">
         {TRANSACTIONS.slice(0, scoped.months === 1 ? 6 : scoped.months === 3 ? 12 : 16).map((t, i, a) => (
           <TxnRow key={t.id} T={T} txn={t} showLogos={showLogos} onClick={() => actions.openTxn(t)} divider={i < a.length - 1} />
@@ -3722,7 +3896,7 @@ function CategoryPickerSheet({ T, open, onClose, categories, value, onPick, z })
         {categories.map((c) => row(c.id,
           <React.Fragment>
             <CategoryMark glyph={c.glyph} color={cc(T, c.id, c.color)} dark={T.dark} size={36} />
-            <span style={{ flex: 1, fontSize: 15, fontWeight: 560, color: T.ink }}>{c.name}</span>
+            <span style={{ flex: 1, fontSize: 15, fontWeight: 560, color: T.ink }}>{trCat(c.name)}</span>
             <span style={{ fontSize: 13.5, fontWeight: 600, color: T.muted, fontVariantNumeric: 'tabular-nums' }}><Dirham size={12} color="currentColor" style={{ marginRight: 3 }} />{fmtAED(c.total)}</span>
           </React.Fragment>,
           value === c.id, () => { onPick(c.id); onClose(); }))}
@@ -3756,7 +3930,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
     actions.openTxnList({ title: b.name, subtitle: `in ${(c && c.name) || b.catName || ''}`, total: bt ? bt.total : undefined, txns: D().txnsForBrand((c && c.id) || b.catId, b.name, D().monthsForPeriod(period)) });
   };
 
-  const title = mode === 'overtime' ? 'Spending over time' : (cat ? 'Brand trends' : 'Category trends');
+  const title = mode === 'overtime' ? tr('Spending over time') : (cat ? tr('Brand trends') : tr('Category trends'));
   const catHeader = (c) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: 13, marginBottom: 16 }}>
       <CategoryMark glyph={c.glyph} color={cc(T, c.id, c.color)} dark={T.dark} size={46} solid />
@@ -3782,7 +3956,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
           {mode === 'overtime'
             ? <span style={{ fontSize: 12.5, fontWeight: 600, color: T.muted, background: T.surface, border: `1px solid ${T.line}`, borderRadius: 999, padding: '8px 13px', whiteSpace: 'nowrap', flexShrink: 0 }}>Last 12 months</span>
             : <PeriodPill T={T} period={period} onClick={actions.openPeriod} inline />}
-          <CategoryDropdown T={T} label={cat ? cat.name : 'All categories'} glyph={cat && cat.glyph} color={cat ? cc(T, cat.id, cat.color) : null} onOpen={() => setPickerOpen(true)} />
+          <CategoryDropdown T={T} label={cat ? trCat(cat.name) : tr('All categories')} glyph={cat && cat.glyph} color={cat ? cc(T, cat.id, cat.color) : null} onOpen={() => setPickerOpen(true)} />
         </div>
       </div>
 
@@ -3826,7 +4000,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
             return (
             <React.Fragment>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, margin: '20px 2px 12px' }}>
-                <h2 style={{ margin: 0, fontSize: 17, fontWeight: 640, letterSpacing: '-0.01em', color: T.ink }}>Brands in {cat.name}</h2>
+                <h2 style={{ margin: 0, fontSize: 17, fontWeight: 640, letterSpacing: '-0.01em', color: T.ink }}>{tr('Brands in')} {trCat(cat.name)}</h2>
                 <SortSwitch T={T} value={brandSort} onChange={setBrandSort} options={[['amount', 'Amount'], ['count', 'Txns']]} />
               </div>
               <Card T={T} pad={20}>
@@ -3834,7 +4008,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
                 <div style={{ fontSize: 13, color: T.muted, fontWeight: 540, marginBottom: 16 }}>Where this category's spend goes · tap a brand for its transactions</div>
                 <RankedBars data={barData} total={brandSort === 'count' ? null : cat.total} max={barMax} dark={T.dark} ink={T.ink} muted={T.muted} track={T.brandSunken} onBar={(d) => openBrand({ name: d.name, catId: cat.id, catName: cat.name })} />
               </Card>
-              <SectionTitle T={T} action="View all" onAction={() => actions.openCategoryTxns(cat.id)}>All brands</SectionTitle>
+              <SectionTitle T={T} action={tr('View all')} onAction={() => actions.openCategoryTxns(cat.id)}>{tr('All brands')}</SectionTitle>
               <Card T={T} pad="2px 18px">
                 {brands.map((b, i, a) => (
                   <div key={b.name} className="pressable-row" onClick={() => openBrand({ ...b, catId: cat.id, catName: cat.name })} style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '12px 0', cursor: 'pointer', position: 'relative' }}>
@@ -3867,7 +4041,7 @@ function TrendsPage({ T, showLogos, period, actions, mode, initialCatId, onClose
                     <div key={c.id} className="pressable-row" onClick={() => goCat(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '13px 0', cursor: 'pointer', position: 'relative' }}>
                       <CategoryMark glyph={c.glyph} color={cc(T, c.id, c.color)} dark={T.dark} size={40} />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 15, fontWeight: 560, color: T.ink }}>{c.name}</div>
+                        <div style={{ fontSize: 15, fontWeight: 560, color: T.ink }}>{trCat(c.name)}</div>
                         <div style={{ fontSize: 12.5, color: T.muted, marginTop: 2 }}><Dirham size={12} color="currentColor" style={{ marginRight: 3 }} />{fmtAED(c.total)}</div>
                       </div>
                       <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 620, color: up ? T.posInk : T.negInk }}>
