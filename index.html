@@ -576,6 +576,37 @@
     18: SAAS,
   };
 
+  const CATALOG_BR = {
+    6:  [ { name: 'Pão de Açúcar', total: 1180.40, count: 8 }, { name: 'Carrefour', total: 620.10, count: 5 },
+          { name: 'Assaí', total: 480.30, count: 4 } ],
+    10: [ { name: 'iFood', total: 620.30, count: 11 }, { name: 'Rappi', total: 340.00, count: 7 },
+          { name: 'Starbucks', total: 240.00, count: 7 }, { name: "McDonald's", total: 190.20, count: 6 },
+          { name: "Habib's", total: 120.00, count: 4 }, { name: 'Burger King', total: 96.00, count: 2 } ],
+    11: [ { name: 'Mercado Livre', total: 984.20, count: 6 }, { name: 'Amazon', total: 320.00, count: 2 },
+          { name: 'Magazine Luiza', total: 280.00, count: 2 }, { name: 'Americanas', total: 240.00, count: 2 },
+          { name: 'Casas Bahia', total: 180.00, count: 2 } ],
+    14: [ { name: 'Uber', total: 420.90, count: 15 }, { name: 'Ipiranga', total: 380.00, count: 6 },
+          { name: '99', total: 240.00, count: 12 }, { name: 'Shell', total: 180.00, count: 3 } ],
+    9:  [ { name: 'Vivo', total: 480.00, count: 1 }, { name: 'Claro', total: 320.00, count: 1 },
+          { name: 'TIM', total: 260.00, count: 1 } ],
+    15: [ { name: 'LATAM', total: 1780.00, count: 1 }, { name: 'Gol', total: 980.00, count: 1 },
+          { name: 'Azul', total: 640.00, count: 1 }, { name: 'Decolar', total: 512.30, count: 1 },
+          { name: 'Booking.com', total: 464.50, count: 1 } ],
+    7:  [ { name: 'Smart Fit', total: 350.00, count: 1 }, { name: 'Drogasil', total: 260.60, count: 4 },
+          { name: 'Droga Raia', total: 190.30, count: 3 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'Disney+', total: 99.00, count: 1 },
+          { name: 'Netflix', total: 56.99, count: 1 }, { name: 'Globoplay', total: 39.00, count: 1 },
+          { name: 'Spotify', total: 19.99, count: 1 } ],
+    1:  [ { name: 'Nubank', total: 520.40, count: 9 }, { name: 'PicPay', total: 240.00, count: 6 },
+          { name: 'Mercado Pago', total: 200.00, count: 5 }, { name: 'Inter', total: 180.00, count: 3 },
+          { name: 'C6 Bank', total: 120.00, count: 2 } ],
+    16: [ { name: 'Itaú', total: 1150.00, count: 1 }, { name: 'Bradesco', total: 840.00, count: 1 },
+          { name: 'Banco do Brasil', total: 620.00, count: 1 }, { name: 'Santander', total: 480.00, count: 1 },
+          { name: 'Caixa', total: 380.00, count: 1 } ],
+    17: [ { name: 'Porto Seguro', total: 480.00, count: 1 }, { name: 'SulAmérica', total: 320.00, count: 1 } ],
+    18: SAAS,
+  };
+
   // Region registry: display meta + currency (symbol/rate/decimals) + catalog.
   // rate converts base units to local display units; dec 0 = whole yen, 3 = BHD fils.
   window.REGIONS = {
@@ -594,6 +625,7 @@
     co: { name: 'Colombia',     flag: '🇨🇴', code: 'COP', symbol: '$',  rate: 1090, dec: 0, lang: 'es', catalog: CATALOG_CO },
     cl: { name: 'Chile',        flag: '🇨🇱', code: 'CLP', symbol: '$',  rate: 258,  dec: 0, lang: 'es', catalog: CATALOG_CL },
     pe: { name: 'Perú',         flag: '🇵🇪', code: 'PEN', symbol: 'S/', rate: 1.02, dec: 2, lang: 'es', catalog: CATALOG_PE },
+    br: { name: 'Brasil',       flag: '🇧🇷', code: 'BRL', symbol: 'R$', rate: 1.5,  dec: 2, lang: 'pt', catalog: CATALOG_BR },
   };
 
   // Build (or rebuild) the entire dataset for one region — everything below
@@ -1845,6 +1877,16 @@ const MERCHANT_DOMAIN = {
   'Plaza Vea': 'plazavea.com.pe', 'Tottus': 'tottus.com.pe', 'Wong': 'wong.pe', 'Bembos': 'bembos.com.pe',
   'Oechsle': 'oechsle.pe', 'Primax': 'primax.com.pe', 'InkaFarma': 'inkafarma.pe', 'Mifarma': 'mifarma.com.pe',
   'Yape': 'yape.com.pe', 'BCP': 'viabcp.com', 'Interbank': 'interbank.pe', 'Rimac': 'rimac.com', 'Pacífico': 'pacifico.com.pe',
+  // ── Brazil
+  'Burger King': 'bk.com',
+  'Pão de Açúcar': 'paodeacucar.com', 'Assaí': 'assai.com.br', 'iFood': 'ifood.com.br', "Habib's": 'habibs.com.br',
+  'Mercado Livre': 'mercadolivre.com.br', 'Magazine Luiza': 'magazineluiza.com.br', 'Americanas': 'americanas.com.br',
+  'Casas Bahia': 'casasbahia.com.br', '99': '99app.com', 'Ipiranga': 'ipiranga.com.br', 'Vivo': 'vivo.com.br', 'TIM': 'tim.com.br',
+  'Gol': 'voegol.com.br', 'Azul': 'voeazul.com.br', 'Decolar': 'decolar.com', 'Drogasil': 'drogasil.com.br',
+  'Droga Raia': 'drogaraia.com.br', 'Smart Fit': 'smartfit.com.br', 'Globoplay': 'globoplay.globo.com',
+  'Nubank': 'nubank.com.br', 'PicPay': 'picpay.com', 'Inter': 'inter.co', 'C6 Bank': 'c6bank.com.br',
+  'Itaú': 'itau.com.br', 'Bradesco': 'bradesco.com.br', 'Banco do Brasil': 'bb.com.br', 'Caixa': 'caixa.gov.br',
+  'Porto Seguro': 'portoseguro.com.br', 'SulAmérica': 'sulamerica.com.br',
   // ── Europe
   'Lidl': 'lidl.com', 'Aldi': 'aldi.us', "Sainsbury's": 'sainsburys.co.uk', 'Just Eat': 'just-eat.com',
   "Nando's": 'nandos.com', 'Pret A Manger': 'pret.com', 'Greggs': 'greggs.co.uk', 'Zalando': 'zalando.com',
@@ -3011,9 +3053,28 @@ const ES_CAT = {
   'Financial Services': 'Servicios financieros', 'Student': 'Educación', 'Loans': 'Préstamos', 'Insurance': 'Seguros',
   'Government Services': 'Servicios públicos', 'Services': 'Servicios', 'Miscellaneous': 'Varios', 'Other': 'Otros',
 };
-function isES() { return !!(window.CURRENT_REGION && window.CURRENT_REGION.lang === 'es'); }
-function tr(s) { return isES() && ES_UI[s] ? ES_UI[s] : s; }
-function trCat(n) { return isES() && ES_CAT[n] ? ES_CAT[n] : n; }
+const PT_UI = {
+  'Spends': 'Gastos', 'Top brands': 'Principais marcas', 'All categories': 'Todas as categorias',
+  'Recent': 'Recentes', 'View all': 'Ver tudo', 'Total spent': 'Total gasto',
+  'vs last period': 'vs período anterior', 'Transactions': 'Transações',
+  'All cards': 'Todos os cartões', 'Debit card': 'Cartão de débito', 'Credit card': 'Cartão de crédito', 'Savings account': 'Conta poupança',
+  'Category trends': 'Tendências por categoria', 'Spending over time': 'Gastos ao longo do tempo',
+  'Brand trends': 'Tendências de marca', 'Brands in': 'Marcas em', 'All brands': 'Todas as marcas',
+  'By category, then brand': 'Por categoria, depois marca', 'Month by month · last 12 months': 'Mês a mês · últimos 12 meses',
+  'Aggregated across every account': 'Agregado de todas as contas', 'Everyday spending': 'Gastos do dia a dia',
+  'Travel, shopping & subscriptions': 'Viagens, compras e assinaturas', 'Bills, loans & standing orders': 'Contas, empréstimos e débitos automáticos',
+  'Card type': 'Tipo de cartão',
+};
+const PT_CAT = {
+  'Groceries': 'Supermercado', 'Dining': 'Restaurantes', 'Shopping': 'Compras', 'Transportation': 'Transporte',
+  'Household': 'Casa', 'Travel': 'Viagens', 'Wellness': 'Bem-estar', 'Entertainment': 'Entretenimento',
+  'Financial Services': 'Serviços financeiros', 'Student': 'Educação', 'Loans': 'Empréstimos', 'Insurance': 'Seguros',
+  'Government Services': 'Serviços públicos', 'Services': 'Serviços', 'Miscellaneous': 'Diversos', 'Other': 'Outros',
+};
+const I18N = { es: { ui: ES_UI, cat: ES_CAT }, pt: { ui: PT_UI, cat: PT_CAT } };
+function i18nDict() { return I18N[(window.CURRENT_REGION && window.CURRENT_REGION.lang) || 'en'] || null; }
+function tr(s) { const d = i18nDict(); return d && d.ui[s] ? d.ui[s] : s; }
+function trCat(n) { const d = i18nDict(); return d && d.cat[n] ? d.cat[n] : n; }
 function loadImg(url) {
   return new Promise((res) => {
     const i = new Image();
@@ -3189,6 +3250,7 @@ function RegionPicker({ T, open, onClose, onPick }) {
             {row('co', '🇨🇴', 'Colombia', 'Bancos y fintechs · COP $', () => toBank('co'))}
             {row('cl', '🇨🇱', 'Chile', 'Bancos y fintechs · CLP $', () => toBank('cl'))}
             {row('pe', '🇵🇪', 'Perú', 'Bancos y fintechs · PEN S/', () => toBank('pe'))}
+            {row('br', '🇧🇷', 'Brasil', 'Bancos e fintechs · BRL R$', () => toBank('br'))}
           </React.Fragment>
         )}
         {step === 'me' && (
@@ -3538,6 +3600,8 @@ const ENRICH_ORDERS = {
     'Netflix', 'Uber', 'Jumbo', 'Banco Falabella', 'Copec', 'Spotify', 'Ripley', 'Entel', 'BancoEstado', 'PedidosYa'],
   pe: ['Yape', 'BCP', 'Rappi', 'Mercado Libre', 'Interbank', 'PedidosYa', 'LATAM', 'Netflix', 'Uber',
     'Plaza Vea', 'Bembos', 'Tottus', 'Spotify', 'Ripley', 'Primax', 'InkaFarma', 'BBVA', 'Starbucks'],
+  br: ['Nubank', 'iFood', 'Mercado Livre', 'PicPay', 'Itaú', 'Starbucks', "McDonald's", 'Uber', 'Netflix',
+    'Magazine Luiza', 'Pão de Açúcar', 'Bradesco', 'Spotify', '99', 'Gol', 'Inter', 'Americanas', 'Ipiranga', 'Drogasil', 'Banco do Brasil'],
   eu: ["McDonald's", 'Starbucks', 'Zara', 'H&M', 'Amazon', 'IKEA', 'Netflix', 'Spotify',
     'Zalando', 'Uber', 'Lufthansa', 'Ryanair', 'Airbnb', 'Deliveroo', 'Lidl', 'PayPal',
     'Vodafone', 'Deutsche Bahn', 'Decathlon', 'Primark', 'PlayStation', 'Carrefour'],
