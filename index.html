@@ -2849,7 +2849,7 @@ function ExpensesApp() {
   };
   const appFrame = () => {
     appCfg();
-    return <iframe key={[region, bankBrand ? bankBrand.name : '', t.dark, desktop].join('|')} src="app.html?v=1" title="Expenses in your bank app"
+    return <iframe key={[region, bankBrand ? bankBrand.name : '', t.dark, desktop].join('|')} src="app.html?v=2" title="Expenses in your bank app"
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0, display: 'block', background: t.dark ? '#0e1013' : '#f4f6f8' }} />;
   };
   // Mobile PFM portal is a fixed full-screen page — freeze the landing behind it.
