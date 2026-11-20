@@ -327,6 +327,36 @@
     18: SAAS,
   };
 
+  const CATALOG_EG = {
+    6:  [ { name: 'Carrefour', total: 820.40, count: 6 }, { name: 'Seoudi', total: 560.10, count: 5 },
+          { name: 'Breadfast', total: 420.30, count: 7 }, { name: 'Gourmet Egypt', total: 310.00, count: 3 },
+          { name: 'Metro Market', total: 240.00, count: 3 }, { name: 'Kazyon', total: 120.00, count: 4 } ],
+    10: [ { name: 'Talabat', total: 540.30, count: 11 }, { name: 'Cilantro', total: 260.00, count: 9 },
+          { name: "McDonald's", total: 190.20, count: 5 }, { name: 'Starbucks', total: 180.00, count: 6 },
+          { name: 'KFC', total: 150.00, count: 4 }, { name: 'Buffalo Burger', total: 130.50, count: 3 } ],
+    11: [ { name: 'Amazon', total: 760.20, count: 5 }, { name: 'Noon', total: 520.00, count: 4 },
+          { name: 'Jumia', total: 340.00, count: 3 }, { name: 'B.TECH', total: 620.00, count: 1 },
+          { name: 'IKEA', total: 280.00, count: 1 }, { name: 'DeFacto', total: 180.00, count: 2 } ],
+    14: [ { name: 'Uber', total: 420.90, count: 16 }, { name: 'inDrive', total: 210.60, count: 9 },
+          { name: 'TotalEnergies', total: 320.00, count: 4 }, { name: 'Swvl', total: 90.30, count: 6 } ],
+    9:  [ { name: 'Vodafone', total: 380.00, count: 1 }, { name: 'Orange', total: 300.00, count: 1 },
+          { name: 'WE', total: 260.00, count: 1 }, { name: 'e&', total: 220.00, count: 1 } ],
+    15: [ { name: 'EgyptAir', total: 1480.00, count: 1 }, { name: 'Air Cairo', total: 620.00, count: 1 },
+          { name: 'Booking.com', total: 464.50, count: 1 }, { name: 'Marriott', total: 820.00, count: 1 } ],
+    7:  [ { name: 'El Ezaby Pharmacy', total: 240.60, count: 4 }, { name: 'Seif Pharmacies', total: 180.30, count: 3 },
+          { name: "Gold's Gym", total: 350.00, count: 1 } ],
+    4:  [ { name: 'PlayStation', total: 189.00, count: 1 }, { name: 'VOX Cinemas', total: 140.00, count: 2 },
+          { name: 'Netflix', total: 56.99, count: 1 }, { name: 'Shahid', total: 39.00, count: 1 },
+          { name: 'Anghami', total: 19.99, count: 1 } ],
+    1:  [ { name: 'InstaPay', total: 420.40, count: 8 }, { name: 'Fawry', total: 260.00, count: 6 },
+          { name: 'Vodafone Cash', total: 180.00, count: 4 }, { name: 'valU', total: 320.00, count: 2 } ],
+    16: [ { name: 'CIB', total: 1150.00, count: 1 }, { name: 'National Bank of Egypt', total: 840.00, count: 1 },
+          { name: 'Banque Misr', total: 620.00, count: 1 }, { name: 'QNB', total: 480.00, count: 1 } ],
+    17: [ { name: 'Misr Insurance', total: 420.00, count: 1 }, { name: 'AXA', total: 330.00, count: 1 },
+          { name: 'Allianz', total: 280.00, count: 1 } ],
+    18: SAAS,
+  };
+
   const CATALOG_SA = {
     6:  [ { name: 'Panda', total: 1180.40, count: 8 }, { name: 'Tamimi Markets', total: 620.10, count: 5 },
           { name: 'Danube', total: 480.30, count: 4 }, { name: 'Carrefour', total: 420.00, count: 4 },
@@ -619,6 +649,7 @@
     my: { name: 'Malaysia',    flag: '🇲🇾', code: 'MYR', symbol: 'RM', rate: 1.2,  dec: 2, catalog: CATALOG_MY },
     sg: { name: 'Singapore',   flag: '🇸🇬', code: 'SGD', symbol: 'S$', rate: 0.37, dec: 2, catalog: CATALOG_SG },
     za: { name: 'South Africa', flag: '🇿🇦', code: 'ZAR', symbol: 'R',  rate: 5,    dec: 2, catalog: CATALOG_ZA },
+    eg: { name: 'Egypt',        flag: '🇪🇬', code: 'EGP', symbol: 'E£', rate: 13.2, dec: 2, catalog: CATALOG_EG },
     us: { name: 'United States', flag: '🇺🇸', code: 'USD', symbol: '$',  rate: 0.272, dec: 2, catalog: CATALOG_US },
     ca: { name: 'Canada',       flag: '🇨🇦', code: 'CAD', symbol: 'C$', rate: 0.368, dec: 2, catalog: CATALOG_CA },
     ar: { name: 'Argentina',    flag: '🇦🇷', code: 'ARS', symbol: '$',  rate: 300,  dec: 0, lang: 'es', catalog: CATALOG_AR },
@@ -1941,6 +1972,16 @@ const MERCHANT_DOMAIN = {
   'Standard Bank': 'standardbank.co.za', 'FNB': 'fnb.co.za', 'Absa': 'absa.co.za', 'Capitec': 'capitecbank.co.za',
   'Nedbank': 'nedbank.co.za', 'Discovery': 'discovery.co.za', 'Old Mutual': 'oldmutual.com', 'Santam': 'santam.co.za',
   'OUTsurance': 'outsurance.co.za',
+  // ── Egypt
+  'Seoudi': 'seoudisupermarket.com', 'Breadfast': 'breadfast.com', 'Gourmet Egypt': 'gourmetegypt.com',
+  'Metro Market': 'metro-markets.com', 'Kazyon': 'kazyon.com', 'Cilantro': 'cilantrocafe.net',
+  'Buffalo Burger': 'buffaloburger.com', 'Jumia': 'jumia.com.eg', 'B.TECH': 'btech.com',
+  'DeFacto': 'defacto.com', 'inDrive': 'indrive.com', 'TotalEnergies': 'totalenergies.com', 'Swvl': 'swvl.com',
+  'WE': 'te.eg', 'e&': 'eand.com.eg', 'EgyptAir': 'egyptair.com', 'Air Cairo': 'aircairo.com',
+  'El Ezaby Pharmacy': 'elezabypharmacy.com', 'Seif Pharmacies': 'seifonline.com', "Gold's Gym": 'goldsgym.com',
+  'VOX Cinemas': 'voxcinemas.com', 'InstaPay': 'instapay.eg', 'Fawry': 'fawry.com', 'Vodafone Cash': 'vodafone.com.eg',
+  'valU': 'valu.com.eg', 'CIB': 'cibeg.com', 'National Bank of Egypt': 'nbe.com.eg', 'Banque Misr': 'banquemisr.com',
+  'Misr Insurance': 'misrins.com.eg',
 };
 // Best-available logo sources, tried in order: Clearbit (real logos) →
 // Google favicon @128 → brand monogram. Anything without a domain (ATM,
@@ -3222,7 +3263,7 @@ function RegionPicker({ T, open, onClose, onPick }) {
             {row('samer', '🌎', 'South America', 'Argentina · Colombia · Chile · Perú', () => setStep('samer'))}
             {row('eu', '🇪🇺', 'Europe', 'European brands · EUR €', () => toBank('eu'))}
             {row('asia', '🌏', 'Asia', 'Japan · Malaysia · Singapore', () => setStep('asia'))}
-            {row('za', '🇿🇦', 'South Africa', 'South African brands · ZAR R', () => toBank('za'))}
+            {row('africa', '🌍', 'Africa', 'Egypt · South Africa', () => setStep('africa'))}
           </React.Fragment>
         )}
         {step === 'na' && (
@@ -3278,6 +3319,18 @@ function RegionPicker({ T, open, onClose, onPick }) {
             {row('jp', '🇯🇵', 'Japan', '日本のブランド · JPY ¥', () => toBank('jp'))}
             {row('my', '🇲🇾', 'Malaysia', 'Malaysian brands · MYR RM', () => toBank('my'))}
             {row('sg', '🇸🇬', 'Singapore', 'Singaporean brands · SGD S$', () => toBank('sg'))}
+          </React.Fragment>
+        )}
+        {step === 'africa' && (
+          <React.Fragment>
+            <button className="pressable" onClick={() => setStep('region')} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 12px 7px 9px', borderRadius: 999,
+              border: `1px solid ${T.line}`, background: T.surface, cursor: 'pointer', fontFamily: 'inherit',
+              fontSize: 12.5, fontWeight: 620, color: T.ink, marginBottom: 12,
+            }}><UIIcon name="chevL" size={14} stroke="currentColor" />Regions</button>
+            <div style={{ fontSize: 19, fontWeight: 700, color: T.ink, letterSpacing: '-0.02em', marginBottom: 16 }}>Choose your market</div>
+            {row('eg', '🇪🇬', 'Egypt', 'Egyptian banks & brands · EGP E£', () => toBank('eg'))}
+            {row('za', '🇿🇦', 'South Africa', 'South African brands · ZAR R', () => toBank('za'))}
           </React.Fragment>
         )}
         {step === 'bank' && (
@@ -3534,12 +3587,13 @@ function rawDescriptor(txn) {
   const m = txn.merchant.toUpperCase().replace(/[^A-Z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
   const ref = String((txn.id * 7919) % 900000 + 100000);
   const short = m.replace(/ /g, '').slice(0, 12);
+  const [city, cc] = { za: ['JHB', 'ZA'], eg: ['CAIRO', 'EG'] }[(window.CURRENT_REGION || {}).key] || ['DXB', 'AE'];
   const fmts = [
-    `POS ${ref} ${m} DXB AE`,
-    `${short}*${(txn.id * 31) % 9000 + 1000} AE`,
+    `POS ${ref} ${m} ${city} ${cc}`,
+    `${short}*${(txn.id * 31) % 9000 + 1000} ${cc}`,
     `MC-DEBIT ${ref} ${m.slice(0, 14)}`,
     `VISADIRECT ${short} ${ref}`,
-    `${m.slice(0, 16)} AE*${ref}`,
+    `${m.slice(0, 16)} ${cc}*${ref}`,
   ];
   return fmts[txn.id % fmts.length];
 }
@@ -3618,6 +3672,8 @@ const ENRICH_ORDERS = {
   za: ['Checkers', 'Pick n Pay', 'Woolworths', "Nando's", 'Uber', 'Takealot', 'Netflix',
     'Vodacom', 'MTN', 'Capitec', 'FNB', 'Mr Price', 'Clicks', 'Dis-Chem', 'Steers',
     'Uber Eats', 'Showmax', 'DStv', 'FlySafair', 'Spotify'],
+  eg: ['Talabat', 'InstaPay', "McDonald's", 'Starbucks', 'Noon', 'Amazon', 'Uber', 'Carrefour', 'Netflix',
+    'Vodafone', 'CIB', 'Fawry', 'Breadfast', 'Jumia', 'EgyptAir', 'Cilantro', 'valU', 'Seoudi', 'Shahid', 'B.TECH'],
 };
 
 // Small 4-point sparkle to hint "tap to enrich".
