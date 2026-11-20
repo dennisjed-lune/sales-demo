@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lune Expenses</title>
+<meta name="robots" content="noindex">
+<style>
+/* Embedded in sales.lunedata.io: the parent page draws the phone and status bar. --top reserves the status-bar height.
+   Adapted from the Lune SDK Expenses prototype. Layout: prototype stage. A small control panel (bank theme, mode) beside one phone. The phone holds the SDK screen and its sheets.
+   Page tokens (--pg-*) belong to the stage. SDK tokens (--*) are the proposed SDK theme: cool neutrals, platform font, bank primary derived in JS. */
+:root{
+  --pg-bg:#e7eaee;--pg-panel:#ffffff;--pg-ink:#15191e;--pg-muted:#5b636d;--pg-line:#d9dee4;--pg-sel:#15191e;--pg-on-sel:#ffffff;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",Roboto,"Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--pg-bg:#0a0b0d;--pg-panel:#16191d;--pg-ink:#eef1f4;--pg-muted:#9aa3ad;--pg-line:#2a2f35;--pg-sel:#eef1f4;--pg-on-sel:#0a0b0d;color-scheme:dark}}
+:root[data-theme="dark"]{--pg-bg:#0a0b0d;--pg-panel:#16191d;--pg-ink:#eef1f4;--pg-muted:#9aa3ad;--pg-line:#2a2f35;--pg-sel:#eef1f4;--pg-on-sel:#0a0b0d;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden;background:#f4f6f8}
+html.dark,html.dark body{background:#0e1013}
+body{font-family:var(--font);margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+.stage{display:flex;gap:28px;justify-content:center;align-items:flex-start;padding-block:24px 40px}
+.panel{width:236px;flex:none;position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);background:var(--pg-panel);border:1px solid var(--pg-line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:12px;font-size:12.5px}
+.panel b{display:block;font-size:13px}
+.panel .k{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--pg-muted);font-weight:600;margin-bottom:6px}
+.panel .opts{display:flex;flex-wrap:wrap;gap:4px}
+.panel button{border:1px solid var(--pg-line);background:transparent;border-radius:8px;min-height:32px;padding:0 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:12px;color:var(--pg-muted)}
+.panel button[aria-pressed="true"]{background:var(--pg-sel);color:var(--pg-on-sel);border-color:var(--pg-sel)}
+.panel i.sw{width:11px;height:11px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1.5px var(--pg-panel),0 0 0 2.5px var(--pg-line)}
+.panel p{margin:0;color:var(--pg-muted);line-height:1.45}
+@media (max-width:760px){.stage{flex-direction:column;align-items:center;gap:14px;padding-block:12px 24px}.panel{position:static;width:100%;max-width:390px}}
+
+/* ===== phone ===== */
+.phone{width:390px;max-width:100%;height:844px;border-radius:52px;background:#0b0b0c;padding:10px;box-shadow:0 18px 50px rgba(10,20,30,.22);flex:none}
+@media (max-width:430px){.phone{height:780px;border-radius:40px;padding:6px}}
+.dev{--top:0px;
+  --bg:#f4f6f8;--card:#ffffff;--line:#e2e6ea;--chip:#eceff3;--ink:#15191e;--ink2:#5b636d;--ink3:#8a929c;--n300:#d3d9df;--scrim:rgba(10,14,20,.36);
+  --pos:#13723d;--pos-bg:#e7f5ec;--neg:#b42318;--neg-bg:#fdecea;--warn:#8a5a00;--warn-bg:#fbf0d9;
+  --p:#1c3d7a;--p-text:#1c3d7a;--on-p:#fff;--tint:#eef1f6;--tint2:#ccd4e2;
+  height:100%;border-radius:0;overflow:hidden;position:relative;padding-top:var(--top);background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.35;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+
+.dev.dark{--bg:#0e1013;--card:#181b1f;--line:#2a2e34;--chip:#22262b;--ink:#f1f3f5;--ink2:#aab2bb;--ink3:#858d97;--n300:#3e434a;--scrim:rgba(0,0,0,.55);
+  --pos:#6fd394;--pos-bg:#12291b;--neg:#ff8a80;--neg-bg:#331614;--warn:#f0c060;--warn-bg:#2e2410;color-scheme:dark}
+.status{height:50px;flex:none;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px;font-size:15px;font-weight:600}
+.status svg{display:block}
+.host{flex:none;height:44px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px dashed var(--line)}
+.host .back{width:44px;height:44px;margin-left:-6px;display:grid;place-items:center;color:var(--p-text);background:none;border:0;padding:0;cursor:pointer;border-radius:50%}
+.host .back:active{opacity:.6}
+.host .mark img{width:100%;height:100%;object-fit:contain;border-radius:7px;background:#fff}
+.host .bank{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);font-weight:500}
+.host .mark{width:22px;height:22px;border-radius:7px;overflow:hidden;background:var(--p);color:var(--on-p);display:grid;place-items:center;font-size:11px;font-weight:700}
+.host .tagsdk{margin-left:auto;font-size:11px;color:var(--ink3);font-weight:500}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 16px 40px;display:flex;flex-direction:column;gap:14px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.dev button{background:none;border:0;padding:0;cursor:pointer;text-align:inherit}
+.dev :focus-visible{outline:2px solid var(--p-text);outline-offset:2px;border-radius:8px}
+
+h1.t{font-size:28px;font-weight:700;letter-spacing:-.02em;margin:0}
+.titlerow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pager{display:flex;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:999px;height:44px}
+.pager .arr{width:44px;height:44px;display:grid;place-items:center;color:var(--ink2);border-radius:50%}
+.pager .arr[disabled]{color:var(--n300);cursor:default}
+.pager .lbl{font-size:14px;font-weight:600;padding:0 2px;min-width:0;white-space:nowrap;display:flex;align-items:center;gap:4px;height:44px}
+.hero small{display:block;font-size:13px;color:var(--ink2);font-weight:500}
+.amt{font-size:34px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.15;display:flex;align-items:baseline;gap:6px}
+.amt .num{white-space:nowrap}
+.amt .cur{font-size:15px;font-weight:600;color:var(--ink2);letter-spacing:0}
+.amt .dec{font-size:20px;color:var(--ink2)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;border-radius:999px;padding:4px 10px;margin-top:8px}
+.chip.pos{background:var(--pos-bg);color:var(--pos)}.chip.neg{background:var(--neg-bg);color:var(--neg)}.chip.n{background:var(--chip);color:var(--ink2)}.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip svg{width:13px;height:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.card.flush{padding:4px 14px}
+.sec{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.sec h2{font-size:17px;font-weight:700;margin:0;letter-spacing:-.01em}
+.link{color:var(--p-text);font-size:14px;font-weight:600;min-height:44px;display:inline-flex;align-items:center;padding:0 2px}
+.seg{display:flex;background:var(--chip);border-radius:999px;padding:3px;gap:2px}
+.seg button{flex:1;height:36px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--ink2);text-align:center}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--ink2);margin-top:6px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:3px;border-radius:2px;display:inline-block}
+.legend i.dash{background:none;border-top:2px dashed var(--ink3);height:0}
+
+.rows{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;min-height:60px;padding:8px 0;border-bottom:1px solid var(--line);width:100%}
+.rows>.row:last-child{border-bottom:0}
+.row.rk{grid-template-columns:40px minmax(0,1fr);padding:12px 0}
+.rk .l1,.rk .l2{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.rk .l1 .nm{min-width:0}
+.rk .amt{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rk .l2{font-size:12.5px;color:var(--ink2);margin-top:6px}
+.rk .l2>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk .l2>span:last-child{font-variant-numeric:tabular-nums;white-space:nowrap}
+.row .nm{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .sub{font-size:12.5px;color:var(--ink2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .bar{display:block;height:4px;border-radius:2px;background:var(--chip);margin-top:7px;overflow:hidden}
+.row .bar i{display:block;height:100%;border-radius:2px}
+.row .v{min-width:86px;text-align:right;font-variant-numeric:tabular-nums;font-size:15px;font-weight:600;white-space:nowrap}
+.row .v small{display:block;font-size:12px;color:var(--ink2);font-weight:500;margin-top:2px}
+.ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none}
+.ic svg{width:20px;height:20px}
+.logo{width:40px;height:40px;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#fff;flex:none;display:grid;place-items:center}
+.logo img{width:100%;height:100%;object-fit:cover;display:block}
+.mono{width:40px;height:40px;border-radius:12px;background:var(--chip);color:var(--ink2);display:grid;place-items:center;font-size:15px;font-weight:700;flex:none}
+.more{width:100%;min-height:44px;font-size:14px;font-weight:600;color:var(--p-text);text-align:center!important;border-top:1px solid var(--line)}
+.note{font-size:12.5px;color:var(--ink2);text-align:center;padding:0 12px}
+.empty{text-align:center;padding:24px 8px;color:var(--ink2);font-size:14px}
+.empty b{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
+.chart{display:block;width:100%;height:auto;touch-action:pan-y}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;font-weight:600;padding:6px 8px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-110%);font-variant-numeric:tabular-nums}
+.chartwrap{position:relative}
+
+/* sheet */
+.scrim{position:absolute;inset:0;background:var(--scrim);opacity:0;transition:opacity .2s;z-index:20;pointer-events:none}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{visibility:hidden}
+.sheet.on{visibility:visible}
+.sheet{position:absolute;left:0;right:0;bottom:0;top:calc(var(--top) + 8px);background:var(--card);border-radius:22px 22px 0 0;z-index:21;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .26s cubic-bezier(.2,.8,.2,1)}
+.sheet.on{transform:none}
+.sheet .grab{width:38px;height:5px;border-radius:3px;background:var(--n300);margin:8px auto 2px;flex:none}
+.shead{display:flex;align-items:center;gap:10px;padding:4px 12px 8px;flex:none;min-height:52px}
+.shead .hb{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:var(--ink2);flex:none}
+.shead .hb.x span{width:30px;height:30px;border-radius:50%;background:var(--chip);display:grid;place-items:center}
+.shead .ttl{flex:1;min-width:0;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shead .ttl small{display:block;font-size:12.5px;color:var(--ink2);font-weight:500}
+.shead .sp{width:44px;flex:none}
+.sbody{flex:1;overflow-y:auto;padding:4px 16px 28px;display:flex;flex-direction:column;gap:14px;scrollbar-width:none}
+.sbody::-webkit-scrollbar{display:none}
+.sfoot{flex:none;padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--card)}
+.idrow{display:flex;align-items:center;gap:12px}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:50px;border-radius:999px;background:var(--p)!important;color:var(--on-p);font-size:16px;font-weight:700}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn2{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;border-radius:999px;border:1.5px solid var(--line)!important;color:var(--ink);font-size:15px;font-weight:600}
+.group{background:var(--bg);border-radius:14px;padding:2px 14px}
+.kv{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;border-bottom:1px solid var(--line);font-size:15px;width:100%}
+.group .kv:last-child{border-bottom:0}
+.kv span:first-child{color:var(--ink2)}
+.kv .r{display:flex;align-items:center;gap:8px;font-weight:600;text-align:right}
+.kv .r svg{width:16px;height:16px;color:var(--ink3)}
+.lbl{font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:6px;display:block}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.dev .tag{height:36px;border-radius:999px;padding:0 14px;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;border:1px solid var(--line)!important;color:var(--ink)}
+.dev .tag.on{background:var(--tint)!important;border-color:var(--tint2)!important;color:var(--p-text)}
+textarea.f,input.f,select.f{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:12px;font-size:16px;color:var(--ink);resize:none}
+textarea.f:focus,input.f:focus,select.f:focus{outline:2px solid var(--p-text);outline-offset:0;border-color:transparent}
+.search{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:0 14px;height:46px}
+.search svg{width:18px;height:18px;color:var(--ink3);flex:none}
+.search input{border:0;background:transparent;outline:0;font-size:16px;flex:1;min-width:0;color:var(--ink)}
+.day{font-size:12.5px;font-weight:600;color:var(--ink2);margin:6px 0 0;text-transform:uppercase;letter-spacing:.04em}
+.radio{display:flex;align-items:center;gap:12px;min-height:52px;border-bottom:1px solid var(--line);width:100%;font-size:15px;font-weight:500}
+.group .radio:last-child{border-bottom:0}
+.radio .dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--n300);flex:none;display:grid;place-items:center}
+.radio[aria-checked="true"] .dot{border-color:var(--p)}
+.radio[aria-checked="true"] .dot::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--p)}
+.radio .rs{margin-left:auto;color:var(--ink2);font-size:13px}
+.txhead{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding-top:4px}
+.txhead .logo,.txhead .mono,.txhead .ic{width:64px;height:64px;border-radius:18px}
+.txhead .ic svg{width:30px;height:30px}
+.txhead .mono{font-size:24px}
+.txhead .nm{font-size:17px;font-weight:600}
+.txhead .amt{font-size:32px}
+.txhead small{font-size:13px;color:var(--ink2)}
+/* range picker */
+.rf{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.dev .rf button{border:1.5px solid var(--line)!important;border-radius:12px;padding:8px 12px;min-height:56px;text-align:left!important;background:var(--bg)!important}
+.dev .rf button.cur{border-color:var(--p)!important}
+.rf small{display:block;font-size:11.5px;color:var(--ink2);font-weight:600}
+.rf b{font-size:15px;font-weight:600}
+.rf b.ph{color:var(--ink3);font-weight:500}
+.calh{display:flex;align-items:center;justify-content:space-between}
+.calh b{font-size:15px}
+.calh button{width:44px;height:44px;display:grid;place-items:center;color:var(--ink2)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:2px 0;text-align:center}
+.cal .wd{font-size:11.5px;color:var(--ink3);font-weight:600;padding:4px 0}
+.cal button{height:44px;display:grid;place-items:center;font-size:14.5px;font-weight:500;font-variant-numeric:tabular-nums;position:relative}
+.cal button[disabled]{color:var(--n300);cursor:default}
+.cal button.in{background:var(--tint)}
+.cal button.s,.cal button.e{color:var(--on-p)}
+.cal button.s::before,.cal button.e::before{content:"";position:absolute;width:40px;height:40px;border-radius:50%;background:var(--p);z-index:0}
+.cal button span{position:relative;z-index:1}
+.cal button.today span{text-decoration:underline;text-underline-offset:3px}
+.sumline{font-size:13.5px;color:var(--ink2);text-align:center;min-height:20px}
+.hint{font-size:12.5px;color:var(--ink2)}
+.toast{position:absolute;left:16px;right:16px;bottom:24px;z-index:40;background:var(--ink);color:var(--bg);border-radius:14px;padding:12px 14px;font-size:14px;font-weight:600;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}
+.toast.on{opacity:1;transform:none}
+.dev .row:active,.dev .kv:active,.dev .radio:active{background:var(--chip)}
+.dev .btn:active,.dev .btn2:active,.dev .tag:active,.dev .link:active,.dev .more:active,.dev .seg button:active,.dev .pager button:active,.dev .hb:active{opacity:.72}
+.panel button:active{opacity:.75}
+.slot{border:1.5px dashed var(--n300);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px;color:var(--ink2);font-size:13px}
+.slot b{color:var(--ink);font-size:14px}
+.tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tools .seg{flex:1;min-width:150px}
+.dev .fbtn{height:42px;border-radius:999px;border:1px solid var(--line);padding:0 14px;display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--ink)}
+.dev .fbtn.on{border-color:var(--p);color:var(--p-text);background:var(--tint)}
+.dev .sw{display:inline-flex;align-items:center;gap:8px;height:42px;font-size:13.5px;font-weight:600;color:var(--ink)}
+.sw .tr{width:40px;height:24px;border-radius:12px;background:var(--n300);position:relative;transition:background .15s}
+.sw .tr::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .15s}
+.sw[aria-checked="true"] .tr{background:var(--p)}
+.sw[aria-checked="true"] .tr::after{transform:translateX(16px)}
+.count{font-size:12.5px;color:var(--ink2)}
+.check{display:flex;align-items:center;gap:12px;min-height:56px;border-bottom:1px solid var(--line);width:100%;font-size:15px}
+.group .check:last-child{border-bottom:0}
+.check .box{width:22px;height:22px;border-radius:6px;border:2px solid var(--n300);display:grid;place-items:center;flex:none;margin-left:auto}
+.check[aria-checked="true"] .box{background:var(--p);border-color:var(--p);color:var(--on-p)}
+.dev .fchip{flex:none;height:36px;border-radius:999px;padding:0 14px;border:1px solid var(--line);font-size:13.5px;font-weight:600;color:var(--ink2)}
+.dev .fchip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.foot2{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.raw{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;font-weight:500;color:var(--ink2);text-align:right;word-break:break-all}
+.upload{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:1.5px dashed var(--n300);border-radius:16px;min-height:150px;cursor:pointer;color:var(--ink2);font-size:14px;text-align:center;padding:12px}
+.upload img{width:72px;height:72px;border-radius:16px;object-fit:cover;border:1px solid var(--line)}
+.upload input{position:absolute;opacity:0;width:1px;height:1px}
+.pick{display:flex;align-items:center;gap:12px;min-height:60px;border-bottom:1px solid var(--line);width:100%;font-size:15px}
+.group .pick:last-child{border-bottom:0}
+.pick .cv{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--ink2);font-size:13.5px}
+.pick .cv .logo,.pick .cv .mono,.pick .cv .ic{width:28px;height:28px;border-radius:8px;font-size:12px}
+.dev .fbtn:active,.dev .sw:active,.dev .fchip:active{opacity:.72}
+.dev .check:active,.dev .pick:active{background:var(--chip)}
+.sbody>*,.scroll>*{flex-shrink:0}
+.tcards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dev .tcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;text-align:left;min-height:96px}
+.tcard .ic{width:36px;height:36px;border-radius:10px;background:var(--tint);color:var(--p-text)}
+.tcard b{font-size:14.5px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+.tcard small{font-size:12.5px;color:var(--ink2)}
+.dev .pchip{height:40px;border-radius:999px;border:1px solid var(--line);padding:0 12px;display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--ink);background:var(--card)}
+.sheadrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sortbar{display:flex;gap:8px}
+.dev .sortb{height:36px;border-radius:999px;padding:0 12px;border:1px solid var(--line);font-size:13.5px;font-weight:600;color:var(--ink2);display:inline-flex;align-items:center;gap:4px}
+.dev .sortb.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.dev .ctile{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:start;padding:14px 0 16px;border-bottom:1px solid var(--line);width:100%}
+.rows>.ctile:last-child{border-bottom:0}
+.ctile .t1,.ctile .t2{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.ctile .t1 b{font-size:15px;font-weight:600}
+.ctile .t1 span{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.ctile .t2{font-size:12.5px;color:var(--ink2);margin-top:3px}
+.ctile .t2 span:last-child{display:inline-flex;align-items:center;gap:2px;font-variant-numeric:tabular-nums}
+.ctile .bar{display:block;height:6px;border-radius:3px;margin-top:8px;overflow:hidden}
+.ctile .bar i{display:block;height:100%;border-radius:3px}
+.amtbtn{display:block;text-align:left}
+.donut{position:relative;width:212px;max-width:100%;margin:6px auto 2px}
+.donut svg{display:block;width:100%;height:auto;overflow:visible}
+.donut .seg{cursor:pointer;transition:opacity .15s}
+.dev .donut .ctr{position:absolute;inset:22%;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px}
+.donut .ctr small{font-size:12px;color:var(--ink2);font-weight:500;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.donut .ctr b{font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.donut .ctr i{font-style:normal;font-size:12px;color:var(--p-text);font-weight:600}
+.dhint{font-size:12px;color:var(--ink2);text-align:center;margin:0 0 4px}
+.row.dim{opacity:.45}
+.sk{background:linear-gradient(90deg,var(--chip) 25%,var(--line) 50%,var(--chip) 75%);background-size:200% 100%;animation:sk 1.2s linear infinite;border-radius:12px}
+@keyframes sk{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.sk{animation:none}}
+.disc{font-size:12.5px;color:var(--ink2);margin:-2px 0 8px}
+.step{margin:0;font-size:14px;font-weight:500;color:var(--ink2);text-align:center}
+.dev .rf button.cur{box-shadow:0 0 0 1px var(--p)}
+.dev .tcard:active,.dev .pchip:active,.dev .sortb:active,.dev .ctile:active{opacity:.75}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dev .days button{height:44px;border-radius:12px;border:1px solid var(--line);font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;text-align:center;color:var(--ink)}
+.dev .days button[aria-pressed="true"]{background:var(--p);border-color:var(--p);color:var(--on-p)}
+.dev .days button.det{border-color:var(--p-text);border-style:dashed}
+.found{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.4}
+.found b{display:block}
+.dev .msrow{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:56px;border:1px solid var(--line);border-radius:12px;padding:0 14px;background:var(--bg);font-size:15px}
+.dev .msrow span:last-child{display:flex;align-items:center;gap:6px;color:var(--p-text);font-weight:600}
+@media (prefers-reduced-motion:reduce){.sheet,.scrim,.toast{transition:none}}
+</style>
+
+<div class="dev" id="dev">
+    <div class="host" aria-label="Bank app navigation"><button type="button" class="back" id="exit" aria-label="Back to raw transactions"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><span class="bank"><span class="mark" id="mark">N</span><span id="bankname">Nova Bank</span></span><span class="tagsdk">Lune SDK below</span></div>
+    <div class="scroll" id="main"></div>
+    <div class="scrim" id="scrim"></div>
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* ---------- icons (outline, 1.5 stroke, 24 grid) ---------- */
+const P={
+ basket:'<path d="m15 11-1 9"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4"/><path d="M4.5 15.5h15"/><path d="m5 11 4-7"/><path d="m9 11 1 9"/>',
+ utensils:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+ coffee:'<path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/><path d="M6 2v2"/>',
+ bag:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+ car:'<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
+ fuel:'<line x1="3" x2="15" y1="22" y2="22"/><line x1="4" x2="14" y1="9" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.8a2 2 0 0 0-.6-1.4L18 5"/>',
+ receipt:'<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M14 8H8"/><path d="M16 12H8"/><path d="M13 16H8"/>',
+ repeat:'<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+ heart:'<path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z"/><path d="M3.2 12.5h4.3l1.5-3 2 5 1.5-2h8.3"/>',
+ ticket:'<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>',
+ plane:'<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>',
+ grad:'<path d="M21.4 10.9a1 1 0 0 0 0-1.8L12.8 5.2a2 2 0 0 0-1.7 0L2.6 9.1a1 1 0 0 0 0 1.8l8.6 3.9a2 2 0 0 0 1.7 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
+ sofa:'<path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z"/><path d="M4 18v2"/><path d="M20 18v2"/><path d="M12 4v9"/>',
+ landmark:'<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+ chevL:'<path d="m15 18-6-6 6-6"/>',chevR:'<path d="m9 18 6-6-6-6"/>',chevD:'<path d="m6 9 6 6 6-6"/>',x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+ search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',up:'<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>',down:'<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>',
+ flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/>',plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',trend:'<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>',wallet:'<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',dots:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',filter:'<path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/>',image:'<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',check:'<path d="M20 6 9 17l-5-5"/>',cal:'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>'
+};
+const I=(n,s)=>`<svg viewBox="0 0 24 24" width="${s||20}" height="${s||20}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`;
+
+/* ---------- categories and brands ---------- */
+/* ---------- market data: read from the sales page (same origin) ---------- */
+let CFG={};try{CFG=(parent!==window&&parent.LUNE_APP_CFG)||{}}catch(e){CFG={}}
+const CUR=CFG.code||'AED';
+const GEO=CFG.geo||['DXB','AE','Dubai, UAE'];
+const logoSrc=n=>{try{return(CFG.logos&&CFG.logos(n))||[]}catch(e){return[]}};
+const monoOf=n=>{const a=String(n).replace(/[^A-Za-z0-9]/g,'');return(a||String(n).trim()).slice(0,1).toUpperCase()};
+window.__lf=img=>{const s=JSON.parse(img.dataset.s||'[]'),i=+img.dataset.i+1;if(i<s.length){img.dataset.i=i;img.src=s[i];return}
+  const box=img.parentNode;box.className=box.className.replace(/\blogo\b/,'mono');box.textContent=box.dataset.mono||'';};
+P.shield='<path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/>';
+P.card='<rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/>';
+
+/* ---------- categories: SDK visuals, Lune taxonomy from the sales data ---------- */
+const CATS=[
+ {id:'groc',n:'Groceries',ic:'basket',h:['#1f7a4d','#4cc58a']},
+ {id:'dine',n:'Dining',ic:'utensils',h:['#c2410c','#fb8a4c']},
+ {id:'cafe',n:'Cafés',ic:'coffee',h:['#8a5a2b','#d4a373']},
+ {id:'shop',n:'Shopping',ic:'bag',h:['#be185d','#f472b6']},
+ {id:'trans',n:'Transport',ic:'car',h:['#0e7490','#38bdf8']},
+ {id:'fuel',n:'Fuel',ic:'fuel',h:['#475569','#94a3b8']},
+ {id:'bills',n:'Bills and utilities',ic:'receipt',h:['#4338ca','#a5b4fc']},
+ {id:'subs',n:'Subscriptions',ic:'repeat',h:['#7c3aed','#c4b5fd']},
+ {id:'health',n:'Health and fitness',ic:'heart',h:['#b91c1c','#fca5a5']},
+ {id:'ent',n:'Entertainment',ic:'ticket',h:['#a16207','#facc15']},
+ {id:'travel',n:'Travel',ic:'plane',h:['#0369a1','#7dd3fc']},
+ {id:'edu',n:'Education',ic:'grad',h:['#15803d','#86efac']},
+ {id:'fin',n:'Financial services',ic:'card',h:['#3852b4','#a3b3f5']},
+ {id:'loans',n:'Loans',ic:'landmark',h:['#0a634d','#5fd3a8']},
+ {id:'ins',n:'Insurance',ic:'shield',h:['#0f766e','#5eead4']},
+ {id:'gov',n:'Government services',ic:'landmark',h:['#334155','#cbd5e1']},
+ {id:'other',n:'Other',ic:'dots',h:['#64748b','#cbd5e1']},
+];
+const CAT=Object.fromEntries(CATS.map(c=>[c.id,c]));
+// Lune category id (sales data) → SDK category; a few brands split by name.
+const CAFE=/starbucks|costa|tim hortons|caf[eé]|coffee|arabica|juan valdez|ya kun|zus|tealive|doutor|dunkin|pret|kaya|mugg|vida e|second cup|tullys|komeda|blue bottle|coffee bean/i;
+const FUEL=/^(shell|bp|esso|mobil|chevron|exxon|texaco|caltex|engen|sasol|adnoc|enoc|emarat|eppco|aldrees|sasco|petromin|woqod|bapco|ypf|axion|puma|copec|primax|terpel|ipiranga|petrobras|br mania|petronas|petro-canada|ultramar|eneos|idemitsu|cosmo|petron|totalenergies|total|chillout|wataniya|misr petroleum|caltex|speedway|7-eleven fuel)\b/i;
+const STREAM=/netflix|spotify|disney|showmax|shahid|osn|anghami|globoplay|hbo|max\b|prime video|apple tv|youtube|watch it|dazn|hulu|crunchyroll|paramount|starz|deezer|tidal|u-next|abema|viu|iflix|vidio|globo/i;
+const CATMAP={6:'groc',10:'dine',11:'shop',14:'trans',9:'bills',15:'travel',7:'health',4:'ent',1:'fin',3:'edu',16:'loans',17:'ins',5:'gov',18:'subs',19:'other'};
+const catFor=(n,cid)=>{const c=CATMAP[cid]||'other';if(c==='dine'&&CAFE.test(n))return'cafe';if(c==='trans'&&FUEL.test(n))return'fuel';if(c==='ent'&&STREAM.test(n))return'subs';return c};
+
+/* ---------- transactions: the same 12 months the sales page enriches ---------- */
+const MO3={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+const RATE=CFG.rate||1;
+const DAY=864e5;
+const dim=(y,m)=>new Date(y,m+1,0).getDate();
+const TODAY=CFG.today?new Date(CFG.today):new Date(2026,5,28,13,40);
+const TX=[];let tid=0;
+const MER={};
+const r2d=v=>{const k=Math.pow(10,CFG.dec==null?2:CFG.dec);return Math.round(v*k)/k};
+function addTx(d,name,cat,amt,raw,desc){const id='t'+(++tid);if(!MER[name])MER[name]={name,logo:!raw,cat,raw:!!raw};TX.push({id,d,m:name,cat,a:r2d(amt),desc});}
+let seed=20260628;const rnd=()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+(CFG.txns||[]).forEach(t=>{const[dd,mm,yy]=String(t.date).split(' ');const h=8+Math.floor(rnd()*13),mi=Math.floor(rnd()*60);
+  const d=new Date(+yy,MO3[mm],+dd,h,mi);if(d>TODAY)return;addTx(d,t.merchant,catFor(t.merchant,t.categoryId),t.amount*RATE,0,t.raw)});
+// A card payment Lune could not match to a brand yet, so the report flow has a real example.
+const RAWM=`POS 4471 ${GEO[0]} MALL`;[[-1,12,140],[-2,20,95]].forEach(([mo,day,a])=>{const d=new Date(TODAY.getFullYear(),TODAY.getMonth()+mo,day,17,25);addTx(d,RAWM,'shop',a*RATE,1)});
+TX.sort((a,b)=>b.d-a.d);
+const TXI=Object.fromEntries(TX.map(t=>[t.id,t]));
+const topIn=c=>{const m={};TX.forEach(t=>{if(t.cat===c&&!MER[t.m].raw)m[t.m]=(m[t.m]||0)+1});return Object.keys(m).sort((a,b)=>m[b]-m[a])};
+const SEED={};(function(){let k=0;TX.forEach(t=>{if(t.cat==='dine'&&k<7&&t.d.getDate()%3===0){SEED[t.id]={tags:['Work']};k++}});
+  TX.filter(t=>t.cat==='groc').slice(0,5).forEach(t=>SEED[t.id]={...(SEED[t.id]||{}),tags:['Family']});
+  TX.filter(t=>t.cat==='travel').forEach(t=>SEED[t.id]={...(SEED[t.id]||{}),tags:['Trip']});
+  const a=TX.find(t=>t.m===RAWM);if(a)SEED[a.id]={rep:'Wrong brand name',status:'reported'};
+  const b=TX.filter(t=>t.cat==='ent')[6];if(b)SEED[b.id]={rep:'Wrong logo',status:'closed'};
+  const c=TX.filter(t=>t.cat==='trans')[2];if(c)SEED[c.id]={rep:'Wrong category',status:'updated'};})();
+const rawOf=t=>{if(t.desc)return t.desc;const m=MER[t.m];const n=+t.id.slice(1);return(m.raw?t.m:t.m.toUpperCase().replace(/[^A-Z0-9 ]/g,'').replace(/ +/g,' ').trim().slice(0,16))+` ${GEO[0]} ${GEO[1]} ${String(1000+n*37%9000)}`};
+const CASHBACK=['groc','dine','shop','cafe'].map(c=>topIn(c)[0]).filter(Boolean);
+const SAVE={};TX.forEach(t=>{if(CASHBACK.includes(t.m)&&+t.id.slice(1)%3===0)SAVE[t.id]=r2d(t.a*.05)});
+const tagsOf=t=>(S.over[t.id]&&S.over[t.id].tags)||[];
+const statusOf=t=>S.over[t.id]&&S.over[t.id].status;
+
+/* ---------- state ---------- */
+const BANK={name:(CFG.brand&&CFG.brand.name)||'Your bank',color:(CFG.brand&&/^#[0-9a-f]{6}$/i.test(CFG.brand.color||'')&&CFG.brand.color)||'#10A37F',logo:CFG.brand&&CFG.brand.logo};
+const fresh=()=>({dark:!!CFG.dark,startDay:1,payday:25,suggest:true,period:{k:'cyc',off:0},tab:'cat',allCats:false,over:JSON.parse(JSON.stringify(SEED)),mini:false,loading:false,bsort:{k:'amt',d:'desc'},stack:[],q:'',f:{cats:{cats:[],tags:[]},brands:{cats:[],tags:[]},all:{cats:[],tags:[]}},sortCats:'amt',sortAll:'date',repOnly:false});
+let S=fresh();
+const dev=document.getElementById('dev'),main=document.getElementById('main'),sheet=document.getElementById('sheet'),scrim=document.getElementById('scrim');
+
+/* ---------- colour derivation ---------- */
+const hx=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),toH=a=>'#'+a.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+const lum=h=>{const f=c=>{c/=255;return c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4)};const[r,g,b]=hx(h);return .2126*f(r)+.7152*f(g)+.0722*f(b)};
+const cr=(a,b)=>{const x=lum(a),y=lum(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+const mix=(a,b,t)=>{const A=hx(a),B=hx(b);return toH(A.map((v,i)=>v*t+B[i]*(1-t)))};
+const toward=(c,t,bg,need)=>{let k=0,x=c;while(cr(x,bg)<need&&k<1){k+=.04;x=mix(t,c,k)}return x};
+function theme(){const p=BANK.color,d=S.dark,card=d?'#181b1f':'#ffffff',bg=d?'#0e1013':'#f4f6f8';
+  const fill=d?toward(p,'#ffffff',card,3):p,text=d?toward(p,'#ffffff',card,4.5):toward(p,'#000000',card,4.5);
+  const on=cr('#ffffff',fill)>=cr('#111111',fill)?'#ffffff':'#111111';
+  const v={'--p':fill,'--p-text':text,'--on-p':on,'--tint':mix(fill,card,d?.18:.09),'--tint2':mix(fill,card,d?.36:.26)};
+  Object.entries(v).forEach(([k,x])=>dev.style.setProperty(k,x));dev.classList.toggle('dark',d);document.documentElement.classList.toggle('dark',d);
+  const mk=document.getElementById('mark');if(BANK.logo){mk.innerHTML=`<img src="${esc(BANK.logo)}" alt="">`;mk.querySelector('img').onerror=()=>{mk.textContent=BANK.name[0]}}else mk.textContent=BANK.name[0];document.getElementById('bankname').textContent=BANK.name;}
+
+/* ---------- periods ---------- */
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],MONL=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const sod=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
+const startOn=(y,m)=>{const n=new Date(y,m,1);return new Date(n.getFullYear(),n.getMonth(),Math.min(S.startDay,dim(n.getFullYear(),n.getMonth())))};
+function cycle(off){const t=sod(TODAY);let y=t.getFullYear(),m=t.getMonth();let s=startOn(y,m);if(s>t){s=startOn(y,m-1);m--}
+  s=startOn(y,m+off);const e=new Date(startOn(y,m+off+1)-DAY);const cur=off===0;return{a:s,b:cur?t:e,full:e,cur,off};}
+const fd=d=>`${d.getDate()} ${MON[d.getMonth()]}`,fdy=d=>`${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear()}`;
+function cycLabel(c){if(S.startDay===1)return`${MONL[c.a.getMonth()]}${c.a.getFullYear()!==TODAY.getFullYear()?' '+c.a.getFullYear():''}`;return`${fd(c.a)} to ${fd(c.full)}`;}
+function cycShort(c){return S.startDay===1?MON[c.a.getMonth()]:MON[c.full.getMonth()]}
+const MINOFF=-6;
+function resolve(p){p=p||S.period;
+  if(p.k==='cyc'){const c=cycle(p.off);return{...c,label:cycLabel(c),kind:'cyc'}}
+  if(p.k==='last'){const a=cycle(-p.n).a,b=cycle(-1).full;return{a,b,full:b,label:`Last ${p.n} months`,kind:'last',n:p.n}}
+  return{a:p.a,b:p.b,full:p.b,label:p.a.getTime()===p.b.getTime()?fdy(p.a):`${fd(p.a)} to ${fdy(p.b)}`,kind:'range'};}
+const catOf=t=>(S.over[t.id]&&S.over[t.id].cat)||t.cat;
+const inR=(t,a,b)=>t.d>=a&&t.d<new Date(b.getTime()+DAY);
+const txIn=(a,b,f)=>TX.filter(t=>inR(t,a,b)&&(!f||f(t)));
+const sum=a=>a.reduce((s,t)=>s+t.a,0);
+
+/* ---------- formatting ---------- */
+const n0=v=>Math.round(v).toLocaleString('en-US');const DEC=CFG.dec==null?2:CFG.dec;
+const n2=v=>v.toLocaleString('en-US',{minimumFractionDigits:DEC,maximumFractionDigits:DEC});
+const aed=v=>`${CUR} ${n0(v)}`;
+const bigAmt=v=>{const[i,dd]=n2(v).split('.');return`<div class="amt"><span class="cur">${CUR}</span><span class="num">${i}${dd?`<span class="dec">.${dd}</span>`:''}</span></div>`};
+const compact=v=>v>=1e9?(v/1e9).toFixed(1).replace('.0','')+'B':v>=1e6?(v/1e6).toFixed(1).replace('.0','')+'M':v>=1e3?(v/1e3).toFixed(1).replace('.0','')+'K':n2(v);
+const heroAmt=v=>`<button class="amtbtn" data-a="mini" aria-label="${S.mini?'Show full amount':'Show short amount'}">${S.mini?`<div class="amt"><span class="cur">${CUR}</span><span class="num">${compact(v)}</span></div>`:bigAmt(v)}</button>`;
+function donutSvg(segs,tot,sel){const R=84,SW=18,C=2*Math.PI*R,gap=segs.length>1?3:0;let acc=0,out='';
+  segs.forEach(sg=>{const len=sg.v/tot*C,dash=Math.max(0.5,len-gap),on=sel==null||sel===sg.id;
+    out+=`<circle class="seg" cx="100" cy="100" r="${R}" fill="none" stroke="${sg.col}" stroke-width="${sel===sg.id?SW+6:SW}" stroke-dasharray="${dash} ${C-dash}" stroke-dashoffset="${-acc}" opacity="${on?1:.28}" data-a="dseg" data-v="${sg.id}" transform="rotate(-90 100 100)"><title>${esc(sg.n)}: ${aed(sg.v)} (${Math.round(sg.v/tot*100)}%)</title></circle>`;acc+=len});
+  return`<svg viewBox="0 0 200 200" role="img" aria-label="Spend by category: ${segs.map(x=>`${x.n} ${Math.round(x.v/tot*100)}%`).join(', ')}"><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--chip)" stroke-width="${SW}"/>${out}</svg>`}
+const periodChip=()=>`<button class="pchip" data-a="period">${I('cal',16)} ${esc(resolve().label)} ${I('chevD',14)}</button>`;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const hue=c=>c.h[S.dark?1:0];
+const catIc=(c,cls,sz)=>`<span class="ic ${cls||''}" style="${sz?`width:${sz}px;height:${sz}px;border-radius:${Math.round(sz*.3)}px;`:''}background:color-mix(in srgb,${hue(c)} ${S.dark?22:13}%,var(--card));color:${hue(c)}">${I(c.ic)}</span>`;
+function mark(name,cls){const m=MER[name];const ls=m&&!m.raw?logoSrc(name):[];if(ls.length)return`<span class="logo ${cls||''}" data-mono="${esc(monoOf(name))}"><img src="${esc(ls[0])}" data-s="${esc(JSON.stringify(ls))}" data-i="0" alt="" onerror="__lf(this)"></span>`;
+  if(m&&m.raw)return catIc(CAT[m.cat],cls);
+  return`<span class="mono ${cls||''}" aria-hidden="true">${esc(monoOf(name))}</span>`;}
+const pctChip=(cur,base,word)=>{if(!base)return'';const d=(cur-base)/base*100,r=Math.round(Math.abs(d));if(r<3)return`<span class="chip n">About the same as ${word}</span>`;
+  return d>0?`<span class="chip neg">${I('up',13)} ${r}% above ${word}</span>`:`<span class="chip pos">${I('down',13)} ${r}% below ${word}</span>`};
+const amtChip=(cur,base,word)=>{const d=cur-base;if(Math.abs(d)<Math.max(20,base*.02))return`<span class="chip n">About the same as ${word}</span>`;
+  return d<0?`<span class="chip pos">${I('down',13)} ${aed(-d)} less than ${word}</span>`:`<span class="chip neg">${I('up',13)} ${aed(d)} more than ${word}</span>`};
+
+/* ---------- comparisons ---------- */
+function sameDayPrev(c,f){const prev=cycle(c.off-1);const len=Math.round((sod(c.b)-c.a)/DAY);const pb=new Date(prev.a.getTime()+len*DAY);return sum(txIn(prev.a,pb<prev.full?pb:prev.full,f));}
+function avgCycles(off,n,f){let s=0,k=0;for(let i=1;i<=n;i++){const c=cycle(off-i);if(c.off<MINOFF-1)break;s+=sum(txIn(c.a,c.full,f));k++}return k?s/k:0;}
+
+/* ---------- charts ---------- */
+const NS='http://www.w3.org/2000/svg';
+function niceMax(v){if(v<=0)return 100;const p=Math.pow(10,Math.floor(Math.log10(v))),u=v/p;return(u<=1.5?1.5:u<=2?2:u<=3?3:u<=5?5:10)*p;}
+const kfmt=v=>v>=1e6?(v/1e6).toFixed(v%1e6?1:0).replace('.0','')+'M':v>=1000?(v/1000).toFixed(v%1000?1:0).replace('.0','')+'k':String(v);
+function paceSvg(c,f){
+  const W=340,H=160,L=4,R=34,T=12,B=24,len=Math.round((c.full-c.a)/DAY)+1,prev=cycle(c.off-1),plen=Math.round((prev.full-prev.a)/DAY)+1;
+  const cum=(a,days,stop)=>{const out=[];let s=0;for(let i=0;i<days;i++){const d0=new Date(a.getTime()+i*DAY);if(stop&&d0>stop)break;s+=sum(txIn(d0,d0,f));out.push(s)}return out};
+  const cur=cum(c.a,len,c.cur?sod(TODAY):null),pr=cum(prev.a,plen);
+  const mx=niceMax(Math.max(cur[cur.length-1]||0,pr[pr.length-1]||0)),X=i=>L+i/(Math.max(len,plen)-1)*(W-L-R),Y=v=>T+(1-v/mx)*(H-T-B);
+  let g='';[0,mx/2,mx].forEach(v=>{g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${W-R+6}" y="${Y(v)+4}" font-size="11" fill="var(--ink2)">${kfmt(v)}</text>`});
+  const pp=pr.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+  const cp=cur.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+  const li=cur.length-1;
+  const area=`M${X(0)},${Y(0)} L${cp.replace(/ /g,' L')} L${X(li)},${Y(0)} Z`;
+  const lbl=(i,t,anchor)=>`<text x="${X(i)}" y="${H-6}" font-size="11" fill="var(--ink2)" text-anchor="${anchor}">${t}</text>`;
+  const endD=new Date(c.a.getTime()+(len-1)*DAY);
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Spend so far this period against last period">${g}
+   <polyline points="${pp}" fill="none" stroke="var(--ink3)" stroke-width="1.75" stroke-dasharray="4 4"/>
+   <path d="${area}" fill="var(--tint)"/><polyline points="${cp}" fill="none" stroke="var(--p)" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round"/>
+   ${c.cur&&pr[li]!=null?`<circle cx="${X(li)}" cy="${Y(pr[li])}" r="3.5" fill="var(--ink3)"/>`:''}
+   <circle cx="${X(li)}" cy="${Y(cur[li])}" r="5" fill="var(--p)" stroke="var(--card)" stroke-width="2"/>
+   ${lbl(0,fd(c.a),'start')}${c.cur&&li>4&&li<len-8?lbl(li,'Today','middle'):''}${lbl(len-1,fd(endD),'end')}
+   <rect class="hit" x="${L}" y="0" width="${W-L-R}" height="${H}" fill="transparent"/></svg>`;
+  return{svg:s,meta:{cur,pr,X,Y,a:c.a,pa:prev.a,W,H}};}
+function barsSvg(items,selIdx,avg,opts){
+  const W=340,H=170,L=4,R=34,T=22,B=26,n=items.length,slot=(W-L-R)/n,bw=Math.min(30,slot*.56);
+  const mx=niceMax(Math.max(avg,...items.map(x=>x.v))*1.08),Y=v=>T+(1-v/mx)*(H-T-B);
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria)}">`;
+  [0,mx/2,mx].forEach(v=>{s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${W-R+6}" y="${Y(v)+4}" font-size="11" fill="var(--ink2)">${kfmt(v)}</text>`});
+  items.forEach((it,i)=>{const x=L+i*slot+(slot-bw)/2,y=Y(it.v),h=Math.max(0,Y(0)-y),sel=i===selIdx,r=Math.min(5,h);
+    const fill=sel?'var(--p)':'var(--n300)';
+    s+=h>0?`<path d="M${x},${Y(0)} V${y+r} Q${x},${y} ${x+r},${y} H${x+bw-r} Q${x+bw},${y} ${x+bw},${y+r} V${Y(0)} Z" fill="${fill}"/>`:'';
+    s+=`<text x="${x+bw/2}" y="${H-8}" font-size="11.5" text-anchor="middle" font-weight="${sel?700:500}" fill="${sel?'var(--ink)':'var(--ink2)'}">${esc(it.l)}</text>`;
+    if(sel)s+=`<text x="${x+bw/2}" y="${y-7}" font-size="11.5" text-anchor="middle" font-weight="700" fill="var(--ink)">${n0(it.v)}</text>`;
+    s+=`<rect x="${L+i*slot}" y="0" width="${slot}" height="${H}" fill="transparent" data-a="${opts.act}" data-v="${it.key}" style="cursor:pointer"><title>${esc(it.l)}: ${aed(it.v)}</title></rect>`;});
+  if(avg>0){const ay=Y(avg);s+=`<line x1="${L}" x2="${W-R}" y1="${ay}" y2="${ay}" stroke="var(--ink)" stroke-width="1.25" stroke-dasharray="4 3"/>`}
+  return s+'</svg>';}
+
+/* ---------- main page ---------- */
+function rankCats(a,b){const m={};txIn(a,b).forEach(t=>{const c=catOf(t);(m[c]=m[c]||{v:0,n:0});m[c].v+=t.a;m[c].n++});return Object.entries(m).map(([id,x])=>({id,...x})).sort((x,y)=>y.v-x.v)}
+function rankMer(a,b,f){const m={};txIn(a,b,f).forEach(t=>{(m[t.m]=m[t.m]||{v:0,n:0});m[t.m].v+=t.a;m[t.m].n++});return Object.entries(m).map(([id,x])=>({id,...x})).sort((x,y)=>y.v-x.v)}
+const savTxt=t=>SAVE[t.id]?`<small style="color:var(--pos)">${CUR} ${n2(SAVE[t.id])} cashback</small>`:'';
+const STL={reported:['var(--warn)','Pending'],updated:['var(--pos)','Updated'],closed:['var(--ink2)','Report closed']};
+function txRow(t,showCat,byDate){const c=CAT[catOf(t)],st=statusOf(t),rep=st?`<span style="color:${STL[st][0]}">${STL[st][1]}</span>`:'';
+  if(byDate)return`<button class="row" data-a="tx" data-v="${t.id}" style="grid-template-columns:minmax(0,1fr) auto"><span style="min-width:0"><span class="nm" style="display:block">${t.d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</span><span class="sub" style="display:block">${String(t.d.getHours()).padStart(2,'0')}:${String(t.d.getMinutes()).padStart(2,'0')} · Visa ···· 4821</span></span><span class="v">${n2(t.a)}${rep?`<small>${rep}</small>`:savTxt(t)}</span></button>`;
+  return`<button class="row" data-a="tx" data-v="${t.id}"><span>${mark(t.m)}</span><span style="min-width:0"><span class="nm" style="display:block">${esc(t.m)}</span><span class="sub" style="display:block">${showCat?esc(c.n)+' · ':''}${fd(t.d)}</span></span><span class="v">${n2(t.a)}${rep?`<small>${rep}</small>`:savTxt(t)}</span></button>`}
+function renderMain(){
+  const r=resolve(),tot=sum(txIn(r.a,r.b));
+  let hero='',chart='';
+  if(r.kind==='cyc'){
+    hero=`<div class="hero"><small>${r.cur?`Spent so far · ${fd(r.a)} to ${fd(r.b)}`:`Spent in ${r.label}`}</small>${bigAmt(tot)}${r.cur?amtChip(tot,sameDayPrev(r),S.startDay!==1?'last period by today':'last month by today'):pctChip(tot,avgCycles(r.off,6),'your 6-month average')}</div>`;
+    const pc=paceSvg(r);PACE=pc.meta;
+    chart=`<div class="card"><div class="chartwrap" id="pacewrap">${pc.svg}<div class="tip" id="tip" hidden></div></div><div class="legend"><span><i style="background:var(--p)"></i>${S.startDay!==1?(r.cur?'This period':esc(r.label)):r.cur?'This month':esc(cycShort(r))}</span><span><i class="dash"></i>${S.startDay!==1?'Previous period':esc(cycShort(cycle(r.off-1)))}</span></div></div>`;
+  }else if(r.kind==='last'){
+    const items=[];for(let i=r.n;i>=1;i--){const c=cycle(-i);items.push({l:cycShort(c),v:sum(txIn(c.a,c.full)),key:-i})}
+    hero=`<div class="hero"><small>Spent in the last ${r.n} months</small>${bigAmt(tot)}<span class="chip n">Average ${aed(tot/r.n)} a month</span></div>`;
+    chart=`<div class="card">${barsSvg(items,-1,tot/r.n,{act:'gocyc',aria:'Spend by month'})}<div class="legend"><span><i class="dash" style="border-color:var(--ink)"></i>Average ${aed(tot/r.n)}</span><span>Tap a month to open it</span></div></div>`;
+  }else{
+    const days=Math.round((r.b-r.a)/DAY)+1;const pa=new Date(r.a.getTime()-days*DAY),pb=new Date(r.a.getTime()-DAY);
+    hero=`<div class="hero"><small>Spent from ${fd(r.a)} to ${fd(r.b)} · ${days} day${days>1?'s':''}</small>${bigAmt(tot)}${amtChip(tot,sum(txIn(pa,pb)),`the ${days} days before`)}</div>`;
+  }
+  const list=S.tab==='cat'?rankCats(r.a,r.b):rankMer(r.a,r.b);
+  const top=list[0]?list[0].v:1;
+  let rows='',stack='';
+  if(S.tab==='cat'){const five=list.slice(0,5),rest=list.slice(5),rv=rest.reduce((s,x)=>s+x.v,0);
+    const segs=five.map(x=>({id:x.id,v:x.v,n:CAT[x.id].n,col:hue(CAT[x.id])}));if(rv)segs.push({id:'others',v:rv,n:'Others',col:'var(--n300)'});
+    const sel=null,ss=null;
+    stack=`<div class="donut">${donutSvg(segs,tot,sel)}<button class="ctr" data-a="${sel?(sel==='others'?'others':'cat'):'dclear'}" data-v="${sel||''}" aria-label="${ss?`Open ${esc(ss.n)}`:'Total spend'}">${ss?`<small>${esc(ss.n)}</small><b>${compact(ss.v)}</b><i>${Math.round(ss.v/tot*100)}% · Open</i>`:`<small>Spent</small><b>${compact(tot)}</b><small>${CUR}</small>`}</button></div><p class="dhint">Tap a category to see its brands.</p>`;
+    rows=five.map(x=>{const c=CAT[x.id];return rkRow('catbrands',x.id,catIc(c),esc(c.n),n0(x.v),(x.v/top*100).toFixed(1),hue(c),txns(x.n),shareP(x.v,tot))}).join('')
+     +(rest.length?rkRow('others','',`<span class="mono">${I('dots')}</span>`,'Others',n0(rv),null,null,`${rest.length} more categor${rest.length>1?'ies':'y'}`,shareP(rv,tot)):'');}
+  else{const rest=list.slice(6),rv=rest.reduce((s,x)=>s+x.v,0);rows=brandRows(list.slice(0,6),tot,true)+(rest.length?rkRow('','',`<span class="mono">${I('dots')}</span>`,'Other brands',n0(rv),null,null,`${rest.length} more brand${rest.length>1?'s':''}`,shareP(rv,tot)):'')}
+  const recent=txIn(r.a,r.b).slice(0,6);
+  const pagerOK=r.kind==='cyc';
+  const titleRow=`<div class="titlerow"><h1 class="t">Expenses</h1>
+     <div class="pager">${pagerOK?`<button class="arr" data-a="prev" aria-label="Previous period" ${r.off<=MINOFF?'disabled':''}>${I('chevL',18)}</button>`:''}<button class="lbl" data-a="period" aria-label="Choose period, now ${esc(r.label)}" style="${pagerOK?'':'padding:0 14px'}">${esc(r.label)}${pagerOK?'':I('chevD',16)}</button>${pagerOK?`<button class="arr" data-a="next" aria-label="Next period" ${r.cur?'disabled':''}>${I('chevR',18)}</button>`:''}</div></div>`;
+  if(S.loading){main.innerHTML=titleRow+`<div class="sk" style="height:70px;width:70%"></div><div class="sk" style="height:180px"></div><div class="sk" style="height:44px;border-radius:999px"></div>${'<div class="sk" style="height:56px"></div>'.repeat(4)}`;return}
+  hero=hero.replace(bigAmt(tot),heroAmt(tot));
+  main.innerHTML=`${titleRow}
+   ${tot>0?hero+chart:`<div class="card empty"><div class="donut" style="width:150px">${`<svg viewBox="0 0 200 200" role="img" aria-label="No spend"><circle cx="100" cy="100" r="84" fill="none" stroke="var(--chip)" stroke-width="18"/></svg>`}<div class="ctr" style="pointer-events:none"><small>Spent</small><b>0</b></div></div><b>No spend</b>You have no spending in this period. Choose another period.</div>`}
+   ${tot>0?`<section><div class="sec"><h2>Where it went</h2></div>
+     <div class="seg" role="group" aria-label="Group spend by"><button data-a="tab" data-v="cat" aria-pressed="${S.tab==='cat'}">Categories</button><button data-a="tab" data-v="mer" aria-pressed="${S.tab==='mer'}">Brands</button></div>
+     <div class="card flush" style="margin-top:10px">${stack}<div class="rows">${rows}</div><button class="more" data-a="${S.tab==='cat'?'breakdown':'brands'}">View all ${list.length} ${S.tab==='cat'?'categories':'brands'}</button></div></section>`:''}
+   <div class="slot" aria-label="Bank content slot"><b>Bank content slot</b>The bank can show its own view here, for example card offers. It is optional.</div>
+   <section><div class="sec"><h2>Transactions</h2><button class="link" data-a="all" ${recent.length?'':'disabled style="color:var(--ink3)"'}>View all</button></div>
+     <p class="disc">Transfers between your own accounts are not counted as spend.</p>
+     <div class="card flush"><div class="rows">${recent.length?recent.map(t=>txRow(t,true)).join(''):'<div class="empty">No transactions in this period</div>'}</div></div></section>`;
+  bindPace();
+}
+let PACE=null;
+function bindPace(){const w=document.getElementById('pacewrap');if(!w||!PACE)return;const svg=w.querySelector('svg'),tip=document.getElementById('tip');
+  const mv=e=>{const rc=svg.getBoundingClientRect(),x=(e.clientX-rc.left)/rc.width*PACE.W;let best=0,bd=1e9;PACE.cur.forEach((_,i)=>{const d=Math.abs(PACE.X(i)-x);if(d<bd){bd=d;best=i}});
+    const d=new Date(PACE.a.getTime()+best*DAY),pv=PACE.pr[best];tip.hidden=false;tip.style.left=(PACE.X(best)/PACE.W*rc.width)+'px';tip.style.top=(PACE.Y(PACE.cur[best])/PACE.H*rc.height)+'px';
+    tip.textContent=`${fd(d)}: ${aed(PACE.cur[best])}${pv!=null?` · last month ${aed(pv)}`:''}`};
+  svg.addEventListener('pointermove',mv);svg.addEventListener('pointerdown',mv);svg.addEventListener('pointerleave',()=>tip.hidden=true);}
+
+/* ---------- sheet views ---------- */
+function headBar(title,sub){const back=S.stack.length>1;
+  return`<div class="grab" aria-hidden="true"></div><div class="shead">${back?`<button class="hb" data-a="back" aria-label="Back">${I('chevL',22)}</button>`:'<span class="sp"></span>'}<div class="ttl" id="sheet-title">${title}${sub?`<small>${sub}</small>`:''}</div><button class="hb x" data-a="close" aria-label="Close"><span>${I('x',16)}</span></button></div>`}
+function sixCycles(selOff,f){const items=[];const end=Math.min(0,selOff+2);const start=Math.max(MINOFF,end-5);for(let o=start;o<=end;o++){const c=cycle(o);items.push({l:cycShort(c)+(c.cur?'*':''),v:sum(txIn(c.a,c.b,f)),key:o,partial:c.cur})}return items}
+function trendBlock(view,f,what){const off=view.off;const c=cycle(off);const items=sixCycles(off,f);const sel=items.findIndex(x=>x.key===off);
+  const full=items.filter(x=>!x.partial&&x.key!==off);const avg=full.length?sum(full.map(x=>({a:x.v})))/full.length:0;
+  const v=sum(txIn(c.a,c.b,f));
+  const chip=c.cur?amtChip(v,sameDayPrev(c,f),'last month by today'):pctChip(v,avg,'your average');
+  return{v,c,html:`<div class="hero"><small>${c.cur?`${what} so far · ${fd(c.a)} to ${fd(c.b)}`:`${what} in ${esc(cycLabel(c))}`}</small>${bigAmt(v)}${chip}</div>
+   <div>${barsSvg(items,sel,avg,{act:'selcyc',aria:`${what} by month`})}<div class="legend"><span><i style="background:var(--p)"></i>Selected</span>${avg>0?`<span><i class="dash" style="border-color:var(--ink)"></i>Average ${aed(avg)}</span>`:''}${items.some(x=>x.partial)?'<span>* so far</span>':''}</div></div>`}}
+function viewCat(v){const c=CAT[v.id],f=t=>catOf(t)===v.id,tb=trendBlock(v,f,'Spent');
+  const mers=rankMer(tb.c.a,tb.c.b,f),txs=txIn(tb.c.a,tb.c.b,f);
+  const sub=v.sub||'mer';
+  return headBar(`<span class="idrow">${catIc(c)}<span>${esc(c.n)}</span></span>`)+`<div class="sbody">${tb.html}
+   <div class="seg" role="group" aria-label="Show"><button data-a="sub" data-v="mer" aria-pressed="${sub==='mer'}">Brands</button><button data-a="sub" data-v="tx" aria-pressed="${sub==='tx'}">Transactions</button></div>
+   <div class="rows">${sub==='mer'?(mers.length?brandRows(mers,tb.v,false):'<div class="empty">No spend in this month</div>')
+     :(txs.length?txs.slice(0,8).map(t=>txRow(t,false)).join('')+(txs.length>8?`<button class="more" data-a="allcat" data-v="${v.id}">See all ${txs.length} transactions</button>`:''):'<div class="empty">No transactions in this month</div>')}</div></div>`}
+function viewMer(v){const m=MER[v.id],c=CAT[m.cat],f=t=>t.m===v.id,tb=trendBlock(v,f,'Total spend');const txs=txIn(tb.c.a,tb.c.b,f);
+  return headBar(`<span class="idrow">${mark(v.id)}<span style="min-width:0;overflow:hidden;text-overflow:ellipsis">${esc(v.id)}</span></span>`)+`<div class="sbody"><div class="sheadrow"><span class="fchip" style="display:inline-flex;align-items:center;gap:8px;padding-left:6px">${catIc(c,'',24)}${esc(c.n)}</span></div>${tb.html}
+   <div><div class="sec"><h2>Transactions</h2></div><div class="rows">${txs.length?txs.map(t=>txRow(t,false,true)).join(''):'<div class="empty">No transactions in this month</div>'}</div></div></div>`}
+function viewTx(v){const t=TXI[v.id],o=S.over[t.id]||{},d=v.d,c=CAT[d.cat],tags=d.tags;
+  const sug=['Work','Family','Trip','Shared','Gift'].filter(x=>!tags.includes(x));
+  const rep=o.rep,st=o.status,dirty=txDirty(v);
+  const stChip=st==='updated'?`<span class="chip pos">${I('check',13)} Updated by your bank: ${esc(rep)}</span>`:st==='closed'?`<span class="chip n">Report closed: ${esc(rep)}</span>`:st?`<span class="chip warn">${I('flag',13)} Pending review: ${esc(rep)}</span>`:'';
+  return headBar('Transaction')+`<div class="sbody">
+   <div class="txhead">${mark(t.m)}<div class="nm">${esc(t.m)}</div>${bigAmt(t.a)}<small>${t.d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})} · ${String(t.d.getHours()).padStart(2,'0')}:${String(t.d.getMinutes()).padStart(2,'0')}</small>${SAVE[t.id]?`<span class="chip pos">${CUR} ${n2(SAVE[t.id])} cashback earned</span>`:''}${stChip}</div>
+   <div class="group"><button class="kv" data-a="pickcat" data-v="${t.id}"><span>Category</span><span class="r">${catIc(c,'',28)}${esc(c.n)}${I('chevR',16)}</span></button>
+     ${o.cat&&o.cat!==t.cat?`<div class="kv"><span>Suggested category</span><span class="r">${esc(CAT[o.cat].n)} · sent to your bank</span></div>`:''}
+     <div class="kv"><span>Card</span><span class="r">Visa ···· 4821</span></div><div class="kv"><span>Location</span><span class="r">${esc(GEO[2])}</span></div><div class="kv"><span>Raw transaction</span><span class="raw">${esc(rawOf(t))}</span></div></div>
+   <div><span class="lbl" id="tags-l">Tags</span><div class="tags" role="group" aria-labelledby="tags-l">${tags.map(x=>`<button class="tag on" data-a="untag" data-v="${x}" aria-label="Remove tag ${x}">${esc(x)} ${I('x',14)}</button>`).join('')}${sug.slice(0,4-Math.min(tags.length,2)).map(x=>`<button class="tag" data-a="tag" data-v="${x}">${I('plus',14)} ${esc(x)}</button>`).join('')}</div></div>
+   <div><label class="lbl" for="note">Notes</label><textarea class="f" id="note" rows="2" maxlength="120" placeholder="Tap to add notes">${esc(d.note)}</textarea></div>
+   ${st==='reported'?`<button class="btn2" data-a="unreport" data-v="${t.id}">Cancel report</button>`:st?'':`<button class="btn2" data-a="report" data-v="${t.id}">${I('flag',16)}&nbsp; Report transaction</button>`}
+  </div><div class="sfoot"><button class="btn" id="txsave" data-a="txsave" ${dirty?'':'disabled'}>${dirty?'Save changes':'No changes to save'}</button></div>`}
+function txDirty(v){const t=TXI[v.id],o=S.over[t.id]||{},d=v.d;return d.cat!==catOf(t)||d.note!==(o.note||'')||d.tags.join('|')!==tagsOf(t).join('|')}
+const openTx=id=>{const t=TXI[id],o=S.over[id]||{};return{v:'tx',id,d:{cat:catOf(t),tags:[...tagsOf(t)],note:o.note||''}}};
+function viewPickCat(v){const t=TXI[v.id],cur=v.cur||catOf(t);
+  return headBar('Change category',esc(t.m))+`<div class="sbody"><div class="group" role="radiogroup" aria-label="Category">${CATS.map(c=>`<button class="radio" role="radio" aria-checked="${c.id===cur}" data-a="setcat" data-v="${t.id}|${c.id}">${catIc(c)}<span>${esc(c.n)}</span><span class="dot" style="margin-left:auto"></span></button>`).join('')}</div>
+   <p class="hint">Only this transaction changes. Tap Save to keep it. Your bank uses your choice to improve categories.</p></div>`}
+function viewReport(v){const t=TXI[v.id],c=CAT[catOf(t)],step=v.step||'choose';
+  if(step==='choose')return headBar('Report a problem',esc(t.m))+`<div class="sbody"><p class="hint" style="font-size:14px;color:var(--ink)">What is wrong with this transaction?</p>
+   <div class="group"><button class="pick" data-a="rstep" data-v="brand"><span>Brand name</span><span class="cv">${esc(t.m)}${I('chevR',16)}</span></button>
+    <button class="pick" data-a="rstep" data-v="logo"><span>Logo</span><span class="cv">${mark(t.m)}${I('chevR',16)}</span></button>
+    <button class="pick" data-a="rstep" data-v="category"><span>Category</span><span class="cv">${esc(c.n)}${I('chevR',16)}</span></button>
+    <button class="pick" data-a="rstep" data-v="unknown"><span>I do not recognise this</span><span class="cv">${I('chevR',16)}</span></button></div>
+   <button class="btn2" data-a="back">Everything looks right</button></div>`;
+  if(step==='brand')return headBar('Brand name',esc(t.m))+`<div class="sbody"><div><label class="lbl" for="rb">Correct brand name</label><input class="f" id="rb" autocomplete="off" autocapitalize="words" placeholder="${esc(t.m)}" value="${esc(v.val||'')}"></div>
+   <div class="chips" id="rbsug">${brandSug(v.val,t.m)}</div>
+   <p class="hint">Raw transaction: <span class="raw" style="text-align:left">${esc(rawOf(t))}</span></p></div><div class="sfoot"><button class="btn" id="rbsend" data-a="rsubmit" data-v="Wrong brand name" ${v.val?'':'disabled'}>Submit suggestion</button></div>`;
+  if(step==='logo')return headBar('Logo',esc(t.m))+`<div class="sbody"><label class="upload" for="rl">${v.img?`<img src="${v.img}" alt="Logo you chose">Tap to choose another image`:`${I('image',28)}<span><b style="color:var(--ink)">Add the correct logo</b><br>PNG or JPG, square works best</span>`}<input id="rl" type="file" accept="image/*"></label></div><div class="sfoot"><button class="btn" data-a="rsubmit" data-v="Wrong logo" ${v.img?'':'disabled'}>Submit logo</button></div>`;
+  if(step==='category')return headBar('Category',esc(t.m))+`<div class="sbody"><div class="group" role="radiogroup" aria-label="Correct category">${CATS.map(x=>`<button class="radio" role="radio" aria-checked="${v.val===x.id}" data-a="rcat" data-v="${x.id}">${catIc(x)}<span>${esc(x.n)}</span><span class="dot" style="margin-left:auto"></span></button>`).join('')}</div></div><div class="sfoot"><button class="btn" data-a="rsubmit" data-v="Wrong category" ${v.val&&v.val!==catOf(t)?'':'disabled'}>Submit category</button></div>`;
+  return headBar('I do not recognise this',esc(t.m))+`<div class="sbody"><p class="hint" style="font-size:14px;color:var(--ink)">We send this to your bank to check. If you think someone used your card, block it in the bank app first.</p></div><div class="sfoot"><button class="btn" data-a="rsubmit" data-v="Not recognised">Send report</button></div>`}
+const brandSug=(q,cur)=>{q=(q||'').toLowerCase();if(q.length<2)return'';return Object.keys(MER).filter(n=>n!==cur&&!MER[n].raw&&n.toLowerCase().includes(q)).slice(0,4).map(n=>`<button class="fchip" data-a="rbpick" data-v="${esc(n)}">${esc(n)}</button>`).join('')};
+const allTags=()=>{const s=new Set(['Work','Family','Trip','Shared','Gift']);Object.values(S.over).forEach(o=>(o.tags||[]).forEach(x=>s.add(x)));return[...s]};
+function fpass(t,F){return(!F.cats.length||F.cats.includes(catOf(t)))&&(!F.tags.length||tagsOf(t).some(x=>F.tags.includes(x)))}
+const fbtn=(k)=>{const F=S.f[k],n=F.cats.length+F.tags.length;return`<button class="fbtn ${n?'on':''}" data-a="filter" data-v="${k}">${I('filter',16)} Filter${n?` · ${n}`:''}</button>`};
+function catTile(x,tot){const c=CAT[x.id],pct=tot?Math.min(x.v/tot,1):0;
+  return`<button class="ctile" data-a="cat" data-v="${x.id}">${catIc(c)}<span style="min-width:0"><span class="t1"><b>${esc(c.n)}</b><span>${n2(x.v)}</span></span><span class="t2"><span>${x.n} transaction${x.n>1?'s':''}</span><span>${(pct*100).toFixed(1)}% ${I('chevR',14)}</span></span><span class="bar" style="background:color-mix(in srgb,${hue(c)} 15%,var(--card))"><i style="width:${pct*100}%;background:${hue(c)}"></i></span></span></button>`}
+function viewBreakdown(v){const r=resolve(),all=rankCats(r.a,r.b),base=v.mode==='others'?all.slice(5):all,tot=base.reduce((s,x)=>s+x.v,0),sv=S.bsort;
+  const list=[...base].sort((a,b)=>{const d=sv.k==='name'?CAT[a.id].n.localeCompare(CAT[b.id].n):a.v-b.v;return sv.d==='asc'?d:-d});
+  const sb=(k,l)=>`<button class="sortb ${sv.k===k?'on':''}" data-a="bsort" data-v="${k}" aria-label="Sort by ${l}${sv.k===k?(sv.d==='asc'?', low to high':', high to low'):''}">${l}${sv.k===k?I(sv.d==='asc'?'up':'down',14):''}</button>`;
+  return headBar(v.mode==='others'?'Others':'Spend categories',esc(r.label))+`<div class="sbody">
+   <div class="sheadrow">${v.mode==='others'?'':periodChip()}<button class="fbtn" data-a="cats">${I('trend',16)} Category trends</button></div>
+   <div class="hero"><small>Total spend</small>${heroAmt(tot)}</div>
+   <div class="sortbar" role="group" aria-label="Sort categories">${sb('name','Name')}${sb('amt','Spend')}</div>
+   <div class="rows">${list.length?list.map(x=>catTile(x,tot)).join(''):'<div class="empty"><b>No transactions</b></div>'}</div></div>`}
+const shareP=(v,t,l='spend')=>{const p=v/(t||1)*100;return(p>0&&p<1?'<1':Math.round(p))+'% of '+l};
+function rkRow(a,v,ic,name,amt,w,col,meta,share){const tag=a?'button':'div';return`<${tag} class="row rk"${a?` data-a="${a}" data-v="${v}"`:''}>${ic}<span style="min-width:0"><span class="l1"><span class="nm">${name}</span><span class="amt">${amt}</span></span>${w==null?'':`<span class="bar"><i style="width:${w}%;background:${col}"></i></span>`}<span class="l2"><span>${meta}</span><span>${share}</span></span></span></${tag}>`}
+const txns=n=>`${n} transaction${n===1?'':'s'}`;
+function brandRows(list,tot,showCat){const top=Math.max(1,...list.map(x=>x.v));
+  return list.map((x,i)=>rkRow('mer',esc(x.id),mark(x.id),esc(x.id),n0(x.v),(x.v/top*100).toFixed(1),hue(CAT[MER[x.id].cat]),showCat?esc(CAT[MER[x.id].cat].n):txns(x.n),showCat?shareP(x.v,tot):shareP(x.v,tot,esc(CAT[MER[x.id].cat].n)))).join('')}
+function viewCats(v){const r=resolve(),F=S.f.cats,all0=rankCats(r.a,r.b),all=v.others?all0.slice(5):all0;let list=all.filter(x=>!F.cats.length||F.cats.includes(x.id));
+  const tot=list.reduce((s,x)=>s+x.v,0),top=Math.max(1,...list.map(x=>x.v)),sv=S.bsort;list=[...list].sort((a,b)=>{const d=sv.k==='name'?CAT[a.id].n.localeCompare(CAT[b.id].n):a.v-b.v;return sv.d==='asc'?d:-d});
+  const sb=(k,l)=>`<button class="sortb ${sv.k===k?'on':''}" data-a="bsort" data-v="${k}" aria-label="Sort by ${l}${sv.k===k?(sv.d==='asc'?', low to high':', high to low'):''}">${l}${sv.k===k?I(sv.d==='asc'?'up':'down',14):''}</button>`;
+  return headBar(v.others?'Others':'Category trends',v.others?esc(r.label):'')+`<div class="sbody"><div class="sheadrow">${v.others?'':periodChip()}</div><div class="hero"><small>${v.others?`${all.length} smaller categories`:'Spending'}${F.cats.length?` · ${F.cats.length} of ${all.length} categories`:''}</small>${heroAmt(tot)}</div>
+   <div class="tools"><div class="sortbar" role="group" aria-label="Sort categories" style="flex:1">${sb('amt','Spend')}${sb('name','Name')}</div>${fbtn('cats')}</div>
+   <div class="sec"><h2>Top categories</h2></div>
+   <div class="rows">${list.length?list.map(x=>{const c=CAT[x.id];return rkRow('catbrands',x.id,catIc(c),esc(c.n),n0(x.v),(x.v/top*100).toFixed(1),hue(c),txns(x.n),shareP(x.v,tot))}).join(''):`<div class="empty"><b>No categories match</b><button class="link" data-a="freset2" data-v="cats" style="margin:0 auto">Clear filters</button></div>`}</div>
+   ${(()=>{const ids=list.map(x=>x.id),tb=rankMer(r.a,r.b,t=>ids.includes(catOf(t))).slice(0,3);return tb.length?`<div><div class="sec"><h2>Top brands</h2><button class="link" data-a="brands">View all brands</button></div><div class="rows">${brandRows(tb,tot,true)}</div></div>`:''})()}</div>`}
+function dailySvg(r,f,sel){const W=340,H=150,L=4,R=34,T=16,B=24,stop=r.cur?sod(TODAY):r.b,n=Math.round((stop-r.a)/DAY)+1,vals=[];
+  for(let i=0;i<n;i++){const d0=new Date(r.a.getTime()+i*DAY);vals.push(sum(txIn(d0,d0,f)))}
+  const mx=niceMax(Math.max(1,...vals)),Y=v=>T+(1-v/mx)*(H-T-B),slot=(W-L-R)/n,bw=Math.max(2,slot*.66);
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Spend per day">`;[0,mx/2,mx].forEach(v=>{s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${W-R+6}" y="${Y(v)+4}" font-size="11" fill="var(--ink2)">${kfmt(v)}</text>`});
+  vals.forEach((v,i)=>{const x=L+i*slot+(slot-bw)/2,y=Y(v),h=Y(0)-y,on=sel===i;if(h>0)s+=`<rect x="${x}" y="${y}" width="${bw}" height="${h}" rx="${Math.min(3,bw/2)}" fill="${on?'var(--p)':sel==null?'var(--p)':'var(--n300)'}" opacity="${sel==null?.85:1}"/>`;
+    s+=`<rect x="${L+i*slot}" y="0" width="${slot}" height="${H}" fill="transparent" data-a="bday" data-v="${i}" style="cursor:pointer"><title>${fd(new Date(r.a.getTime()+i*DAY))}: ${aed(v)}</title></rect>`});
+  s+=`<text x="${L}" y="${H-6}" font-size="11" fill="var(--ink2)">${fd(r.a)}</text><text x="${W-R}" y="${H-6}" font-size="11" fill="var(--ink2)" text-anchor="end">${fd(stop)}</text>`;
+  return s+'</svg>'}
+function viewBrands(v){const r=resolve(),F=S.f.brands,sc=v.cat,f=t=>(!sc||catOf(t)===sc)&&fpass(t,F);const day=v.day!=null?new Date(r.a.getTime()+v.day*DAY):null;
+  const L=day?txIn(day,day,f):txIn(r.a,r.b,f),tot=sum(L),m={};L.forEach(t=>{(m[t.m]=m[t.m]||{v:0,n:0});m[t.m].v+=t.a;m[t.m].n++});const mers=Object.entries(m).map(([id,x])=>({id,...x})).sort((a,b)=>b.v-a.v);
+  const c=sc&&CAT[sc];
+  return headBar(c?`<span class="idrow">${catIc(c)}<span>${esc(c.n)} brands</span></span>`:'Brand trends','')+`<div class="sbody"><div class="sheadrow">${periodChip()}${c?`<button class="fchip" aria-pressed="true" data-a="unscopeb" aria-label="Show brands in all categories">${esc(c.n)} ${I('x',14)}</button>`:''}</div>
+   <div class="hero"><small>${day?`Spending on ${fdy(day)}`:c?`Spending on ${esc(c.n)}`:'Spending'}</small>${bigAmt(tot)}</div>
+   ${c?`<div class="seg" role="group" aria-label="Chart"><button data-a="cmode" data-v="day" aria-pressed="${(v.cm||'day')==='day'}">By day</button><button data-a="cmode" data-v="month" aria-pressed="${v.cm==='month'}">By month</button></div>`:''}
+   ${c&&v.cm==='month'?(()=>{const off=r.kind==='cyc'?r.off:0,items=sixCycles(off,f),si=items.findIndex(x=>x.key===off),fl=items.filter(x=>!x.partial&&x.key!==off),avg=fl.length?fl.reduce((a,x)=>a+x.v,0)/fl.length:0;return`<div>${barsSvg(items,si,avg,{act:'gocycs',aria:'Spend by month'})}<div class="legend"><span><i style="background:var(--p)"></i>Selected</span>${avg?`<span><i class="dash" style="border-color:var(--ink)"></i>Average ${aed(avg)}</span>`:''}<span>Tap a month to open it</span></div></div>`})()
+   :`<div>${dailySvg(r,f,v.day)}<div class="legend"><span>Spend per day.</span><span>${day?'Tap the day again to see all days':'Tap a day to see its brands'}</span></div></div>`}
+   <div class="tools"><div style="flex:1"><h2 style="font-size:17px;margin:0">Top brands</h2><span class="count">${mers.length} brand${mers.length===1?'':'s'}</span></div>${fbtn('brands')}</div>
+   <div class="rows">${mers.length?brandRows(mers,tot,!c):`<div class="empty"><b>No brands match</b><button class="link" data-a="freset2" data-v="brands" style="margin:0 auto">Clear filters</button></div>`}</div>${c&&L.length?`<button class="more" data-a="allcat" data-v="${sc}">${L.length===1?`See the ${esc(c.n)} transaction`:`See all ${L.length} ${esc(c.n)} transactions`}</button>`:''}</div>`}
+function viewFilter(v){const d=v.d,q=(v.q||'').toLowerCase(),cats=CATS.filter(c=>!q||c.n.toLowerCase().includes(q));
+  return headBar('Filters')+`<div class="sbody"><label class="search" for="fs">${I('search',18)}<input id="fs" type="search" placeholder="Search categories" value="${esc(v.q||'')}" autocomplete="off"></label>
+   <div><span class="lbl">Categories</span><div class="group" role="group" aria-label="Categories" id="fcats">${cats.map(c=>`<button class="check" role="checkbox" aria-checked="${d.cats.includes(c.id)}" data-a="fcat" data-v="${c.id}">${catIc(c)}<span>${esc(c.n)}</span><span class="box">${d.cats.includes(c.id)?I('check',14):''}</span></button>`).join('')||'<div class="empty">No categories match</div>'}</div></div>
+   ${v.t!=='cats'?`<div><span class="lbl">Tags</span><div class="chips" role="group" aria-label="Tags">${allTags().map(x=>`<button class="fchip" data-a="ftag" data-v="${esc(x)}" aria-pressed="${d.tags.includes(x)}">${esc(x)}</button>`).join('')}</div></div>`:''}</div>
+   <div class="sfoot"><div class="foot2"><button class="btn2" data-a="freset">Reset</button><button class="btn" data-a="fapply">Apply</button></div></div>`}
+function viewAll(v){const r=resolve(),q=S.q.trim().toLowerCase(),F=S.f.all,sc=v.cat;
+  let list=txIn(r.a,r.b,t=>(!sc||catOf(t)===sc)&&fpass(t,F)&&(!S.repOnly||statusOf(t))&&(!q||t.m.toLowerCase().includes(q)||CAT[catOf(t)].n.toLowerCase().includes(q)));
+  if(S.sortAll==='amt')list=[...list].sort((a,b)=>b.a-a.a);
+  const lim=v.lim||30,base0=txIn(r.a,r.b,t=>!sc||catOf(t)===sc).length;
+  return headBar('Transactions','')+`<div class="sbody"><div class="sheadrow">${periodChip()}<button class="fbtn" data-a="cats">${I('trend',16)} Trends</button>${sc?`<button class="fchip" aria-pressed="true" data-a="unscope" aria-label="Remove filter ${esc(CAT[sc].n)}">${esc(CAT[sc].n)} ${I('x',14)}</button>`:''}</div>${base0?`<div class="hero"><small>${list.length} transaction${list.length===1?'':'s'}</small>${bigAmt(sum(list))}</div>`:''}
+   ${base0?`<label class="search" for="q">${I('search',18)}<input id="q" type="search" placeholder="Search brand or category" value="${esc(S.q)}" autocomplete="off" enterkeyhint="search"></label>
+   <div class="tools"><div class="seg" role="group" aria-label="Sort by"><button data-a="sorta" data-v="date" aria-pressed="${S.sortAll==='date'}">Date</button><button data-a="sorta" data-v="amt" aria-pressed="${S.sortAll==='amt'}">Amount</button></div>${fbtn('all')}</div>
+   <button class="sw" role="switch" aria-checked="${S.repOnly}" data-a="reponly"><span class="tr"></span>Reported only</button>`:''}
+   <div class="rows" id="alllist">${allRows(list.slice(0,lim))}</div>${list.length>lim?`<button class="more" data-a="loadmore">Load more · ${list.length-lim} left</button>`:''}</div>`}
+function allRows(list){if(!list.length&&!S.repOnly&&!S.q&&!S.f.all.cats.length&&!S.f.all.tags.length)return'<div class="empty"><b>No transactions</b>There are no transactions in this period.</div>';if(!list.length)return S.repOnly?'<div class="empty"><b>No reported transactions in this period</b>Turn off Reported only to see all transactions.</div>':'<div class="empty"><b>No results</b>Try another search, or clear filters.</div>';
+  if(S.sortAll==='amt')return list.map(t=>txRow(t,true)).join('');
+  let h='',last='';list.forEach(t=>{const k=fdy(t.d);if(k!==last){h+=`<div class="day">${t.d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</div>`;last=k}h+=txRow(t,true)});return h}
+const PRESETS=[['cyc0','This month'],['cyc1','Last month'],['last3','Last 3 months'],['last6','Last 6 months']];
+const presetPeriod=k=>k==='cyc0'?{k:'cyc',off:0}:k==='cyc1'?{k:'cyc',off:-1}:k==='last3'?{k:'last',n:3}:{k:'last',n:6};
+const presetDates=k=>{const r=resolve(presetPeriod(k));return[sod(r.a),sod(r.b)]};
+function viewPeriod(v){const d=v.draft,y=d.vm.getFullYear(),m=d.vm.getMonth(),first=(new Date(y,m,1).getDay()+6)%7,days=dim(y,m),minD=cycle(MINOFF).a;
+  let cal='';['M','T','W','T','F','S','S'].forEach(x=>cal+=`<span class="wd">${x}</span>`);for(let i=0;i<first;i++)cal+='<span></span>';
+  for(let i=1;i<=days;i++){const dt=new Date(y,m,i),dis=dt>sod(TODAY)||dt<minD;let cls='';if(d.s&&dt.getTime()===d.s.getTime())cls='s';if(d.e&&dt.getTime()===d.e.getTime())cls+=' e';if(d.s&&d.e&&dt>d.s&&dt<d.e)cls+=' in';if(dt.getTime()===sod(TODAY).getTime())cls+=' today';
+    cal+=`<button class="${cls}" data-a="day" data-v="${dt.getTime()}" ${dis?'disabled':''} aria-label="${fdy(dt)}${cls.includes('s')?', start date':''}${cls.includes(' e')?', end date':''}"><span>${i}</span></button>`}
+  const nd=d.s&&d.e?Math.round((d.e-d.s)/DAY)+1:d.s?1:0,minM=new Date(minD.getFullYear(),minD.getMonth(),1);
+  const label=d.s&&d.e&&d.e.getTime()!==d.s.getTime()?`Show ${fd(d.s)} to ${fdy(d.e)}`:d.s?`Show ${fdy(d.s)} only`:'Choose a start date';
+  return headBar('Choose dates')+`<div class="sbody">
+   <div class="chips" role="group" aria-label="Quick periods">${PRESETS.map(p=>`<button class="fchip" data-a="pp" data-v="${p[0]}" aria-pressed="${d.k===p[0]}">${p[1]}</button>`).join('')}</div>
+   <div class="rf"><button class="${d.next!=='e'?'cur':''}" data-a="fld" data-v="s" aria-pressed="${d.next!=='e'}"><small>Start date</small><b class="${d.s?'':'ph'}">${d.s?fdy(d.s):'Choose'}</b></button><span aria-hidden="true">${I('chevR',16)}</span><button class="${d.next==='e'?'cur':''}" data-a="fld" data-v="e" aria-pressed="${d.next==='e'}"><small>End date</small><b class="${d.e?'':'ph'}">${d.e?fdy(d.e):'Choose'}</b></button></div>
+   <p class="step" role="status">${d.next==='e'?(d.s?`Now tap the end date. Start: ${fd(d.s)}`:'Tap the start date'):d.s&&d.e?`${fd(d.s)} to ${fd(d.e)} · ${nd} day${nd>1?'s':''}. Tap a date to start again.`:'Tap the start date'}</p>
+   <div><div class="calh"><button data-a="calm" data-v="-1" aria-label="Previous month" ${d.vm<=minM?'disabled':''}>${I('chevL',20)}</button><b>${MONL[m]} ${y}</b><button data-a="calm" data-v="1" aria-label="Next month" ${y===TODAY.getFullYear()&&m===TODAY.getMonth()?'disabled':''}>${I('chevR',20)}</button></div><div class="cal">${cal}</div></div>
+   <div><span class="lbl">My month starts on</span><button class="msrow" data-a="payday"><span>${S.startDay===1?'Day 1 (calendar month)':`Day ${S.startDay} · salary day`}</span><span>Change ${I('chevR',16)}</span></button>
+   <p class="hint" style="margin-top:6px">${S.startDay===1?`We found your salary around the ${ord(DETECTED.day)}. Start your month on that day so money in and out line up.`:'Cashflow and Expenses both use this day.'}</p></div>
+  </div><div class="sfoot"><button class="btn" data-a="applyp" ${d.s?'':'disabled'}>${label}</button></div>`}
+const DETECTED={day:25,from:'Your employer',months:6};
+const ord=n=>n+(n%10===1&&n!==11?'st':n%10===2&&n!==12?'nd':n%10===3&&n!==13?'rd':'th');
+function viewPayday(v){const sel=v.sel,det=DETECTED.day;
+  return headBar('Salary day')+`<div class="sbody">
+   <div class="found"><span class="ic" style="background:var(--tint);color:var(--p-text);flex:none">${I('cal')}</span><span><b>We found your salary around the ${ord(det)}</b>${esc(DETECTED.from)} paid you on or near this day in ${DETECTED.months} of the last 6 months. If this is wrong, choose the right day.</span></div>
+   <div><span class="lbl" id="pd-l">My salary arrives on</span><div class="days" role="group" aria-labelledby="pd-l">${Array.from({length:31},(_,i)=>i+1).map(d=>`<button data-a="pdday" data-v="${d}" aria-pressed="${d===sel}" class="${d===det&&d!==sel?'det':''}" aria-label="Day ${d}${d===det?', detected':''}">${d}</button>`).join('')}</div>
+   <p class="hint" style="margin-top:8px">The dashed day is the one we found. In short months we use the last day.</p></div>
+   <button class="sw" role="switch" aria-checked="${v.start}" data-a="pdstart"><span class="tr"></span>Start my month on my salary day</button></div>
+   <div class="sfoot"><button class="btn" data-a="pdsave">Save</button></div>`}
+const VIEWS={breakdown:viewBreakdown,payday:viewPayday,cat:viewCat,mer:viewMer,tx:viewTx,pickcat:viewPickCat,report:viewReport,all:viewAll,period:viewPeriod,cats:viewCats,brands:viewBrands,filter:viewFilter};
+
+/* ---------- sheet control ---------- */
+let lastFocus=null;
+function renderSheet(keepScroll){const top=S.stack[S.stack.length-1];if(!top){sheet.classList.remove('on');scrim.classList.remove('on');setTimeout(()=>{if(!S.stack.length)sheet.innerHTML=''},280);return}
+  const sb=sheet.querySelector('.sbody'),y=keepScroll&&sb?sb.scrollTop:0;
+  sheet.innerHTML=VIEWS[top.v](top);sheet.classList.add('on');scrim.classList.add('on');
+  const nb=sheet.querySelector('.sbody');if(nb)nb.scrollTop=y;}
+function push(v){if(!S.stack.length)lastFocus=document.activeElement;S.stack.push(v);renderSheet();focusSheet()}
+function focusSheet(){setTimeout(()=>{const b=sheet.querySelector('.shead .hb');b&&b.focus({preventScroll:true})},60)}
+function closeSheet(){S.stack=[];S.q='';renderSheet();if(lastFocus&&lastFocus.focus)lastFocus.focus({preventScroll:true})}
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),1800)}
+const top=()=>S.stack[S.stack.length-1];
+function loadMain(){S.dsel=null;S.loading=true;renderMain();clearTimeout(loadMain.t);loadMain.t=setTimeout(()=>{S.loading=false;renderMain()},380)}
+function render(){theme();renderMain();if(S.stack.length)renderSheet(true)}
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el||el.disabled)return;const a=el.dataset.a,v=el.dataset.v;
+  const tp=top();
+  switch(a){
+   case'prev':S.period={k:'cyc',off:Math.max(MINOFF,resolve().off-1)};S.allCats=false;loadMain();break;
+   case'next':S.period={k:'cyc',off:Math.min(0,resolve().off+1)};S.allCats=false;loadMain();break;
+   case'tab':S.tab=v;S.dsel=null;S.allCats=false;renderMain();break;
+   case'allcats':S.allCats=!S.allCats;renderMain();break;
+   case'gocyc':S.period={k:'cyc',off:+v};loadMain();break;
+   case'cat':push({v:'cat',id:v,off:resolve().kind==='cyc'?resolve().off:-1});break;
+   case'mer':push({v:'mer',id:v,off:tp&&tp.off!=null?tp.off:(resolve().kind==='cyc'?resolve().off:-1)});break;
+   case'tx':push(openTx(v));break;
+   case'all':S.q='';push({v:'all'});break;
+   case'period':{const p=S.period,r=resolve(),k=p.k==='cyc'?(p.off===0?'cyc0':p.off===-1?'cyc1':'range'):p.k==='last'?'last'+p.n:'range',s=sod(r.a),e=sod(r.b);push({v:'period',draft:{k,s,e,next:'s',vm:new Date(s.getFullYear(),s.getMonth(),1)}});break;}
+   case'pp':{const d=tp.draft,[a,b]=presetDates(v);d.k=v;d.s=a;d.e=b;d.next='s';d.vm=new Date(a.getFullYear(),a.getMonth(),1);renderSheet(true);break;}
+   case'fld':tp.draft.next=v;renderSheet(true);break;
+   case'calm':{const vm=tp.draft.vm;tp.draft.vm=new Date(vm.getFullYear(),vm.getMonth()+(+v),1);renderSheet(true);break;}
+   case'day':{const d=tp.draft,dt=new Date(+v);d.k='range';if(d.next==='e'&&d.s){if(dt<d.s)d.s=dt;else{d.e=dt;d.next='s'}}else{d.s=dt;d.e=null;d.next='e'}renderSheet(true);break;}
+   case'selcyc':tp.off=+v;renderSheet(true);break;
+   case'sub':tp.sub=v;renderSheet(true);break;
+   case'back':S.stack.pop();renderSheet();focusSheet();break;
+   case'close':closeSheet();break;
+   case'pickcat':push({v:'pickcat',id:v,cur:tp.d?tp.d.cat:null});break;
+   case'setcat':{const[id,c]=v.split('|');S.stack.pop();const tv=top();if(tv&&tv.v==='tx')tv.d.cat=c;renderSheet();break;}
+   case'tag':case'untag':{const a0=tp.d.tags.filter(y=>y!==v);if(a==='tag')a0.push(v);tp.d.tags=a0;renderSheet(true);break;}
+   case'report':push({v:'report',id:v});break;
+   case'rstep':push({v:'report',id:tp.id,step:v});break;
+   case'rcat':tp.val=v;renderSheet(true);break;
+   case'rsubmit':{const id=tp.id;S.over[id]={...(S.over[id]||{}),rep:v,status:'reported'};while(top()&&top().v==='report')S.stack.pop();renderSheet();renderMain();toast('Report sent. We will update you here.');break;}
+   case'unreport':{delete S.over[v].rep;delete S.over[v].status;renderSheet(true);renderMain();toast('Report cancelled');break;}
+   case'payday':push({v:'payday',sel:S.payday,start:true});break;
+   case'pdday':tp.sel=+v;renderSheet(true);break;
+   case'pdstart':tp.start=!tp.start;renderSheet(true);break;
+   case'pdsave':{S.payday=tp.sel;S.suggest=false;if(tp.start)S.startDay=tp.sel;S.stack.pop();const pv=top();if(pv&&pv.draft)pv.draft.sd=S.startDay;renderSheet();loadMain();toast(`Salary day set to the ${ord(tp.sel)}${tp.start?'. Your month starts on that day.':''}`);break;}
+   case'cats':push({v:'cats'});break;
+   case'catbrands':push({v:'brands',cat:v});break;
+   case'cmode':tp.cm=v;tp.day=null;renderSheet(true);break;
+   case'gocycs':S.period={k:'cyc',off:+v};loadMain();renderSheet(true);break;
+   case'unscopeb':tp.cat=null;tp.day=null;renderSheet(true);break;
+   case'dseg':if(v==='others')push({v:'cats',others:true});else push({v:'brands',cat:v});break;
+   case'dclear':S.dsel=null;renderMain();break;
+   case'mini':S.mini=!S.mini;renderMain();if(S.stack.length)renderSheet(true);break;
+   case'others':push({v:'cats',others:true});break;
+   case'breakdown':push({v:'cats'});break;
+   case'bsort':S.bsort=S.bsort.k===v?{k:v,d:S.bsort.d==='asc'?'desc':'asc'}:{k:v,d:v==='name'?'asc':'desc'};renderSheet(true);break;
+   case'allcat':push({v:'all',cat:v});break;
+   case'unscope':tp.cat=null;renderSheet(true);break;
+   case'loadmore':tp.lim=(tp.lim||30)+30;renderSheet(true);break;
+   case'rbpick':tp.val=v;renderSheet(true);break;
+   case'txsave':{const t=TXI[tp.id],d=tp.d,o={...(S.over[t.id]||{})};if(d.cat!==t.cat)o.cat=d.cat;else delete o.cat;o.tags=[...d.tags];o.note=d.note;S.over[t.id]=o;renderMain();renderSheet(true);toast('Saved');break;}
+   case'brands':push({v:'brands'});break;
+   case'filter':push({v:'filter',t:v,d:JSON.parse(JSON.stringify(S.f[v]))});break;
+   case'fcat':{const a=tp.d.cats,i=a.indexOf(v);i>=0?a.splice(i,1):a.push(v);renderSheet(true);break;}
+   case'ftag':{const a=tp.d.tags,i=a.indexOf(v);i>=0?a.splice(i,1):a.push(v);renderSheet(true);break;}
+   case'freset':tp.d={cats:[],tags:[]};tp.q='';renderSheet(true);break;
+   case'fapply':{S.f[tp.t]=tp.d;S.stack.pop();renderSheet();toast('Filters applied');break;}
+   case'freset2':S.f[v]={cats:[],tags:[]};renderSheet(true);break;
+   case'sortc':S.sortCats=v;renderSheet(true);break;
+   case'sorta':S.sortAll=v;renderSheet(true);break;
+   case'reponly':S.repOnly=!S.repOnly;renderSheet(true);break;
+   case'bday':tp.day=tp.day===+v?null:+v;renderSheet(true);break;
+   case'applyp':{const d=tp.draft;
+     S.period=['cyc0','cyc1','last3','last6'].includes(d.k)?presetPeriod(d.k):{k:'range',a:d.s,b:d.e||d.s};
+     S.allCats=false;S.stack.pop();if(S.stack.length){renderSheet();loadMain()}else{closeSheet();loadMain()}break;}
+  }
+});
+scrim.addEventListener('click',closeSheet);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&S.stack.length){if(S.stack.length>1){S.stack.pop();renderSheet();focusSheet()}else closeSheet()}});
+document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;const tmp=document.createElement('div');tmp.innerHTML=viewAll(top());document.getElementById('alllist').innerHTML=tmp.querySelector('#alllist').innerHTML;const h=document.querySelector('#sheet .hero');if(h)h.innerHTML=tmp.querySelector('.hero').innerHTML}
+  if(e.target.id==='fs'){top().q=e.target.value;const tmp=document.createElement('div');tmp.innerHTML=viewFilter(top());document.getElementById('fcats').innerHTML=tmp.querySelector('#fcats').innerHTML}
+  if(e.target.id==='rb'){top().val=e.target.value.trim();document.getElementById('rbsend').disabled=!top().val;document.getElementById('rbsug').innerHTML=brandSug(top().val,TXI[top().id].m)}
+  if(e.target.id==='note'){const tv=top();tv.d.note=e.target.value;const b=document.getElementById('txsave');if(b)b.disabled=!txDirty(tv)}});
+document.addEventListener('change',e=>{if(e.target.id==='rl'&&e.target.files&&e.target.files[0]){const fr=new FileReader();fr.onload=()=>{top().img=fr.result;renderSheet(true)};fr.readAsDataURL(e.target.files[0]);return}if(e.target.id==='sday'&&top()&&top().draft){top().draft.sd=+e.target.value;const old=S.startDay;S.startDay=+e.target.value;renderSheet(true);S.startDay=old;}});
+// swipe down on grab area closes or goes back
+(function(){let y0=null;sheet.addEventListener('pointerdown',e=>{if(e.target.closest('.grab,.shead')&&!e.target.closest('button'))y0=e.clientY});
+  sheet.addEventListener('pointerup',e=>{if(y0!=null&&e.clientY-y0>60)closeSheet();y0=null});})();
+
+/* ---------- language: Spanish / Portuguese for the LatAm markets ---------- */
+(function(){const L=CFG.lang;if(L!=='es'&&L!=='pt')return;const es=L==='es';
+const X=es?{
+ 'Expenses':'Gastos','Your bank':'Tu banco','Lune SDK below':'Lune SDK abajo','Where it went':'En qué gastaste','Categories':'Categorías','Brands':'Marcas',
+ 'Tap a category to see its brands.':'Toca una categoría para ver sus marcas.','Others':'Otras','Other brands':'Otras marcas','Spent':'Gastado','Spend':'Gasto','Spending':'Gastos',
+ 'Bank content slot':'Espacio para el banco','The bank can show its own view here, for example card offers. It is optional.':'El banco puede mostrar aquí su propio contenido, por ejemplo ofertas de tarjeta. Es opcional.',
+ 'Transactions':'Transacciones','Transaction':'Transacción','View all':'Ver todo','View all brands':'Ver todas las marcas','Transfers between your own accounts are not counted as spend.':'Las transferencias entre tus propias cuentas no cuentan como gasto.',
+ 'This month':'Este mes','Last month':'Mes pasado','Last 3 months':'Últimos 3 meses','Last 6 months':'Últimos 6 meses','This period':'Este período','Previous period':'Período anterior','Today':'Hoy',
+ 'Category':'Categoría','Card':'Tarjeta','Location':'Ubicación','Raw transaction':'Transacción original','Raw transaction:':'Transacción original:','Tags':'Etiquetas','Notes':'Notas','Tap to add notes':'Toca para añadir notas',
+ 'No changes to save':'No hay cambios','Save changes':'Guardar cambios','Save':'Guardar','Saved':'Guardado','Report a problem':'Reportar un problema','Work':'Trabajo','Family':'Familia','Trip':'Viaje','Shared':'Compartido','Gift':'Regalo',
+ 'Pending':'Pendiente','Updated':'Actualizado','Report closed':'Reporte cerrado','Report cancelled':'Reporte cancelado','Report sent. We will update you here.':'Reporte enviado. Te avisaremos aquí.','Cancel report':'Cancelar reporte',
+ 'What is wrong with this transaction?':'¿Qué está mal en esta transacción?','Wrong brand name':'Nombre de marca incorrecto','Wrong category':'Categoría incorrecta','Wrong logo':'Logo incorrecto','I do not recognise this':'No reconozco este cargo','Everything looks right':'Todo está bien',
+ 'Correct brand name':'Nombre correcto de la marca','Brand name':'Nombre de la marca','Send report':'Enviar reporte','Submit suggestion':'Enviar sugerencia','Submit category':'Enviar categoría','Submit logo':'Enviar logo','Add the correct logo':'Añade el logo correcto','PNG or JPG, square works best':'PNG o JPG, mejor cuadrado',
+ 'We send this to your bank to check. If you think someone used your card, block it in the bank app first.':'Lo enviamos a tu banco para revisarlo. Si crees que alguien usó tu tarjeta, bloquéala primero en la app del banco.',
+ 'Change category':'Cambiar categoría','Suggested category':'Categoría sugerida','Selected':'Seleccionada','Only this transaction changes. Tap Save to keep it. Your bank uses your choice to improve categories.':'Solo cambia esta transacción. Toca Guardar para conservarla. Tu banco usa tu elección para mejorar las categorías.',
+ 'Filters':'Filtros','Filters applied':'Filtros aplicados','Apply':'Aplicar','Reset':'Restablecer','Clear filters':'Quitar filtros','Reported only':'Solo reportadas','No results':'Sin resultados','Try another search, or clear filters.':'Prueba otra búsqueda o quita los filtros.',
+ 'No brands match':'Ninguna marca coincide','No categories match':'Ninguna categoría coincide','No transactions':'Sin transacciones','No transactions in this period':'No hay transacciones en este período','No transactions in this month':'No hay transacciones este mes','No reported transactions in this period':'No hay transacciones reportadas en este período',
+ 'Turn off Reported only to see all transactions.':'Desactiva Solo reportadas para ver todas las transacciones.','There are no transactions in this period.':'No hay transacciones en este período.','No spend':'Sin gastos','No spend in this month':'Sin gastos este mes','You have no spending in this period. Choose another period.':'No tienes gastos en este período. Elige otro período.',
+ 'Spend categories':'Categorías de gasto','Top brands':'Marcas principales','Top categories':'Categorías principales','Total spend':'Gasto total','Category trends':'Tendencias por categoría','Brand trends':'Tendencias por marca','By day':'Por día','By month':'Por mes','Spend by month':'Gasto por mes','Spend per day.':'Gasto por día.',
+ 'Tap a month to open it':'Toca un mes para abrirlo','Tap a day to see its brands':'Toca un día para ver sus marcas','Tap the day again to see all days':'Toca el día otra vez para ver todos','Amount':'Monto','Date':'Fecha','Name':'Nombre','Logo':'Logo',
+ 'Choose dates':'Elegir fechas','Choose':'Elegir','Start date':'Fecha de inicio','End date':'Fecha final','Choose a start date':'Elige una fecha de inicio','Tap the start date':'Toca la fecha de inicio',
+ 'My month starts on':'Mi mes empieza el','Day 1 (calendar month)':'Día 1 (mes calendario)','Salary day':'Día de sueldo','My salary arrives on':'Mi sueldo llega el','Start my month on my salary day':'Empezar mi mes el día de sueldo','Cashflow and Expenses both use this day.':'Flujo de caja y Gastos usan este día.',
+ 'The dashed day is the one we found. In short months we use the last day.':'El día punteado es el que encontramos. En meses cortos usamos el último día.','Your employer':'Tu empleador',
+ 'Filter':'Filtrar','Trends':'Tendencias','Change':'Cambiar','Report transaction':'Reportar transacción','Tap to choose another image':'Toca para elegir otra imagen','Search brand or category':'Busca marca o categoría','Search categories':'Busca categorías',
+ 'Groceries':'Supermercado','Dining':'Restaurantes','Cafés':'Cafeterías','Shopping':'Compras','Transport':'Transporte','Fuel':'Combustible','Bills and utilities':'Servicios y facturas','Subscriptions':'Suscripciones','Health and fitness':'Salud y deporte',
+ 'Entertainment':'Entretenimiento','Travel':'Viajes','Education':'Educación','Financial services':'Servicios financieros','Loans':'Préstamos','Insurance':'Seguros','Government services':'Servicios públicos','Other':'Otros',
+}:{
+ 'Expenses':'Gastos','Your bank':'Seu banco','Lune SDK below':'Lune SDK abaixo','Where it went':'Para onde foi','Categories':'Categorias','Brands':'Marcas',
+ 'Tap a category to see its brands.':'Toque em uma categoria para ver as marcas.','Others':'Outras','Other brands':'Outras marcas','Spent':'Gasto','Spend':'Gasto','Spending':'Gastos',
+ 'Bank content slot':'Espaço do banco','The bank can show its own view here, for example card offers. It is optional.':'O banco pode mostrar seu próprio conteúdo aqui, por exemplo ofertas do cartão. É opcional.',
+ 'Transactions':'Transações','Transaction':'Transação','View all':'Ver tudo','View all brands':'Ver todas as marcas','Transfers between your own accounts are not counted as spend.':'Transferências entre suas próprias contas não contam como gasto.',
+ 'This month':'Este mês','Last month':'Mês passado','Last 3 months':'Últimos 3 meses','Last 6 months':'Últimos 6 meses','This period':'Este período','Previous period':'Período anterior','Today':'Hoje',
+ 'Category':'Categoria','Card':'Cartão','Location':'Local','Raw transaction':'Transação original','Raw transaction:':'Transação original:','Tags':'Etiquetas','Notes':'Notas','Tap to add notes':'Toque para adicionar notas',
+ 'No changes to save':'Nenhuma alteração','Save changes':'Salvar alterações','Save':'Salvar','Saved':'Salvo','Report a problem':'Relatar um problema','Work':'Trabalho','Family':'Família','Trip':'Viagem','Shared':'Compartilhado','Gift':'Presente',
+ 'Pending':'Pendente','Updated':'Atualizado','Report closed':'Relato encerrado','Report cancelled':'Relato cancelado','Report sent. We will update you here.':'Relato enviado. Avisaremos você aqui.','Cancel report':'Cancelar relato',
+ 'What is wrong with this transaction?':'O que está errado nesta transação?','Wrong brand name':'Nome da marca errado','Wrong category':'Categoria errada','Wrong logo':'Logo errado','I do not recognise this':'Não reconheço esta compra','Everything looks right':'Está tudo certo',
+ 'Correct brand name':'Nome correto da marca','Brand name':'Nome da marca','Send report':'Enviar relato','Submit suggestion':'Enviar sugestão','Submit category':'Enviar categoria','Submit logo':'Enviar logo','Add the correct logo':'Adicione o logo correto','PNG or JPG, square works best':'PNG ou JPG, de preferência quadrado',
+ 'We send this to your bank to check. If you think someone used your card, block it in the bank app first.':'Enviamos isso ao seu banco para verificação. Se acha que alguém usou seu cartão, bloqueie-o primeiro no app do banco.',
+ 'Change category':'Mudar categoria','Suggested category':'Categoria sugerida','Selected':'Selecionada','Only this transaction changes. Tap Save to keep it. Your bank uses your choice to improve categories.':'Só esta transação muda. Toque em Salvar para manter. Seu banco usa sua escolha para melhorar as categorias.',
+ 'Filters':'Filtros','Filters applied':'Filtros aplicados','Apply':'Aplicar','Reset':'Redefinir','Clear filters':'Limpar filtros','Reported only':'Só relatadas','No results':'Sem resultados','Try another search, or clear filters.':'Tente outra busca ou limpe os filtros.',
+ 'No brands match':'Nenhuma marca encontrada','No categories match':'Nenhuma categoria encontrada','No transactions':'Sem transações','No transactions in this period':'Nenhuma transação neste período','No transactions in this month':'Nenhuma transação neste mês','No reported transactions in this period':'Nenhuma transação relatada neste período',
+ 'Turn off Reported only to see all transactions.':'Desative Só relatadas para ver todas as transações.','There are no transactions in this period.':'Não há transações neste período.','No spend':'Sem gastos','No spend in this month':'Sem gastos neste mês','You have no spending in this period. Choose another period.':'Você não tem gastos neste período. Escolha outro período.',
+ 'Spend categories':'Categorias de gasto','Top brands':'Principais marcas','Top categories':'Principais categorias','Total spend':'Gasto total','Category trends':'Tendências por categoria','Brand trends':'Tendências por marca','By day':'Por dia','By month':'Por mês','Spend by month':'Gasto por mês','Spend per day.':'Gasto por dia.',
+ 'Tap a month to open it':'Toque em um mês para abrir','Tap a day to see its brands':'Toque em um dia para ver as marcas','Tap the day again to see all days':'Toque no dia de novo para ver todos','Amount':'Valor','Date':'Data','Name':'Nome','Logo':'Logo',
+ 'Choose dates':'Escolher datas','Choose':'Escolher','Start date':'Data inicial','End date':'Data final','Choose a start date':'Escolha uma data inicial','Tap the start date':'Toque na data inicial',
+ 'My month starts on':'Meu mês começa no dia','Day 1 (calendar month)':'Dia 1 (mês do calendário)','Salary day':'Dia do salário','My salary arrives on':'Meu salário cai no dia','Start my month on my salary day':'Começar meu mês no dia do salário','Cashflow and Expenses both use this day.':'Fluxo de caixa e Gastos usam este dia.',
+ 'The dashed day is the one we found. In short months we use the last day.':'O dia tracejado é o que encontramos. Em meses curtos usamos o último dia.','Your employer':'Seu empregador',
+ 'Filter':'Filtrar','Trends':'Tendências','Change':'Alterar','Report transaction':'Relatar transação','Tap to choose another image':'Toque para escolher outra imagem','Search brand or category':'Busque marca ou categoria','Search categories':'Busque categorias',
+ 'Groceries':'Mercado','Dining':'Restaurantes','Cafés':'Cafeterias','Shopping':'Compras','Transport':'Transporte','Fuel':'Combustível','Bills and utilities':'Contas e serviços','Subscriptions':'Assinaturas','Health and fitness':'Saúde e academia',
+ 'Entertainment':'Entretenimento','Travel':'Viagens','Education':'Educação','Financial services':'Serviços financeiros','Loans':'Empréstimos','Insurance':'Seguros','Government services':'Serviços públicos','Other':'Outros',
+};
+const MF=['January','February','March','April','May','June','July','August','September','October','November','December'],MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MFL=es?['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']:['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const MSL=es?['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']:['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const cap=w=>w[0].toUpperCase()+w.slice(1);
+const W=es?{to:'al',tx:['transacción','transacciones'],of:'del gasto',more:['categoría más','categorías más'],moreB:['marca más','marcas más'],all:'Ver las',cats:'categorías',brands:'marcas',sofar:'Gastado hasta ahora',spentIn:'Gastado en',last:'Gastado en los últimos',months:'meses',avg:'Promedio',amonth:'al mes',
+  more2:'más que',less:'menos que',same:'Casi igual que',lm:'el mes pasado a esta fecha',lp:'el período anterior a esta fecha',avg6:'tu promedio de 6 meses',days:'día',daysP:'días',before:'los',dbefore:'días anteriores',from:'Gastado del',cash:'de cashback'}
+ :{to:'a',tx:['transação','transações'],of:'do gasto',more:['categoria a mais','categorias a mais'],moreB:['marca a mais','marcas a mais'],all:'Ver as',cats:'categorias',brands:'marcas',sofar:'Gasto até agora',spentIn:'Gasto em',last:'Gasto nos últimos',months:'meses',avg:'Média de',amonth:'por mês',
+  more2:'a mais que',less:'a menos que',same:'Quase igual a',lm:'o mês passado até hoje',lp:'o período anterior até hoje',avg6:'sua média de 6 meses',days:'dia',daysP:'dias',before:'os',dbefore:'dias anteriores',from:'Gasto de',cash:'de cashback'};
+const PW=w=>w==='last month by today'?W.lm:w==='last period by today'?W.lp:w==='your 6-month average'?W.avg6:w==='your average'?(es?'tu promedio':'sua média'):w.replace(/^the (\d+) days before$/,(_,n)=>es?`los ${n} días anteriores`:`os ${n} dias anteriores`);
+const WD=es?{Mon:'lun',Tue:'mar',Wed:'mié',Thu:'jue',Fri:'vie',Sat:'sáb',Sun:'dom'}:{Mon:'seg',Tue:'ter',Wed:'qua',Thu:'qui',Fri:'sex',Sat:'sáb',Sun:'dom'};
+const dmy=t=>t.replace(/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b(?=,? \d)/g,w=>cap(WD[w])).replace(/\b(\d{1,2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/g,(_,d,m)=>`${d} ${MSL[MS.indexOf(m)]}`)
+  .replace(/\b(January|February|March|April|May|June|July|August|September|October|November|December)\b/g,m=>cap(MFL[MF.indexOf(m)]))
+  .replace(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$/,m=>cap(MSL[MS.indexOf(m)]));
+const XC=w=>X[w]||w;
+const RX=[
+ [/^(Spent|Total spend|Spending) so far · (.+) to (.+)$/,(_,w,a,b)=>`${XC(w)} ${es?'hasta ahora':'até agora'} · ${dmy(a)} ${W.to} ${dmy(b)}`],
+ [/^Spent from (.+) to (.+) · (\d+) days?$/,(_,a,b,n)=>`${W.from} ${dmy(a)} ${W.to} ${dmy(b)} · ${n} ${n==='1'?W.days:W.daysP}`],
+ [/^Spent in the last (\d+) months$/,(_,n)=>`${W.last} ${n} ${W.months}`],
+ [/^(Spent|Total spend) in (.+)$/,(_,w,a)=>`${XC(w)} ${es?'en':'em'} ${dmy(a).toLowerCase()}`],
+ [/^Spending on (\d{1,2} \w{3} \d{4})$/,(_,a)=>`${es?'Gasto el':'Gasto em'} ${dmy(a)}`],
+ [/^Spending on (.+)$/,(_,a)=>`${es?'Gasto en':'Gasto em'} ${XC(a)}`],
+ [/^(.+?) · (\d+) of (\d+) categories$/,(_,h,n,m)=>`${tr(h)} · ${n} ${es?'de':'de'} ${m} ${W.cats}`],
+ [/^(\d+) smaller categories$/,(_,n)=>`${n} ${es?'categorías menores':'categorias menores'}`],
+ [/^Average (.+) a month$/,(_,a)=>`${W.avg} ${a} ${W.amonth}`],
+ [/^Average (.+)$/,(_,a)=>`${W.avg} ${a}`],
+ [/^(.+) more than (.+)$/,(_,a,w)=>`${a} ${W.more2} ${PW(w)}`],
+ [/^(.+) less than (.+)$/,(_,a,w)=>`${a} ${W.less} ${PW(w)}`],
+ [/^About the same as (.+)$/,(_,w)=>`${W.same} ${PW(w)}`],
+ [/^(\d+)% (above|below) (.+)$/,(_,n,d,w)=>es?`${n}% ${d==='above'?'por encima de':'por debajo de'} ${PW(w)}`:`${n}% ${d==='above'?'acima de':'abaixo de'} ${PW(w)}`],
+ [/^(\d+) transactions?$/,(_,n)=>`${n} ${n==='1'?W.tx[0]:W.tx[1]}`],
+ [/^(\d+) brands?$/,(_,n)=>`${n} ${n==='1'?(es?'marca':'marca'):W.brands}`],
+ [/^(<?\d+)% of spend$/,(_,n)=>`${n}% ${W.of}`],
+ [/^(<?\d+)% of (.+)$/,(_,n,c)=>`${n}% ${es?'de':'de'} ${XC(c)}`],
+ [/^(\d+) more categor(y|ies)$/,(_,n)=>`${n} ${n==='1'?W.more[0]:W.more[1]}`],
+ [/^(\d+) more brands?$/,(_,n)=>`${n} ${n==='1'?W.moreB[0]:W.moreB[1]}`],
+ [/^View all (\d+) (categories|brands)$/,(_,n,k)=>`${W.all} ${n} ${k==='categories'?W.cats:W.brands}`],
+ [/^See all (\d+) transactions$/,(_,n)=>es?`Ver las ${n} transacciones`:`Ver as ${n} transações`],
+ [/^See all (\d+) (.+) transactions$/,(_,n,c)=>es?`Ver las ${n} transacciones de ${XC(c)}`:`Ver as ${n} transações de ${XC(c)}`],
+ [/^See the (.+) transaction$/,(_,c)=>es?`Ver la transacción de ${XC(c)}`:`Ver a transação de ${XC(c)}`],
+ [/^(.+) brands$/,(_,c)=>X[c]?`${es?'Marcas de':'Marcas de'} ${X[c]}`:null],
+ [/^(.+) cashback earned$/,(_,a)=>`${a} ${es?'de cashback ganado':'de cashback ganho'}`],
+ [/^(.+) cashback$/,(_,a)=>`${a} ${W.cash}`],
+ [/^Updated by your bank: (.+)$/,(_,a)=>`${es?'Actualizado por tu banco':'Atualizado pelo seu banco'}: ${XC(a)}`],
+ [/^Pending review: (.+)$/,(_,a)=>`${es?'En revisión':'Em análise'}: ${XC(a)}`],
+ [/^Report closed: (.+)$/,(_,a)=>`${XC('Report closed')}: ${XC(a)}`],
+ [/^(.+) · sent to your bank$/,(_,a)=>`${XC(a)} · ${es?'enviado a tu banco':'enviado ao seu banco'}`],
+ [/^Day (\d+) · salary day$/,(_,n)=>es?`Día ${n} · día de sueldo`:`Dia ${n} · dia do salário`],
+ [/^We found your salary around the (\d+)(?:st|nd|rd|th)(\. Start your month on that day so money in and out line up\.)?$/,(_,n,more)=>(es?`Encontramos tu sueldo cerca del día ${n}`:`Encontramos seu salário perto do dia ${n}`)+(more?(es?'. Empieza tu mes ese día para que entradas y salidas coincidan.':'. Comece seu mês nesse dia para alinhar entradas e saídas.'):'')],
+ [/^(.+) paid you on or near this day in (\d+) of the last 6 months\. If this is wrong, choose the right day\.$/,(_,a,n)=>es?`${XC(a)} te pagó en este día o cerca en ${n} de los últimos 6 meses. Si no es correcto, elige el día correcto.`:`${XC(a)} pagou você neste dia ou perto dele em ${n} dos últimos 6 meses. Se estiver errado, escolha o dia certo.`],
+ [/^Salary day set to the (\d+)(?:st|nd|rd|th)(\. Your month starts on that day\.)?$/,(_,n,m)=>(es?`Día de sueldo: ${n}`:`Dia do salário: ${n}`)+(m?(es?'. Tu mes empieza ese día.':'. Seu mês começa nesse dia.'):'')],
+ [/^Load more · (\d+) left$/,(_,n)=>es?`Cargar más · quedan ${n}`:`Carregar mais · faltam ${n}`],
+];
+const cats=Object.keys(X).filter(k=>CATS.some(c=>c.n===k));
+function tr(t){const s=t.trim();if(!s)return t;if(X[s])return t.replace(s,X[s]);
+  for(const[r,f]of RX){const m=s.match(r);if(m){const v=f(...m);if(v!=null)return t.replace(s,v)}}
+  // "Category · 27 Jun" rows and bare dates
+  let o=s;cats.forEach(k=>{if(o.startsWith(k+' · '))o=X[k]+o.slice(k.length)});o=dmy(o);
+  return o===s?t:t.replace(s,o)}
+const seen=new WeakMap();
+function walk(root){const it=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=it.nextNode())){if(seen.get(n)===n.nodeValue)continue;const v=tr(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v;seen.set(n,n.nodeValue)}
+  root.querySelectorAll&&root.querySelectorAll('[placeholder]').forEach(e=>{const p=e.getAttribute('placeholder');const v=tr(p);if(v!==p)e.setAttribute('placeholder',v)})}
+document.documentElement.lang=L;
+new MutationObserver(ms=>{ms.forEach(m=>{if(m.type==='characterData'){const n=m.target;if(seen.get(n)!==n.nodeValue){const v=tr(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v;seen.set(n,n.nodeValue)}}else m.addedNodes.forEach(a=>{if(a.nodeType===3){const v=tr(a.nodeValue);if(v!==a.nodeValue)a.nodeValue=v;seen.set(a,a.nodeValue)}else if(a.nodeType===1)walk(a)})})})
+ .observe(dev,{subtree:true,childList:true,characterData:true});
+walk(dev);})();
+
+/* ---------- host app (the sales page) ---------- */
+dev.style.setProperty('--top',(CFG.top||0)+'px');
+document.getElementById('exit').addEventListener('click',()=>{try{parent.postMessage({type:'lune-exit'},location.origin)}catch(e){}});
+render();
+})();
+</script>
+
+</body></html>
