@@ -333,9 +333,9 @@ const CATS=[
 ];
 const CAT=Object.fromEntries(CATS.map(c=>[c.id,c]));
 // Lune category id (sales data) → SDK category; a few brands split by name.
-const CAFE=/starbucks|costa|tim hortons|caf[eé]|coffee|arabica|juan valdez|ya kun|zus|tealive|doutor|dunkin|pret|kaya|mugg|vida e|second cup|tullys|komeda|blue bottle|coffee bean/i;
-const FUEL=/^(shell|bp|esso|mobil|chevron|exxon|texaco|caltex|engen|sasol|adnoc|enoc|emarat|eppco|aldrees|sasco|petromin|woqod|bapco|ypf|axion|puma|copec|primax|terpel|ipiranga|petrobras|br mania|petronas|petro-canada|ultramar|eneos|idemitsu|cosmo|petron|totalenergies|total|chillout|wataniya|misr petroleum|caltex|speedway|7-eleven fuel)\b/i;
-const STREAM=/netflix|spotify|disney|showmax|shahid|osn|anghami|globoplay|hbo|max\b|prime video|apple tv|youtube|watch it|dazn|hulu|crunchyroll|paramount|starz|deezer|tidal|u-next|abema|viu|iflix|vidio|globo/i;
+const CAFE=/safia|starbucks|costa|tim hortons|caf[eé]|coffee|arabica|juan valdez|ya kun|zus|tealive|doutor|dunkin|pret|kaya|mugg|vida e|second cup|tullys|komeda|blue bottle|coffee bean/i;
+const FUEL=/^(uzbekneftegaz|saneg|shell|bp|esso|mobil|chevron|exxon|texaco|caltex|engen|sasol|adnoc|enoc|emarat|eppco|aldrees|sasco|petromin|woqod|bapco|ypf|axion|puma|copec|primax|terpel|ipiranga|petrobras|br mania|petronas|petro-canada|ultramar|eneos|idemitsu|cosmo|petron|totalenergies|total|chillout|wataniya|misr petroleum|caltex|speedway|7-eleven fuel)\b/i;
+const STREAM=/kinopoisk|yandex plus|netflix|spotify|disney|showmax|shahid|osn|anghami|globoplay|hbo|max\b|prime video|apple tv|youtube|watch it|dazn|hulu|crunchyroll|paramount|starz|deezer|tidal|u-next|abema|viu|iflix|vidio|globo/i;
 const CATMAP={6:'groc',10:'dine',11:'shop',14:'trans',9:'bills',15:'travel',7:'health',4:'ent',1:'fin',3:'edu',16:'loans',17:'ins',5:'gov',18:'subs',19:'other'};
 const catFor=(n,cid)=>{const c=CATMAP[cid]||'other';if(c==='dine'&&CAFE.test(n))return'cafe';if(c==='trans'&&FUEL.test(n))return'fuel';if(c==='ent'&&STREAM.test(n))return'subs';return c};
 
