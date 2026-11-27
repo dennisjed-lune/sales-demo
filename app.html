@@ -761,6 +761,22 @@ document.addEventListener('change',e=>{if(e.target.id==='rl'&&e.target.files&&e.
 (function(){let y0=null;sheet.addEventListener('pointerdown',e=>{if(e.target.closest('.grab,.shead')&&!e.target.closest('button'))y0=e.clientY});
   sheet.addEventListener('pointerup',e=>{if(y0!=null&&e.clientY-y0>60)closeSheet();y0=null});})();
 
+/* ---------- translation engine (shared by every language) ---------- */
+function runI18n(L,X,RX,dmy){
+const cats=Object.keys(X).filter(k=>CATS.some(c=>c.n===k));
+function tr(t){const s=t.trim();if(!s)return t;if(X[s])return t.replace(s,X[s]);
+  for(const[r,f]of RX){const m=s.match(r);if(m){const v=f(...m);if(v!=null)return t.replace(s,v)}}
+  // "Category · 27 Jun" rows and bare dates
+  let o=s;cats.forEach(k=>{if(o.startsWith(k+' · '))o=X[k]+o.slice(k.length)});o=dmy(o);
+  return o===s?t:t.replace(s,o)}
+window.__tr=tr;
+const seen=new WeakMap();
+function walk(root){const it=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=it.nextNode())){if(seen.get(n)===n.nodeValue)continue;const v=tr(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v;seen.set(n,n.nodeValue)}
+  root.querySelectorAll&&root.querySelectorAll('[placeholder]').forEach(e=>{const p=e.getAttribute('placeholder');const v=tr(p);if(v!==p)e.setAttribute('placeholder',v)})}
+document.documentElement.lang=L;
+new MutationObserver(ms=>{ms.forEach(m=>{if(m.type==='characterData'){const n=m.target;if(seen.get(n)!==n.nodeValue){const v=tr(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v;seen.set(n,n.nodeValue)}}else m.addedNodes.forEach(a=>{if(a.nodeType===3){const v=tr(a.nodeValue);if(v!==a.nodeValue)a.nodeValue=v;seen.set(a,a.nodeValue)}else if(a.nodeType===1)walk(a)})})})
+ .observe(dev,{subtree:true,childList:true,characterData:true});
+walk(dev);}
 /* ---------- language: Spanish / Portuguese for the LatAm markets ---------- */
 (function(){const L=CFG.lang;if(L!=='es'&&L!=='pt')return;const es=L==='es';
 const X=es?{
@@ -833,7 +849,7 @@ const RX=[
  [/^(Spent|Total spend) in (.+)$/,(_,w,a)=>`${XC(w)} ${es?'en':'em'} ${dmy(a).toLowerCase()}`],
  [/^Spending on (\d{1,2} \w{3} \d{4})$/,(_,a)=>`${es?'Gasto el':'Gasto em'} ${dmy(a)}`],
  [/^Spending on (.+)$/,(_,a)=>`${es?'Gasto en':'Gasto em'} ${XC(a)}`],
- [/^(.+?) · (\d+) of (\d+) categories$/,(_,h,n,m)=>`${tr(h)} · ${n} ${es?'de':'de'} ${m} ${W.cats}`],
+ [/^(.+?) · (\d+) of (\d+) categories$/,(_,h,n,m)=>`${window.__tr(h)} · ${n} ${es?'de':'de'} ${m} ${W.cats}`],
  [/^(\d+) smaller categories$/,(_,n)=>`${n} ${es?'categorías menores':'categorias menores'}`],
  [/^Average (.+) a month$/,(_,a)=>`${W.avg} ${a} ${W.amonth}`],
  [/^Average (.+)$/,(_,a)=>`${W.avg} ${a}`],
@@ -864,19 +880,88 @@ const RX=[
  [/^Salary day set to the (\d+)(?:st|nd|rd|th)(\. Your month starts on that day\.)?$/,(_,n,m)=>(es?`Día de sueldo: ${n}`:`Dia do salário: ${n}`)+(m?(es?'. Tu mes empieza ese día.':'. Seu mês começa nesse dia.'):'')],
  [/^Load more · (\d+) left$/,(_,n)=>es?`Cargar más · quedan ${n}`:`Carregar mais · faltam ${n}`],
 ];
-const cats=Object.keys(X).filter(k=>CATS.some(c=>c.n===k));
-function tr(t){const s=t.trim();if(!s)return t;if(X[s])return t.replace(s,X[s]);
-  for(const[r,f]of RX){const m=s.match(r);if(m){const v=f(...m);if(v!=null)return t.replace(s,v)}}
-  // "Category · 27 Jun" rows and bare dates
-  let o=s;cats.forEach(k=>{if(o.startsWith(k+' · '))o=X[k]+o.slice(k.length)});o=dmy(o);
-  return o===s?t:t.replace(s,o)}
-const seen=new WeakMap();
-function walk(root){const it=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=it.nextNode())){if(seen.get(n)===n.nodeValue)continue;const v=tr(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v;seen.set(n,n.nodeValue)}
-  root.querySelectorAll&&root.querySelectorAll('[placeholder]').forEach(e=>{const p=e.getAttribute('placeholder');const v=tr(p);if(v!==p)e.setAttribute('placeholder',v)})}
-document.documentElement.lang=L;
-new MutationObserver(ms=>{ms.forEach(m=>{if(m.type==='characterData'){const n=m.target;if(seen.get(n)!==n.nodeValue){const v=tr(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v;seen.set(n,n.nodeValue)}}else m.addedNodes.forEach(a=>{if(a.nodeType===3){const v=tr(a.nodeValue);if(v!==a.nodeValue)a.nodeValue=v;seen.set(a,a.nodeValue)}else if(a.nodeType===1)walk(a)})})})
- .observe(dev,{subtree:true,childList:true,characterData:true});
-walk(dev);})();
+runI18n(L,X,RX,dmy);})();
+
+/* ---------- language: Russian for Uzbekistan ---------- */
+(function(){const L=CFG.lang;if(L!=='ru')return;
+const X={
+ 'Tashkent, Uzbekistan':'Ташкент, Узбекистан','Expenses':'Расходы','Your bank':'Ваш банк','Lune SDK below':'Ниже — Lune SDK','Where it went':'На что ушли деньги','Categories':'Категории','Brands':'Бренды',
+ 'Tap a category to see its brands.':'Нажмите на категорию, чтобы увидеть бренды.','Others':'Другие','Other brands':'Другие бренды','Spent':'Потрачено','Spend':'Расходы','Spending':'Расходы',
+ 'Bank content slot':'Место для контента банка','The bank can show its own view here, for example card offers. It is optional.':'Здесь банк может показать свой контент, например предложения по картам. Это необязательно.',
+ 'Transactions':'Транзакции','Transaction':'Транзакция','View all':'Все','View all brands':'Все бренды','Transfers between your own accounts are not counted as spend.':'Переводы между вашими счетами не считаются расходами.',
+ 'This month':'Этот месяц','Last month':'Прошлый месяц','Last 3 months':'Последние 3 месяца','Last 6 months':'Последние 6 месяцев','This period':'Этот период','Previous period':'Предыдущий период','Today':'Сегодня',
+ 'Category':'Категория','Card':'Карта','Location':'Место','Raw transaction':'Исходная запись','Raw transaction:':'Исходная запись:','Tags':'Теги','Notes':'Заметки','Tap to add notes':'Нажмите, чтобы добавить заметку',
+ 'No changes to save':'Нет изменений','Save changes':'Сохранить изменения','Save':'Сохранить','Saved':'Сохранено','Report a problem':'Сообщить о проблеме','Work':'Работа','Family':'Семья','Trip':'Поездка','Shared':'Общие','Gift':'Подарок',
+ 'Pending':'На проверке','Updated':'Обновлено','Report closed':'Обращение закрыто','Report cancelled':'Обращение отменено','Report sent. We will update you here.':'Обращение отправлено. Мы сообщим вам здесь.','Cancel report':'Отменить обращение',
+ 'What is wrong with this transaction?':'Что не так с этой транзакцией?','Wrong brand name':'Неверное название бренда','Wrong category':'Неверная категория','Wrong logo':'Неверный логотип','I do not recognise this':'Я не узнаю эту операцию','Everything looks right':'Всё верно',
+ 'Correct brand name':'Правильное название бренда','Brand name':'Название бренда','Send report':'Отправить','Submit suggestion':'Отправить предложение','Submit category':'Отправить категорию','Submit logo':'Отправить логотип','Add the correct logo':'Добавьте правильный логотип','PNG or JPG, square works best':'PNG или JPG, лучше квадратный',
+ 'We send this to your bank to check. If you think someone used your card, block it in the bank app first.':'Мы передадим это в банк для проверки. Если вы думаете, что вашей картой воспользовался кто-то другой, сначала заблокируйте её в приложении банка.',
+ 'Change category':'Изменить категорию','Suggested category':'Предлагаемая категория','Selected':'Выбрано','Only this transaction changes. Tap Save to keep it. Your bank uses your choice to improve categories.':'Изменится только эта транзакция. Нажмите «Сохранить». Банк использует ваш выбор, чтобы улучшать категории.',
+ 'Filters':'Фильтры','Filters applied':'Фильтры применены','Apply':'Применить','Reset':'Сбросить','Clear filters':'Сбросить фильтры','Reported only':'Только с обращениями','No results':'Ничего не найдено','Try another search, or clear filters.':'Измените запрос или сбросьте фильтры.',
+ 'No brands match':'Бренды не найдены','No categories match':'Категории не найдены','No transactions':'Нет транзакций','No transactions in this period':'Нет транзакций за этот период','No transactions in this month':'Нет транзакций в этом месяце','No reported transactions in this period':'Нет обращений за этот период',
+ 'Turn off Reported only to see all transactions.':'Отключите «Только с обращениями», чтобы увидеть все транзакции.','There are no transactions in this period.':'За этот период транзакций нет.','No spend':'Нет расходов','No spend in this month':'Нет расходов в этом месяце','You have no spending in this period. Choose another period.':'За этот период расходов нет. Выберите другой период.',
+ 'Spend categories':'Категории расходов','Top brands':'Основные бренды','Top categories':'Основные категории','Total spend':'Всего потрачено','Category trends':'Динамика по категориям','Brand trends':'Динамика по брендам','By day':'По дням','By month':'По месяцам','Spend by month':'Расходы по месяцам','Spend per day.':'Расходы по дням.',
+ 'Tap a month to open it':'Нажмите на месяц, чтобы открыть его','Tap a day to see its brands':'Нажмите на день, чтобы увидеть бренды','Tap the day again to see all days':'Нажмите ещё раз, чтобы показать все дни','Amount':'Сумма','Date':'Дата','Name':'Название','Logo':'Логотип',
+ 'Choose dates':'Выберите даты','Choose':'Выбрать','Start date':'Начало','End date':'Конец','Choose a start date':'Выберите дату начала','Tap the start date':'Нажмите на дату начала',
+ 'My month starts on':'Мой месяц начинается','Day 1 (calendar month)':'1-го числа (календарный месяц)','Salary day':'День зарплаты','My salary arrives on':'Зарплата приходит','Start my month on my salary day':'Начинать месяц в день зарплаты','Cashflow and Expenses both use this day.':'Этот день используют и Cashflow, и Расходы.',
+ 'The dashed day is the one we found. In short months we use the last day.':'Пунктиром отмечен найденный день. В коротких месяцах берём последний день.','Your employer':'Ваш работодатель',
+ 'Filter':'Фильтр','Trends':'Динамика','Change':'Изменить','Report transaction':'Сообщить о проблеме','Tap to choose another image':'Нажмите, чтобы выбрать другое изображение','Search brand or category':'Поиск бренда или категории','Search categories':'Поиск категорий',
+ 'Groceries':'Продукты','Dining':'Рестораны','Cafés':'Кафе','Shopping':'Покупки','Transport':'Транспорт','Fuel':'Топливо','Bills and utilities':'Счета и коммунальные услуги','Subscriptions':'Подписки','Health and fitness':'Здоровье и спорт',
+ 'Entertainment':'Развлечения','Travel':'Путешествия','Education':'Образование','Financial services':'Финансовые услуги','Loans':'Кредиты','Insurance':'Страхование','Government services':'Госуслуги','Other':'Другое',
+};
+// 1 транзакция, 2 транзакции, 5 транзакций
+const pl=(n,f)=>{n=Math.abs(+n)%100;const d=n%10;return n>10&&n<20?f[2]:d===1?f[0]:d>=2&&d<=4?f[1]:f[2]};
+const TXW=['транзакция','транзакции','транзакций'],CATW=['категория','категории','категорий'],BRW=['бренд','бренда','брендов'],DAYW=['день','дня','дней'],MONW=['месяц','месяца','месяцев'];
+const MF=['January','February','March','April','May','June','July','August','September','October','November','December'],MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MN=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const MP=['январе','феврале','марте','апреле','мае','июне','июле','августе','сентябре','октябре','ноябре','декабре'];
+const MSR=['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+const WD={Mon:'Пн',Tue:'Вт',Wed:'Ср',Thu:'Чт',Fri:'Пт',Sat:'Сб',Sun:'Вс'};
+const dmy=t=>t.replace(/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b(?=,? \d)/g,w=>WD[w]).replace(/\b(\d{1,2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/g,(_,d,m)=>`${d} ${MSR[MS.indexOf(m)]}`)
+  .replace(/\b(January|February|March|April|May|June|July|August|September|October|November|December)\b/g,m=>MN[MF.indexOf(m)])
+  .replace(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$/,m=>MN[MS.indexOf(m)]);
+const XC=w=>X[w]||w;
+const PW=w=>w==='last month by today'?'в прошлом месяце к этой дате':w==='last period by today'?'в прошлом периоде к этой дате':w==='your 6-month average'?'в среднем за 6 месяцев':w==='your average'?'в среднем':w.replace(/^the (\d+) days before$/,(_,n)=>`за предыдущие ${n} ${pl(n,DAYW)}`);
+const inMonth=a=>{const m=a.match(/^(January|February|March|April|May|June|July|August|September|October|November|December)( \d{4})?$/);return m?`в ${MP[MF.indexOf(m[1])]}${m[2]?m[2]+' г.':''}`:`за ${dmy(a)}`};
+const RX=[
+ [/^(Spent|Total spend|Spending) so far · (.+) to (.+)$/,(_,w,a,b)=>`${XC(w)} на сегодня · ${dmy(a)} – ${dmy(b)}`],
+ [/^Spent from (.+) to (.+) · (\d+) days?$/,(_,a,b,n)=>`Потрачено с ${dmy(a)} по ${dmy(b)} · ${n} ${pl(n,DAYW)}`],
+ [/^Spent in the last (\d+) months$/,(_,n)=>`Потрачено за последние ${n} ${pl(n,MONW)}`],
+ [/^(Spent|Total spend) in (.+)$/,(_,w,a)=>`${XC(w)} ${inMonth(a)}`],
+ [/^Spending on (\d{1,2} \w{3} \d{4})$/,(_,a)=>`Расходы ${dmy(a)}`],
+ [/^Spending on (.+)$/,(_,a)=>`Расходы: ${XC(a)}`],
+ [/^(.+?) · (\d+) of (\d+) categories$/,(_,h,n,m)=>`${window.__tr(h)} · ${n} из ${m} ${pl(m,CATW)}`],
+ [/^(\d+) smaller categories$/,(_,n)=>`${n} ${pl(n,['небольшая категория','небольшие категории','небольших категорий'])}`],
+ [/^Average (.+) a month$/,(_,a)=>`В среднем ${a} в месяц`],
+ [/^Average (.+)$/,(_,a)=>`В среднем ${a}`],
+ [/^(.+) more than (.+)$/,(_,a,w)=>`На ${a} больше, чем ${PW(w)}`],
+ [/^(.+) less than (.+)$/,(_,a,w)=>`На ${a} меньше, чем ${PW(w)}`],
+ [/^About the same as (.+)$/,(_,w)=>`Примерно как ${PW(w)}`],
+ [/^(\d+)% (above|below) (.+)$/,(_,n,d,w)=>`На ${n}% ${d==='above'?'выше':'ниже'}, чем ${PW(w)}`],
+ [/^(\d+) transactions?$/,(_,n)=>`${n} ${pl(n,TXW)}`],
+ [/^(\d+) brands?$/,(_,n)=>`${n} ${pl(n,BRW)}`],
+ [/^(<?\d+)% of spend$/,(_,n)=>`${n}% расходов`],
+ [/^(<?\d+)% of (.+)$/,(_,n,c)=>`${n}% от «${XC(c)}»`],
+ [/^(\d+) more categor(y|ies)$/,(_,n)=>`Ещё ${n} ${pl(n,CATW)}`],
+ [/^(\d+) more brands?$/,(_,n)=>`Ещё ${n} ${pl(n,BRW)}`],
+ [/^View all (\d+) (categories|brands)$/,(_,n,k)=>`Все ${k==='categories'?'категории':'бренды'} (${n})`],
+ [/^See all (\d+) transactions$/,(_,n)=>`Все транзакции (${n})`],
+ [/^See all (\d+) (.+) transactions$/,(_,n,c)=>`Все транзакции «${XC(c)}» (${n})`],
+ [/^See the (.+) transaction$/,(_,c)=>`Транзакция «${XC(c)}»`],
+ [/^(.+) brands$/,(_,c)=>X[c]?`Бренды: ${X[c]}`:null],
+ [/^(.+) cashback earned$/,(_,a)=>`Кешбэк ${a}`],
+ [/^(.+) cashback$/,(_,a)=>`Кешбэк ${a}`],
+ [/^Updated by your bank: (.+)$/,(_,a)=>`Банк обновил: ${XC(a)}`],
+ [/^Pending review: (.+)$/,(_,a)=>`На проверке: ${XC(a)}`],
+ [/^Report closed: (.+)$/,(_,a)=>`Обращение закрыто: ${XC(a)}`],
+ [/^(.+) · sent to your bank$/,(_,a)=>`${XC(a)} · отправлено в банк`],
+ [/^Day (\d+) · salary day$/,(_,n)=>`${n}-е число · день зарплаты`],
+ [/^We found your salary around the (\d+)(?:st|nd|rd|th)(\. Start your month on that day so money in and out line up\.)?$/,(_,n,more)=>`Мы нашли вашу зарплату около ${n}-го числа`+(more?'. Начните месяц в этот день, чтобы доходы и расходы совпадали.':'')],
+ [/^(.+) paid you on or near this day in (\d+) of the last 6 months\. If this is wrong, choose the right day\.$/,(_,a,n)=>`${XC(a)} платил вам в этот день или рядом с ним в ${n} из последних 6 месяцев. Если это не так, выберите правильный день.`],
+ [/^Salary day set to the (\d+)(?:st|nd|rd|th)(\. Your month starts on that day\.)?$/,(_,n,m)=>`День зарплаты: ${n}-е число`+(m?'. Ваш месяц начинается в этот день.':'')],
+ [/^Load more · (\d+) left$/,(_,n)=>`Показать ещё · осталось ${n}`],
+];
+runI18n(L,X,RX,dmy);})();
 
 /* ---------- host app (the sales page) ---------- */
 dev.style.setProperty('--top',(CFG.top||0)+'px');

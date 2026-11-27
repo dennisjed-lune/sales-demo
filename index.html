@@ -676,7 +676,7 @@
     sg: { name: 'Singapore',   flag: '🇸🇬', code: 'SGD', symbol: 'S$', rate: 0.37, dec: 2, catalog: CATALOG_SG },
     za: { name: 'South Africa', flag: '🇿🇦', code: 'ZAR', symbol: 'R',  rate: 5,    dec: 2, catalog: CATALOG_ZA },
     eg: { name: 'Egypt',        flag: '🇪🇬', code: 'EGP', symbol: 'E£', rate: 13.2, dec: 2, catalog: CATALOG_EG },
-    uz: { name: 'Uzbekistan',   flag: '🇺🇿', code: 'UZS', symbol: 'UZS', rate: 3460, dec: 0, catalog: CATALOG_UZ },
+    uz: { name: 'Uzbekistan',   flag: '🇺🇿', code: 'UZS', symbol: 'UZS', rate: 3460, dec: 0, lang: 'ru', catalog: CATALOG_UZ },
     us: { name: 'United States', flag: '🇺🇸', code: 'USD', symbol: '$',  rate: 0.272, dec: 2, catalog: CATALOG_US },
     ca: { name: 'Canada',       flag: '🇨🇦', code: 'CAD', symbol: 'C$', rate: 0.368, dec: 2, catalog: CATALOG_CA },
     ar: { name: 'Argentina',    flag: '🇦🇷', code: 'ARS', symbol: '$',  rate: 300,  dec: 0, lang: 'es', catalog: CATALOG_AR },
@@ -2292,48 +2292,6 @@ function pickBrandColor(hexes) {
   return ok[0] || null;
 }
 
-// ── Light i18n: Spanish for the LatAm regions. tr() = chrome strings,
-// trCat() = category names. Everything else stays English. ──────────────────
-const ES_UI = {
-  'Spends': 'Gastos', 'Top brands': 'Marcas principales', 'All categories': 'Todas las categorías',
-  'Recent': 'Recientes', 'View all': 'Ver todo', 'Total spent': 'Total gastado',
-  'vs last period': 'vs período anterior', 'Transactions': 'Transacciones',
-  'All cards': 'Todas las tarjetas', 'Debit card': 'Tarjeta de débito', 'Credit card': 'Tarjeta de crédito', 'Savings account': 'Cuenta de ahorros',
-  'Category trends': 'Tendencias por categoría', 'Spending over time': 'Gastos en el tiempo',
-  'Brand trends': 'Tendencias de marca', 'Brands in': 'Marcas en', 'All brands': 'Todas las marcas',
-  'By category, then brand': 'Por categoría, luego marca', 'Month by month · last 12 months': 'Mes a mes · últimos 12 meses',
-  'Aggregated across every account': 'Agregado de todas las cuentas', 'Everyday spending': 'Gastos diarios',
-  'Travel, shopping & subscriptions': 'Viajes, compras y suscripciones', 'Bills, loans & standing orders': 'Facturas, préstamos y débitos automáticos',
-  'Card type': 'Tipo de tarjeta',
-};
-const ES_CAT = {
-  'Groceries': 'Supermercado', 'Dining': 'Restaurantes', 'Shopping': 'Compras', 'Transportation': 'Transporte',
-  'Household': 'Hogar', 'Travel': 'Viajes', 'Wellness': 'Bienestar', 'Entertainment': 'Entretenimiento',
-  'Financial Services': 'Servicios financieros', 'Student': 'Educación', 'Loans': 'Préstamos', 'Insurance': 'Seguros',
-  'Government Services': 'Servicios públicos', 'Services': 'Servicios', 'Miscellaneous': 'Varios', 'Other': 'Otros',
-};
-const PT_UI = {
-  'Spends': 'Gastos', 'Top brands': 'Principais marcas', 'All categories': 'Todas as categorias',
-  'Recent': 'Recentes', 'View all': 'Ver tudo', 'Total spent': 'Total gasto',
-  'vs last period': 'vs período anterior', 'Transactions': 'Transações',
-  'All cards': 'Todos os cartões', 'Debit card': 'Cartão de débito', 'Credit card': 'Cartão de crédito', 'Savings account': 'Conta poupança',
-  'Category trends': 'Tendências por categoria', 'Spending over time': 'Gastos ao longo do tempo',
-  'Brand trends': 'Tendências de marca', 'Brands in': 'Marcas em', 'All brands': 'Todas as marcas',
-  'By category, then brand': 'Por categoria, depois marca', 'Month by month · last 12 months': 'Mês a mês · últimos 12 meses',
-  'Aggregated across every account': 'Agregado de todas as contas', 'Everyday spending': 'Gastos do dia a dia',
-  'Travel, shopping & subscriptions': 'Viagens, compras e assinaturas', 'Bills, loans & standing orders': 'Contas, empréstimos e débitos automáticos',
-  'Card type': 'Tipo de cartão',
-};
-const PT_CAT = {
-  'Groceries': 'Supermercado', 'Dining': 'Restaurantes', 'Shopping': 'Compras', 'Transportation': 'Transporte',
-  'Household': 'Casa', 'Travel': 'Viagens', 'Wellness': 'Bem-estar', 'Entertainment': 'Entretenimento',
-  'Financial Services': 'Serviços financeiros', 'Student': 'Educação', 'Loans': 'Empréstimos', 'Insurance': 'Seguros',
-  'Government Services': 'Serviços públicos', 'Services': 'Serviços', 'Miscellaneous': 'Diversos', 'Other': 'Outros',
-};
-const I18N = { es: { ui: ES_UI, cat: ES_CAT }, pt: { ui: PT_UI, cat: PT_CAT } };
-function i18nDict() { return I18N[(window.CURRENT_REGION && window.CURRENT_REGION.lang) || 'en'] || null; }
-function tr(s) { const d = i18nDict(); return d && d.ui[s] ? d.ui[s] : s; }
-function trCat(n) { const d = i18nDict(); return d && d.cat[n] ? d.cat[n] : n; }
 function loadImg(url) {
   return new Promise((res) => {
     const i = new Image();
@@ -2539,7 +2497,7 @@ function RegionPicker({ T, open, onClose, onPick }) {
             {row('jp', '🇯🇵', 'Japan', '日本のブランド · JPY ¥', () => toBank('jp'))}
             {row('my', '🇲🇾', 'Malaysia', 'Malaysian brands · MYR RM', () => toBank('my'))}
             {row('sg', '🇸🇬', 'Singapore', 'Singaporean brands · SGD S$', () => toBank('sg'))}
-            {row('uz', '🇺🇿', 'Uzbekistan', 'Uzbek banks & brands · UZS', () => toBank('uz'))}
+            {row('uz', '🇺🇿', 'Uzbekistan', 'Банки и бренды Узбекистана · UZS', () => toBank('uz'))}
           </React.Fragment>
         )}
         {step === 'africa' && (
@@ -2898,7 +2856,7 @@ function ExpensesApp() {
   };
   const appFrame = () => {
     appCfg();
-    return <iframe key={[region, bankBrand ? bankBrand.name : '', t.dark, desktop].join('|')} src="app.html?v=4" title="Expenses in your bank app"
+    return <iframe key={[region, bankBrand ? bankBrand.name : '', t.dark, desktop].join('|')} src="app.html?v=5" title="Expenses in your bank app"
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0, display: 'block', background: t.dark ? '#0e1013' : '#f4f6f8' }} />;
   };
   // Mobile PFM portal is a fixed full-screen page — freeze the landing behind it.
